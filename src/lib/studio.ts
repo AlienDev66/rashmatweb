@@ -4,6 +4,7 @@ import type {
   StudioProgram,
   StudioSession,
 } from "./database";
+import { getPublishReadiness } from "./publishGate";
 import { isSupabaseConfigured, supabase } from "./supabase";
 import {
   buildSessionPlan,
@@ -163,6 +164,17 @@ export async function updateProgram(
 }
 
 export async function publishProgram(programId: string, published: boolean) {
+  if (published) {
+    const { program } = await fetchProgram(programId);
+    if (!program) return { error: "Program not found" };
+    const gate = await getPublishReadiness(program);
+    if (!gate.ready) {
+      const missing = gate.checks.filter((c) => !c.ok).map((c) => c.label);
+      return {
+        error: `Not ready to publish: ${missing.join("; ")}`,
+      };
+    }
+  }
   return updateProgram(programId, { status: published ? "published" : "draft" });
 }
 
@@ -278,6 +290,7 @@ export async function updateSession(
     day: number;
     minutes: number;
     mux_playback_id: string | null;
+    video_url: string | null;
   }>,
 ) {
   if (!isSupabaseConfigured) return { error: "Supabase not configured" };
@@ -369,6 +382,7 @@ export async function createExercise(opts: {
   sortOrder?: number;
   restSeconds?: number;
   muxPlaybackId?: string | null;
+  videoUrl?: string | null;
 }) {
   if (!isSupabaseConfigured) return { error: "Supabase not configured", exercise: null };
   const id = `ex-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -382,7 +396,7 @@ export async function createExercise(opts: {
       sort_order: opts.sortOrder ?? 0,
       rest_seconds: opts.restSeconds ?? 60,
       mux_playback_id: opts.muxPlaybackId ?? null,
-      video_url: null,
+      video_url: opts.videoUrl ?? null,
       thumbnail_url: DEFAULT_COVER.replace("w=1200", "w=800"),
     })
     .select("*")
@@ -416,6 +430,7 @@ export async function updateExercise(
     sort_order: number;
     rest_seconds: number;
     mux_playback_id: string | null;
+    video_url: string | null;
   }>,
 ) {
   if (!isSupabaseConfigured) return { error: "Supabase not configured" };
