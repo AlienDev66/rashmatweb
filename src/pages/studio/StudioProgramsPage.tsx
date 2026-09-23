@@ -8,6 +8,7 @@ import {
   fetchMyPrograms,
   publishProgram,
 } from "../../lib/studio";
+import { getPublishReadiness } from "../../lib/publishGate";
 
 export function StudioProgramsPage() {
   const { user, profile } = useAuth();
@@ -59,8 +60,16 @@ export function StudioProgramsPage() {
   };
 
   const onToggle = async (p: StudioProgram) => {
-    setBusyId(p.id);
     const next = p.status !== "published";
+    if (next) {
+      const readiness = await getPublishReadiness(p);
+      if (!readiness.ready) {
+        const missing = readiness.checks.filter((c) => !c.ok).map((c) => c.label);
+        window.alert(`Finish publish checklist first:\n• ${missing.join("\n• ")}`);
+        return;
+      }
+    }
+    setBusyId(p.id);
     const { error } = await publishProgram(p.id, next);
     setBusyId(null);
     if (error) {
