@@ -64,8 +64,13 @@ export async function getPublishReadiness(program: StudioProgram): Promise<Publi
   const sessionRows = sessions ?? [];
   let drillsWithVideo = 0;
   let totalDrills = 0;
+  let sessionsWithVideo = 0;
 
   for (const s of sessionRows) {
+    if (hasVideo({ mux: s.mux_playback_id, url: s.video_url })) {
+      sessionsWithVideo += 1;
+    }
+
     const { data: exercises } = await supabase
       .from("exercises")
       .select("id, mux_playback_id, video_url")
@@ -76,11 +81,11 @@ export async function getPublishReadiness(program: StudioProgram): Promise<Publi
     for (const ex of list) {
       if (hasVideo({ mux: ex.mux_playback_id, url: ex.video_url })) drillsWithVideo += 1;
     }
-    if (hasVideo({ mux: s.mux_playback_id, url: s.video_url }) && list.length === 0) {
-      drillsWithVideo += 1;
-      totalDrills += 1;
-    }
   }
+
+  const allDrillsHaveVideo = totalDrills > 0 && drillsWithVideo === totalDrills;
+  const allSessionsHaveVideo =
+    sessionRows.length > 0 && sessionsWithVideo === sessionRows.length;
 
   const checks: PublishCheck[] = [
     {
@@ -102,10 +107,16 @@ export async function getPublishReadiness(program: StudioProgram): Promise<Publi
       hint: "Add drills to a session (or quick-add starter block).",
     },
     {
-      id: "video",
-      label: "At least 1 drill/session with video",
-      ok: drillsWithVideo >= 1,
-                  hint: "Upload an MP4 to Storage (or add Mux later).",
+      id: "session_videos",
+      label: "Every session has a video",
+      ok: allSessionsHaveVideo,
+      hint: "Upload an MP4 to Storage for each session (or add Mux later).",
+    },
+    {
+      id: "drill_videos",
+      label: "Every drill has a video",
+      ok: allDrillsHaveVideo,
+      hint: "Upload an MP4 for each drill before publishing.",
     },
   ];
 

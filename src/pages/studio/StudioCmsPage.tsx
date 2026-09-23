@@ -19,6 +19,7 @@ import {
   updateSession,
 } from "../../lib/studio";
 import { VideoUploader } from "../../components/VideoUploader";
+import { getPublishReadiness } from "../../lib/publishGate";
 import { DRILL_QUICK_ADDS } from "../../lib/templates";
 
 export function StudioCmsPage() {
@@ -333,6 +334,14 @@ export function StudioCmsPage() {
   const onTogglePublish = async () => {
     if (!selectedProgram) return;
     const next = selectedProgram.status !== "published";
+    if (next) {
+      const readiness = await getPublishReadiness(selectedProgram);
+      if (!readiness.ready) {
+        const missing = readiness.checks.filter((c) => !c.ok).map((c) => c.label);
+        flash(`Finish checklist: ${missing.join(" · ")}`);
+        return;
+      }
+    }
     setBusy(true);
     const { error } = await publishProgram(selectedProgram.id, next);
     setBusy(false);
@@ -602,22 +611,40 @@ export function StudioCmsPage() {
                             )
                           }
                         />
-                        <input
-                          placeholder="Video URL or Mux ID"
-                          value={ex.video_url || ex.mux_playback_id || ""}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            setExercises((prev) =>
-                              prev.map((x) =>
-                                x.id === ex.id
-                                  ? /^https?:\/\//i.test(v)
-                                    ? { ...x, video_url: v || null, mux_playback_id: null }
-                                    : { ...x, mux_playback_id: v || null, video_url: null }
-                                  : x,
-                              ),
-                            );
-                          }}
-                        />
+                        <div className="span-2">
+                          <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
+                            Drill video
+                          </p>
+                          <VideoUploader
+                            value={{
+                              muxPlaybackId: ex.mux_playback_id ?? "",
+                              videoUrl: ex.video_url ?? "",
+                            }}
+                            onChange={(next) => {
+                              setExercises((prev) =>
+                                prev.map((x) =>
+                                  x.id === ex.id
+                                    ? {
+                                        ...x,
+                                        video_url: next.videoUrl.trim() || null,
+                                        mux_playback_id: next.muxPlaybackId.trim() || null,
+                                      }
+                                    : x,
+                                ),
+                              );
+                              if (next.videoUrl) {
+                                void updateExercise(ex.id, {
+                                  video_url: next.videoUrl.trim() || null,
+                                  mux_playback_id: next.muxPlaybackId.trim() || null,
+                                }).then(({ error }) => {
+                                  if (error) flash(error);
+                                  else flash("Drill video saved");
+                                });
+                              }
+                            }}
+                            disabled={busy}
+                          />
+                        </div>
                         <div className="studio-actions">
                           <button
                             type="button"
