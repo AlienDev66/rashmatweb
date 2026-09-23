@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth";
+import { ProgramSharePage } from "./pages/ProgramSharePage";
 import { LandingPage } from "./pages/LandingPage";
 import { StudioCmsPage } from "./pages/studio/StudioCmsPage";
 import { StudioHomePage } from "./pages/studio/StudioHomePage";
@@ -25,6 +26,7 @@ createRoot(el).render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/p/:id" element={<ProgramSharePage />} />
           <Route path="/studio/login" element={<StudioLoginPage />} />
           <Route path="/studio" element={<StudioShell />}>
             <Route index element={<StudioHomePage />} />
