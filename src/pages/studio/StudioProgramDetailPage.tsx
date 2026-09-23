@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../auth";
+import { CoverUploader } from "../../components/CoverUploader";
 import type { StudioProgram, StudioSession } from "../../lib/database";
 import {
   deleteProgram,
@@ -13,7 +14,7 @@ import {
 
 export function StudioProgramDetailPage() {
   const { id = "" } = useParams();
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [program, setProgram] = useState<StudioProgram | null>(null);
   const [sessions, setSessions] = useState<StudioSession[]>([]);
@@ -89,6 +90,19 @@ export function StudioProgramDetailPage() {
   const flash = (t: string) => {
     setMessage(t);
     window.setTimeout(() => setMessage(null), 2400);
+  };
+
+  const onCoverUrl = async (url: string) => {
+    setCoverUrl(url);
+    setBusy(true);
+    const { error } = await updateProgram(program.id, { cover_url: url });
+    setBusy(false);
+    if (error) {
+      flash(error);
+      return;
+    }
+    setProgram({ ...program, cover_url: url });
+    flash("Cover uploaded");
   };
 
   const onSave = async (e: FormEvent) => {
@@ -190,6 +204,17 @@ export function StudioProgramDetailPage() {
             <h2>Details</h2>
           </div>
           <div className="studio-form studio-form--grid">
+            <div className="span-2">
+              {user ? (
+                <CoverUploader
+                  userId={user.id}
+                  programId={program.id}
+                  coverUrl={coverUrl}
+                  onCoverUrl={(url) => void onCoverUrl(url)}
+                  disabled={busy}
+                />
+              ) : null}
+            </div>
             <label className="span-2">
               Title
               <input value={title} onChange={(e) => setTitle(e.target.value)} required />
@@ -197,10 +222,6 @@ export function StudioProgramDetailPage() {
             <label className="span-2">
               Description
               <textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
-            </label>
-            <label className="span-2">
-              Cover URL
-              <input value={coverUrl} onChange={(e) => setCoverUrl(e.target.value)} />
             </label>
             <label>
               Weeks

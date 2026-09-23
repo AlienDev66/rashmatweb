@@ -130,6 +130,14 @@ export function StudioProgramsPage() {
         <ul className="studio-card-list">
           {filtered.map((p) => (
             <li key={p.id} className="studio-card">
+              <div
+                className="studio-card-cover"
+                style={
+                  p.cover_url
+                    ? { ["--cover" as string]: `url('${p.cover_url}')` }
+                    : undefined
+                }
+              />
               <div className="studio-card-main">
                 <Link to={`/studio/programs/${p.id}`} className="studio-card-title">
                   {p.title}

@@ -1,7 +1,9 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth";
-import { createProgram } from "../../lib/studio";
+import { CoverUploader } from "../../components/CoverUploader";
+import { uploadProgramCover } from "../../lib/cover";
+import { createProgram, updateProgram } from "../../lib/studio";
 import { PROGRAM_TEMPLATES, buildSessionPlan } from "../../lib/templates";
 
 export function StudioNewProgramPage() {
@@ -12,6 +14,8 @@ export function StudioNewProgramPage() {
 
   const [title, setTitle] = useState(template.name);
   const [description, setDescription] = useState("");
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [pendingCover, setPendingCover] = useState<File | null>(null);
   const [weeks, setWeeks] = useState(template.weeks);
   const [daysPerWeek, setDaysPerWeek] = useState(template.daysPerWeek);
   const [minutes, setMinutes] = useState(template.minutes);
@@ -66,11 +70,24 @@ export function StudioNewProgramPage() {
       autoSchedule,
       seedDrills: seedDrills && templateId !== "blank",
     });
-    setBusy(false);
     if (err || !program) {
+      setBusy(false);
       setError(err ?? "Could not create program");
       return;
     }
+
+    if (pendingCover) {
+      const { url, error: upErr } = await uploadProgramCover(user.id, program.id, pendingCover);
+      if (upErr || !url) {
+        setBusy(false);
+        setError(upErr ?? "Program created, but cover upload failed — add it on the next screen.");
+        navigate(`/studio/programs/${program.id}`, { replace: true });
+        return;
+      }
+      await updateProgram(program.id, { cover_url: url });
+    }
+
+    setBusy(false);
     navigate(`/studio/programs/${program.id}`, { replace: true });
   };
 
@@ -114,6 +131,17 @@ export function StudioNewProgramPage() {
             <h2>2 · Details</h2>
           </div>
           <div className="studio-form studio-form--grid">
+            <div className="span-2">
+              {user ? (
+                <CoverUploader
+                  userId={user.id}
+                  coverUrl={coverPreview}
+                  onCoverUrl={setCoverPreview}
+                  onPendingFile={setPendingCover}
+                  disabled={busy}
+                />
+              ) : null}
+            </div>
             <label className="span-2">
               Title
               <input value={title} onChange={(e) => setTitle(e.target.value)} required />

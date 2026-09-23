@@ -92,6 +92,41 @@ export function StudioLibraryPage() {
         </div>
       </section>
 
+      <section className="studio-panel" id="hotmart">
+        <div className="studio-panel-head">
+          <h2>Hotmart / course sellers → RASHMAT</h2>
+          <span className="studio-muted">Convert catalog owners</span>
+        </div>
+        <div className="playbook">
+          <p>
+            <strong>Wedge:</strong> they already sell videos (Hotmart, Eduzz, Kiwify, Teachable…).
+            Buyers binge and quit. RASHMAT turns the best course into a{" "}
+            <em>Week → Day → Session → Drill</em> camp with completion tracking.
+          </p>
+          <h3>Do not ask them to leave Hotmart first</h3>
+          <p className="studio-muted">
+            Phase 1 = companion training layer (checkout stays). Phase 2 = sell inside RASHMAT when
+            payments exist. Lead with completion and reputation, not “migrate your funnel.”
+          </p>
+          <h3>Map their course</h3>
+          <ul className="playbook-metrics">
+            <li>Product → Program</li>
+            <li>Module → Week (or group modules into weeks)</li>
+            <li>Lesson → Session (Day)</li>
+            <li>Technique clip → Drill</li>
+            <li>Course cover → Upload to Storage (mats, not gym stock)</li>
+          </ul>
+          <h3>Pitch</h3>
+          <p className="studio-muted">
+            “Keep selling on Hotmart. We turn your core system into a 4–6 week camp athletes finish —
+            you see who completes.”
+          </p>
+          <p className="studio-muted">
+            Full playbook + objections: <code>web/docs/HOTMART_CONVERSION.md</code>
+          </p>
+        </div>
+      </section>
+
       <section className="studio-panel">
         <div className="studio-panel-head">
           <h2>Program templates</h2>
