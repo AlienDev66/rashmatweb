@@ -9,7 +9,8 @@ export const brand = {
     handle: "@rashmatapp",
   },
   platformUrl: "https://app.rashmat.app",
-  studioUrl: "https://app.rashmat.app/studio",
+  /** Web Creator Studio (this package). */
+  studioUrl: "/studio",
 } as const;
 
 /** Full-bleed mats — Unsplash (reliable CDN params). */
