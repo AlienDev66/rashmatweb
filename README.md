@@ -39,7 +39,7 @@ Sidebar app with:
 - One-tap drill presets + full starter block
 - Reorder / duplicate last drill
 
-Mux **upload** still comes later — paste playback IDs for now.
+Mux **upload** is optional. Default: MP4 to Supabase Storage (`video_url`). Mux HLS can come later when budget allows.
 
 ### Product tour
 
