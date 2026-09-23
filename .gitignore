@@ -8,7 +8,8 @@ dist/
 .DS_Store
 *.local
 .env
-.env*.local
+.env.*
+!.env.example
 
 # logs
 npm-debug.*
