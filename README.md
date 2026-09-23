@@ -41,6 +41,17 @@ Sidebar app with:
 
 Mux **upload** still comes later — paste playback IDs for now.
 
+### Product tour
+
+First creator login starts a **Studio guide** (Next / Back / Skip) across Dashboard → Programs → Wizard → CMS → Students → Library → Settings. Replay from **Guide** in the sidebar, Library, or Settings.
+
+### Creator onboarding
+
+White-glove playbook for the first 5–10 grappling creators:
+
+- In-app: **Library → Creator onboarding playbook**
+- Repo: [`docs/CREATOR_ONBOARDING.md`](docs/CREATOR_ONBOARDING.md)
+
 ## Build
 
 ```bash
