@@ -1,6 +1,7 @@
 import { NavLink, Navigate, Outlet, Link } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { brand } from "../../brand";
+import { StudioTourOverlay, StudioTourProvider, useStudioTour } from "../../tour/StudioTour";
 
 const NAV = [
   { to: "/studio", end: true, label: "Dashboard", hint: "Overview" },
@@ -11,33 +12,18 @@ const NAV = [
   { to: "/studio/settings", end: false, label: "Settings", hint: "Account" },
 ] as const;
 
-export function StudioShell() {
-  const { ready, user, profile, signOut, configured } = useAuth();
+function TourHintButton() {
+  const { active, start } = useStudioTour();
+  if (active) return null;
+  return (
+    <button type="button" className="studio-tour-launch" onClick={start}>
+      Guide
+    </button>
+  );
+}
 
-  if (!ready) {
-    return (
-      <div className="studio-boot">
-        <p>Loading Studio…</p>
-      </div>
-    );
-  }
-
-  if (!configured) {
-    return (
-      <div className="studio-boot">
-        <h1>Studio</h1>
-        <p>
-          Copy <code>.env.example</code> → <code>.env</code> with your Supabase URL and anon key,
-          then restart <code>bun run dev</code>.
-        </p>
-        <Link to="/">← Back to site</Link>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/studio/login" replace />;
-  }
+function StudioChrome() {
+  const { user, profile, signOut } = useAuth();
 
   return (
     <div className="studio-app">
@@ -65,13 +51,14 @@ export function StudioShell() {
         </nav>
 
         <div className="studio-side-foot">
-          <p className="studio-side-user">{profile?.full_name || user.email}</p>
+          <p className="studio-side-user">{profile?.full_name || user?.email}</p>
           {profile?.is_creator ? (
             <p className="studio-side-meta">@{profile.creator_slug}</p>
           ) : (
             <p className="studio-side-meta">Creator mode off</p>
           )}
           <div className="studio-side-actions">
+            <TourHintButton />
             <Link to="/">Site</Link>
             <button type="button" onClick={() => void signOut()}>
               Sign out
@@ -83,6 +70,42 @@ export function StudioShell() {
       <div className="studio-body">
         <Outlet />
       </div>
+      <StudioTourOverlay />
     </div>
+  );
+}
+
+export function StudioShell() {
+  const { ready, user, profile, configured } = useAuth();
+
+  if (!ready) {
+    return (
+      <div className="studio-boot">
+        <p>Loading Studio…</p>
+      </div>
+    );
+  }
+
+  if (!configured) {
+    return (
+      <div className="studio-boot">
+        <h1>Studio</h1>
+        <p>
+          Copy <code>.env.example</code> → <code>.env</code> with your Supabase URL and anon key,
+          then restart <code>bun run dev</code>.
+        </p>
+        <Link to="/">← Back to site</Link>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/studio/login" replace />;
+  }
+
+  return (
+    <StudioTourProvider enabled={Boolean(profile?.is_creator)}>
+      <StudioChrome />
+    </StudioTourProvider>
   );
 }

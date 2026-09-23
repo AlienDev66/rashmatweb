@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { brand } from "../../brand";
 import { isSupabaseConfigured } from "../../lib/supabase";
+import { useStudioTour } from "../../tour/StudioTour";
 
 export function StudioSettingsPage() {
   const { user, profile, signOut } = useAuth();
+  const { start } = useStudioTour();
 
   return (
     <main className="studio-page studio-page--narrow">
@@ -45,6 +47,19 @@ export function StudioSettingsPage() {
 
       <section className="studio-panel">
         <div className="studio-panel-head">
+          <h2>Studio guide</h2>
+        </div>
+        <p className="studio-muted" style={{ marginBottom: "0.85rem" }}>
+          Replay the walkthrough (Next / Skip) when onboarding a new coach — Dashboard through
+          Settings.
+        </p>
+        <button type="button" className="studio-btn studio-btn--accent" onClick={start}>
+          Replay Studio tour
+        </button>
+      </section>
+
+      <section className="studio-panel">
+        <div className="studio-panel-head">
           <h2>Links</h2>
         </div>
         <ul className="studio-link-list">
@@ -55,6 +70,9 @@ export function StudioSettingsPage() {
           </li>
           <li>
             <Link to="/">Marketing site</Link>
+          </li>
+          <li>
+            <Link to="/studio/library">Creator onboarding playbook</Link>
           </li>
           <li>
             <a href={brand.social.instagram} target="_blank" rel="noreferrer">

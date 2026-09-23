@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { DRILL_QUICK_ADDS, PROGRAM_TEMPLATES } from "../../lib/templates";
+import { useStudioTour } from "../../tour/StudioTour";
 
 export function StudioLibraryPage() {
   const { profile } = useAuth();
+  const { start } = useStudioTour();
 
   if (!profile?.is_creator) {
     return (
@@ -20,14 +22,75 @@ export function StudioLibraryPage() {
           <p className="studio-kicker">Automation</p>
           <h1>Library</h1>
           <p className="studio-muted">
-            Templates and drill presets used by the wizard and CMS — designed so creators barely
-            start from zero.
+            Templates, drill presets, and the white-glove playbook for your first creators.
           </p>
         </div>
-        <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
-          Use in wizard
-        </Link>
+        <div className="studio-actions">
+          <button type="button" className="studio-btn studio-btn--ghost" onClick={start}>
+            Replay tour
+          </button>
+          <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
+            Use in wizard
+          </Link>
+        </div>
       </header>
+
+      <section className="studio-panel" id="playbook">
+        <div className="studio-panel-head">
+          <h2>Creator onboarding playbook</h2>
+          <span className="studio-muted">First 5–10 · grappling-first</span>
+        </div>
+        <div className="playbook">
+          <p>
+            <strong>Thesis:</strong> creator builds program → athlete executes → RASHMAT tracks →
+            creator sees evolution. Studio is the moat — protect that loop.
+          </p>
+          <h3>Offer</h3>
+          <p className="studio-muted">
+            “Send videos + the system in your head. We turn it into Week → Day → Session → Drill.
+            You publish. Athletes follow. You see who finishes.”
+          </p>
+          <h3>7-day white-glove</h3>
+          <ol className="playbook-steps">
+            <li>
+              <strong>Day 0 — Recruit</strong>
+              <span>15-min call. Theme + 4–6 weeks. Promise live program ≤7 days with your help.</span>
+            </li>
+            <li>
+              <strong>Day 1 — Kickoff</strong>
+              <span>Activate creator, run Studio tour, pick wizard template, name the camp.</span>
+            </li>
+            <li>
+              <strong>Day 2–3 — Structure (you)</strong>
+              <span>Auto-schedule, map curriculum, paste Mux IDs, auto-fill missing days.</span>
+            </li>
+            <li>
+              <strong>Day 4 — Review</strong>
+              <span>CMS together: rename drills, reorder, duplicate a strong day. Keep draft.</span>
+            </li>
+            <li>
+              <strong>Day 5 — Smoke test</strong>
+              <span>Test athlete completes 1–2 sessions. Confirm Students progress.</span>
+            </li>
+            <li>
+              <strong>Day 6 — Soft publish</strong>
+              <span>Publish + one story: “Don’t just watch. Progress.”</span>
+            </li>
+            <li>
+              <strong>Day 7 — Debrief</strong>
+              <span>Blockers? Ask for 1 peer intro. Track completion %, not vanity downloads.</span>
+            </li>
+          </ol>
+          <h3>Validate in 30 days</h3>
+          <ul className="playbook-metrics">
+            <li>≥5 programs from real coaches published</li>
+            <li>≥30% of enrolled athletes finish ≥3 sessions</li>
+          </ul>
+          <p className="studio-muted">
+            Full write-up: <code>web/docs/CREATOR_ONBOARDING.md</code>
+          </p>
+        </div>
+      </section>
 
       <section className="studio-panel">
         <div className="studio-panel-head">
@@ -35,7 +98,7 @@ export function StudioLibraryPage() {
         </div>
         <div className="wizard-templates">
           {PROGRAM_TEMPLATES.map((t) => (
-            <Link key={t.id} to={`/studio/programs/new`} className="library-card">
+            <Link key={t.id} to="/studio/programs/new" className="library-card">
               <strong>{t.name}</strong>
               <span>{t.blurb}</span>
               <em>
