@@ -52,6 +52,15 @@ White-glove playbook for the first 5–10 grappling creators:
 - In-app: **Library → Creator onboarding playbook**
 - Repo: [`docs/CREATOR_ONBOARDING.md`](docs/CREATOR_ONBOARDING.md)
 
+Hotmart / course-platform sellers (keep checkout, add camp layer):
+
+- In-app: **Library → Hotmart / course sellers**
+- Repo: [`docs/HOTMART_CONVERSION.md`](docs/HOTMART_CONVERSION.md)
+
+### Covers
+
+Program covers upload to Supabase Storage bucket `covers` (`{userId}/programs/{programId}.*`). Apply migration `20260326000000_covers_owner_paths.sql` if the project was created before path-scoped policies.
+
 ## Build
 
 ```bash
