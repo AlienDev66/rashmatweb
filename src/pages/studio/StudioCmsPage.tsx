@@ -18,6 +18,7 @@ import {
   updateExercise,
   updateSession,
 } from "../../lib/studio";
+import { VideoUploader } from "../../components/VideoUploader";
 import { DRILL_QUICK_ADDS } from "../../lib/templates";
 
 export function StudioCmsPage() {
@@ -35,12 +36,14 @@ export function StudioCmsPage() {
   const [sessionTitle, setSessionTitle] = useState("");
   const [sessionDesc, setSessionDesc] = useState("");
   const [sessionMinutes, setSessionMinutes] = useState(45);
-  const [muxId, setMuxId] = useState("");
+  const [sessionMux, setSessionMux] = useState("");
+  const [sessionVideoUrl, setSessionVideoUrl] = useState("");
 
   const [drillName, setDrillName] = useState("");
   const [drillReps, setDrillReps] = useState("Reps: 8 8 8");
   const [drillRest, setDrillRest] = useState(60);
   const [drillMux, setDrillMux] = useState("");
+  const [drillVideoUrl, setDrillVideoUrl] = useState("");
   const [editingDrill, setEditingDrill] = useState<string | null>(null);
 
   const [busy, setBusy] = useState(false);
@@ -117,14 +120,16 @@ export function StudioCmsPage() {
         setSessionTitle("");
         setSessionDesc("");
         setSessionMinutes(45);
-        setMuxId("");
+        setSessionMux("");
+        setSessionVideoUrl("");
         return;
       }
       const sess = sessions.find((s) => s.id === sessionId);
       setSessionTitle(sess?.title ?? "");
       setSessionDesc(sess?.description ?? "");
       setSessionMinutes(sess?.minutes ?? 45);
-      setMuxId(sess?.mux_playback_id ?? "");
+      setSessionMux(sess?.mux_playback_id ?? "");
+      setSessionVideoUrl(sess?.video_url ?? "");
       const { exercises: list } = await fetchSessionExercises(sessionId);
       if (!cancelled) setExercises(list);
     };
@@ -154,7 +159,8 @@ export function StudioCmsPage() {
       title: sessionTitle.trim() || "Session",
       description: sessionDesc,
       minutes: sessionMinutes,
-      mux_playback_id: muxId.trim() || null,
+      mux_playback_id: sessionMux.trim() || null,
+      video_url: sessionVideoUrl.trim() || null,
     });
     setBusy(false);
     if (error) return flash(error);
@@ -166,7 +172,8 @@ export function StudioCmsPage() {
               title: sessionTitle.trim() || "Session",
               description: sessionDesc,
               minutes: sessionMinutes,
-              mux_playback_id: muxId.trim() || null,
+              mux_playback_id: sessionMux.trim() || null,
+              video_url: sessionVideoUrl.trim() || null,
             }
           : s,
       ),
@@ -239,6 +246,7 @@ export function StudioCmsPage() {
       restSeconds: preset?.rest_seconds ?? drillRest,
       sortOrder: exercises.length,
       muxPlaybackId: preset ? null : drillMux.trim() || null,
+      videoUrl: preset ? null : drillVideoUrl.trim() || null,
     });
     setBusy(false);
     if (error || !exercise) return flash(error ?? "Could not add drill");
@@ -246,6 +254,7 @@ export function StudioCmsPage() {
     if (!preset) {
       setDrillName("");
       setDrillMux("");
+      setDrillVideoUrl("");
     }
     flash("Drill added");
   };
@@ -271,6 +280,7 @@ export function StudioCmsPage() {
       reps: ex.reps ?? "",
       rest_seconds: ex.rest_seconds,
       mux_playback_id: ex.mux_playback_id,
+      video_url: ex.video_url,
     });
     setBusy(false);
     if (error) return flash(error);
@@ -312,6 +322,7 @@ export function StudioCmsPage() {
       restSeconds: last.rest_seconds,
       sortOrder: exercises.length,
       muxPlaybackId: last.mux_playback_id,
+      videoUrl: last.video_url,
     });
     setBusy(false);
     if (error || !exercise) return flash(error ?? "Failed");
@@ -487,14 +498,42 @@ export function StudioCmsPage() {
                     onChange={(e) => setSessionMinutes(Number(e.target.value) || 45)}
                   />
                 </label>
-                <label>
-                  Session Mux ID
-                  <input
-                    value={muxId}
-                    onChange={(e) => setMuxId(e.target.value)}
-                    placeholder="Optional HLS playback id"
+                <div className="span-2">
+                  <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
+                    Session video
+                  </p>
+                  <VideoUploader
+                    value={{ muxPlaybackId: sessionMux, videoUrl: sessionVideoUrl }}
+                    onChange={(next) => {
+                      setSessionMux(next.muxPlaybackId);
+                      setSessionVideoUrl(next.videoUrl);
+                      // Persist immediately after Storage upload so video isn't lost
+                      if (sessionId && next.videoUrl) {
+                        void updateSession(sessionId, {
+                          mux_playback_id: next.muxPlaybackId.trim() || null,
+                          video_url: next.videoUrl.trim() || null,
+                        }).then(({ error }) => {
+                          if (error) flash(error);
+                          else {
+                            setSessions((prev) =>
+                              prev.map((s) =>
+                                s.id === sessionId
+                                  ? {
+                                      ...s,
+                                      mux_playback_id: next.muxPlaybackId.trim() || null,
+                                      video_url: next.videoUrl.trim() || null,
+                                    }
+                                  : s,
+                              ),
+                            );
+                            flash("Session video saved");
+                          }
+                        });
+                      }
+                    }}
+                    disabled={busy}
                   />
-                </label>
+                </div>
               </div>
               <button
                 type="button"
@@ -564,17 +603,20 @@ export function StudioCmsPage() {
                           }
                         />
                         <input
-                          placeholder="Mux ID"
-                          value={ex.mux_playback_id ?? ""}
-                          onChange={(e) =>
+                          placeholder="Video URL or Mux ID"
+                          value={ex.video_url || ex.mux_playback_id || ""}
+                          onChange={(e) => {
+                            const v = e.target.value;
                             setExercises((prev) =>
                               prev.map((x) =>
                                 x.id === ex.id
-                                  ? { ...x, mux_playback_id: e.target.value || null }
+                                  ? /^https?:\/\//i.test(v)
+                                    ? { ...x, video_url: v || null, mux_playback_id: null }
+                                    : { ...x, mux_playback_id: v || null, video_url: null }
                                   : x,
                               ),
-                            )
-                          }
+                            );
+                          }}
                         />
                         <div className="studio-actions">
                           <button
@@ -605,7 +647,11 @@ export function StudioCmsPage() {
                           <span>
                             {ex.reps} · rest {ex.rest_seconds}s
                           </span>
-                          {ex.mux_playback_id ? <em>Mux · {ex.mux_playback_id}</em> : null}
+                          {ex.video_url ? (
+                            <em>Video · Storage</em>
+                          ) : ex.mux_playback_id ? (
+                            <em>Mux · {ex.mux_playback_id}</em>
+                          ) : null}
                         </div>
                         <div className="cms-drill-actions">
                           <button type="button" disabled={busy} onClick={() => void moveDrill(index, -1)}>
@@ -644,10 +690,19 @@ export function StudioCmsPage() {
                     onChange={(e) => setDrillRest(Number(e.target.value) || 0)}
                   />
                 </label>
-                <label>
-                  Drill Mux ID
-                  <input value={drillMux} onChange={(e) => setDrillMux(e.target.value)} />
-                </label>
+                <div className="span-2">
+                  <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
+                    Drill video
+                  </p>
+                  <VideoUploader
+                    value={{ muxPlaybackId: drillMux, videoUrl: drillVideoUrl }}
+                    onChange={(next) => {
+                      setDrillMux(next.muxPlaybackId);
+                      setDrillVideoUrl(next.videoUrl);
+                    }}
+                    disabled={busy}
+                  />
+                </div>
                 <button
                   type="button"
                   className="studio-btn studio-btn--accent span-2"

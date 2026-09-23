@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { CoverUploader } from "../../components/CoverUploader";
 import type { StudioProgram, StudioSession } from "../../lib/database";
+import { getPublishReadiness, type PublishReadiness } from "../../lib/publishGate";
 import {
   deleteProgram,
   fetchProgram,
@@ -21,6 +22,7 @@ export function StudioProgramDetailPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [gate, setGate] = useState<PublishReadiness | null>(null);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -51,6 +53,10 @@ export function StudioProgramDetailPage() {
       setLevel(p.level);
       setTags(p.tags.join(", "));
       setIsPremium(p.is_premium);
+      const readiness = await getPublishReadiness(p);
+      setGate(readiness);
+    } else {
+      setGate(null);
     }
     setLoading(false);
   }, [id]);
@@ -103,6 +109,8 @@ export function StudioProgramDetailPage() {
     }
     setProgram({ ...program, cover_url: url });
     flash("Cover uploaded");
+    const readiness = await getPublishReadiness({ ...program, cover_url: url });
+    setGate(readiness);
   };
 
   const onSave = async (e: FormEvent) => {
@@ -184,19 +192,51 @@ export function StudioProgramDetailPage() {
         </div>
         <div className="studio-actions">
           {message ? <span className="studio-flash">{message}</span> : null}
+          {program.status === "published" ? (
+            <a className="studio-btn studio-btn--ghost" href={`/p/${program.id}`} target="_blank" rel="noreferrer">
+              Share link
+            </a>
+          ) : null}
           <Link className="studio-btn studio-btn--ghost" to={`/studio/cms?program=${program.id}`}>
             Open in CMS
           </Link>
           <button
             type="button"
             className="studio-btn studio-btn--accent"
-            disabled={busy}
+            disabled={busy || (program.status !== "published" && gate !== null && !gate.ready)}
             onClick={() => void onPublish()}
+            title={
+              gate && !gate.ready && program.status !== "published"
+                ? "Fix publish checklist first"
+                : undefined
+            }
           >
             {program.status === "published" ? "Unpublish" : "Publish"}
           </button>
         </div>
       </header>
+
+      {gate ? (
+        <section className="studio-panel publish-gate">
+          <div className="studio-panel-head">
+            <h2>Publish checklist</h2>
+            <span className={gate.ready ? "studio-flash" : "studio-muted"}>
+              {gate.ready ? "Ready to publish" : "Complete before publish"}
+            </span>
+          </div>
+          <ul className="publish-checks">
+            {gate.checks.map((c) => (
+              <li key={c.id} className={c.ok ? "is-ok" : "is-miss"}>
+                <strong>{c.ok ? "✓" : "○"}</strong>
+                <div>
+                  <span>{c.label}</span>
+                  {!c.ok && c.hint ? <em>{c.hint}</em> : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <div className="studio-split-2">
         <form className="studio-panel" onSubmit={(e) => void onSave(e)}>
