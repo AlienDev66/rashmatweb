@@ -9,6 +9,10 @@ import {
   igImage,
   mocksStage,
 } from "../brand";
+import { LanguageSwitcher } from "../components/LanguageSwitcher";
+import { SiteFooter } from "../components/SiteFooter";
+import { useI18n, useT } from "../i18n";
+import { messages } from "../i18n/messages";
 
 const IgIcon = () => (
   <svg className="btn__ig" viewBox="0 0 24 24" aria-hidden="true" width="20" height="20">
@@ -31,31 +35,36 @@ type PhoneProps = {
   alt: string;
   label: string;
   className?: string;
-  /** Welcome: hero photo + CSS chrome (screenshot was missing the image). */
   welcome?: boolean;
+  welcomeCopy?: {
+    kicker: string;
+    kickerAccent: string;
+    titleOutline: string;
+    titleSolid: string;
+    sub: string;
+    cta: string;
+  };
 };
 
-function PhoneMock({ src, alt, label, className = "", welcome }: PhoneProps) {
+function PhoneMock({ src, alt, label, className = "", welcome, welcomeCopy }: PhoneProps) {
   return (
     <figure className={`phone ${className}`}>
       <div className="phone__device" aria-hidden={!welcome}>
         <div className="phone__bezel">
           <span className="phone__island" />
-          {welcome ? (
+          {welcome && welcomeCopy ? (
             <div className="phone__screen phone__screen--welcome">
               <img src={src} alt="" className="phone__shot" />
               <div className="phone__welcome">
                 <p className="phone__welcome-kicker">
-                  TRAIN ON THE <span>MAT</span>
+                  {welcomeCopy.kicker} <span>{welcomeCopy.kickerAccent}</span>
                 </p>
                 <p className="phone__welcome-title">
-                  <span className="phone__welcome-outline">BUILD</span>
-                  <span className="phone__welcome-solid">YOUR GAME</span>
+                  <span className="phone__welcome-outline">{welcomeCopy.titleOutline}</span>
+                  <span className="phone__welcome-solid">{welcomeCopy.titleSolid}</span>
                 </p>
-                <p className="phone__welcome-sub">
-                  Train with creators who live your sport.
-                </p>
-                <span className="phone__welcome-cta">FIND YOUR JOURNEY</span>
+                <p className="phone__welcome-sub">{welcomeCopy.sub}</p>
+                <span className="phone__welcome-cta">{welcomeCopy.cta}</span>
               </div>
             </div>
           ) : (
@@ -69,6 +78,10 @@ function PhoneMock({ src, alt, label, className = "", welcome }: PhoneProps) {
 }
 
 export function LandingPage() {
+  const t = useT();
+  const { locale } = useI18n();
+  const marquee = messages[locale].landing.marquee;
+
   useEffect(() => {
     requestAnimationFrame(() => {
       document.documentElement.classList.add("is-ready");
@@ -114,6 +127,15 @@ export function LandingPage() {
     };
   }, []);
 
+  const welcomeCopy = {
+    kicker: t("landing.kicker"),
+    kickerAccent: t("landing.kickerAccent"),
+    titleOutline: t("landing.titleOutline"),
+    titleSolid: t("landing.titleSolid"),
+    sub: t("landing.sub"),
+    cta: t("landing.athletesCta").replace(" →", "").toUpperCase(),
+  };
+
   return (
     <>
       <div className="scroll-progress" aria-hidden="true">
@@ -133,25 +155,25 @@ export function LandingPage() {
               <img className="hero__mark" src="/logo-yellow.png" width={72} height={72} alt="" />
               <div className="hero__brand-text">
                 <span className="hero__word">{brand.name}</span>
-                <span className="hero__tag">Martial arts · Creators · Progress</span>
+                <span className="hero__tag">{t("landing.brandTag")}</span>
               </div>
+              <LanguageSwitcher className="hero__lang" />
             </header>
 
             <div className="hero__copy">
               <p className="hero__kicker" data-reveal="hero" data-d="1">
-                TRAIN ON THE <span className="accent">MAT</span>
+                {t("landing.kicker")} <span className="accent">{t("landing.kickerAccent")}</span>
               </p>
               <h1 className="hero__title" data-reveal="hero" data-d="2">
-                <span className="outline">BUILD</span>
-                <span className="solid">YOUR GAME</span>
+                <span className="outline">{t("landing.titleOutline")}</span>
+                <span className="solid">{t("landing.titleSolid")}</span>
               </h1>
               <p className="hero__sub" data-reveal="hero" data-d="3">
-                Train with creators who live your sport — drill, track your week, and show up ready
-                for live rounds.
+                {t("landing.sub")}
               </p>
               <div className="hero__ctas" data-reveal="hero" data-d="4">
                 <a className="btn btn--accent" href={brand.platformUrl}>
-                  Enter the platform
+                  {t("landing.ctaPlatform")}
                 </a>
                 <a
                   className="btn btn--ghost"
@@ -168,20 +190,9 @@ export function LandingPage() {
 
           <div className="hero__marquee" aria-hidden="true">
             <div className="hero__marquee-track">
-              <span>BJJ</span>
-              <span>NO-GI</span>
-              <span>MUAY THAI</span>
-              <span>MMA</span>
-              <span>WRESTLING</span>
-              <span>STRIKING</span>
-              <span>LIVE ROUNDS</span>
-              <span>BJJ</span>
-              <span>NO-GI</span>
-              <span>MUAY THAI</span>
-              <span>MMA</span>
-              <span>WRESTLING</span>
-              <span>STRIKING</span>
-              <span>LIVE ROUNDS</span>
+              {[...marquee, ...marquee].map((item, i) => (
+                <span key={`${item}-${i}`}>{item}</span>
+              ))}
             </div>
           </div>
         </section>
@@ -189,29 +200,29 @@ export function LandingPage() {
         <section className="band" data-reveal>
           <div className="shell band__inner">
             <div className="band__head">
-              <p className="band__kicker">WHAT YOU GET</p>
-              <h2 className="band__title">One hub. Real systems. Measurable weeks.</h2>
+              <p className="band__kicker">{t("landing.bandKicker")}</p>
+              <h2 className="band__title">{t("landing.bandTitle")}</h2>
             </div>
             <ul className="band__list">
               <li>
                 <span className="band__n">01</span>
                 <div>
-                  <strong>Train with creators</strong>
-                  <p>Follow creators and unlock real systems — not random clips.</p>
+                  <strong>{t("landing.band1Title")}</strong>
+                  <p>{t("landing.band1Body")}</p>
                 </div>
               </li>
               <li>
                 <span className="band__n">02</span>
                 <div>
-                  <strong>Week on the mats</strong>
-                  <p>See your training days, rest, and next session in one hub.</p>
+                  <strong>{t("landing.band2Title")}</strong>
+                  <p>{t("landing.band2Body")}</p>
                 </div>
               </li>
               <li>
                 <span className="band__n">03</span>
                 <div>
-                  <strong>Progress that sticks</strong>
-                  <p>Log rounds, finish sessions, and watch XP + streaks build.</p>
+                  <strong>{t("landing.band3Title")}</strong>
+                  <p>{t("landing.band3Body")}</p>
                 </div>
               </li>
             </ul>
@@ -227,23 +238,20 @@ export function LandingPage() {
           <div className="feature__veil feature__veil--left" aria-hidden="true" />
           <div className="shell feature__frame">
             <div className="feature__copy">
-              <p className="kicker">FOR ATHLETES</p>
+              <p className="kicker">{t("landing.athletesKicker")}</p>
               <h2 className="display">
-                Show up with a plan —
+                {t("landing.athletesTitle1")}
                 <br />
-                <span className="accent">not guesswork.</span>
+                <span className="accent">{t("landing.athletesTitle2")}</span>
               </h2>
-              <p className="body">
-                Pick a program, open today&apos;s session, drill with video, and close the loop.
-                Built for gi, no-gi, and striking — the same cadence you need between classes.
-              </p>
+              <p className="body">{t("landing.athletesBody")}</p>
               <ul className="feature__points">
-                <li>Session video + rest timers</li>
-                <li>Week strip with rest days</li>
-                <li>XP, streaks, follow creators</li>
+                <li>{t("landing.athletesP1")}</li>
+                <li>{t("landing.athletesP2")}</li>
+                <li>{t("landing.athletesP3")}</li>
               </ul>
               <a className="btn btn--accent btn--inline" href={brand.platformUrl}>
-                Start training →
+                {t("landing.athletesCta")}
               </a>
             </div>
           </div>
@@ -258,23 +266,20 @@ export function LandingPage() {
           <div className="feature__veil feature__veil--right" aria-hidden="true" />
           <div className="shell feature__frame feature__frame--end">
             <div className="feature__copy">
-              <p className="kicker">FOR CREATORS</p>
+              <p className="kicker">{t("landing.creatorsKicker")}</p>
               <h2 className="display">
-                Publish drills.
+                {t("landing.creatorsTitle1")}
                 <br />
-                <span className="accent">See who shows up.</span>
+                <span className="accent">{t("landing.creatorsTitle2")}</span>
               </h2>
-              <p className="body">
-                Creator Studio is the RASHMAT web CMS — ship programs, structure weeks, track
-                students, and see who follows your profile.
-              </p>
+              <p className="body">{t("landing.creatorsBody")}</p>
               <ul className="feature__points">
-                <li>Programs → sessions → drills</li>
-                <li>Storage video uploads</li>
-                <li>Students + followers</li>
+                <li>{t("landing.creatorsP1")}</li>
+                <li>{t("landing.creatorsP2")}</li>
+                <li>{t("landing.creatorsP3")}</li>
               </ul>
               <Link className="btn btn--accent btn--inline" to={brand.studioUrl}>
-                Open Creator Studio →
+                {t("landing.creatorsCta")}
               </Link>
             </div>
           </div>
@@ -289,55 +294,53 @@ export function LandingPage() {
           <div className="mocks__veil" aria-hidden="true" />
           <div className="shell mocks__inner">
             <div className="mocks__head">
-              <p className="kicker">INSIDE THE APP</p>
+              <p className="kicker">{t("landing.mocksKicker")}</p>
               <h2 className="display">
-                From welcome to
+                {t("landing.mocksTitle1")}
                 <br />
-                <span className="accent">live rounds.</span>
+                <span className="accent">{t("landing.mocksTitle2")}</span>
               </h2>
-              <p className="body">
-                Hub, session player, creators you follow, XP, and Creator Studio — the product in
-                one glance.
-              </p>
+              <p className="body">{t("landing.mocksBody")}</p>
             </div>
 
             <div className="phone-fan" role="list">
               <PhoneMock
                 className="phone--fan phone--f1"
                 src={appScreens.welcomeHero}
-                alt="Welcome — Build your game"
-                label="Welcome"
+                alt={t("landing.mockWelcome")}
+                label={t("landing.mockWelcome")}
                 welcome
+                welcomeCopy={welcomeCopy}
               />
               <PhoneMock
                 className="phone--fan phone--f2 phone--featured"
                 src={appScreens.hub}
-                alt="Training hub with week strip and start session"
-                label="Training hub"
+                alt={t("landing.mockHub")}
+                label={t("landing.mockHub")}
               />
               <PhoneMock
                 className="phone--fan phone--f3"
                 src={appScreens.sessionPreview}
-                alt="Session preview before starting"
-                label="Session"
+                alt={t("landing.mockSession")}
+                label={t("landing.mockSession")}
               />
               <PhoneMock
                 className="phone--fan phone--f4"
                 src={appScreens.programOverview}
-                alt="Program overview with progress and next session"
-                label="Program"
+                alt={t("landing.mockProgram")}
+                label={t("landing.mockProgram")}
               />
               <PhoneMock
                 className="phone--fan phone--f5"
                 src={appScreens.creators}
-                alt="Creators directory — follow and train"
-                label="Creators"
+                alt={t("landing.mockCreators")}
+                label={t("landing.mockCreators")}
               />
               <PhoneMock
                 className="phone--fan phone--f6"
                 src={appScreens.complete}
-                alt="Session complete with XP share card"
-                label="XP & share"
+                alt={t("landing.mockXp")}
+                label={t("landing.mockXp")}
               />
             </div>
 
@@ -345,14 +348,14 @@ export function LandingPage() {
               <PhoneMock
                 className="phone--rail"
                 src={appScreens.creatorProfile}
-                alt="Creator profile with Follow and Train"
-                label="Creator profile"
+                alt={t("landing.mockCreatorProfile")}
+                label={t("landing.mockCreatorProfile")}
               />
               <PhoneMock
                 className="phone--rail"
                 src={appScreens.studio}
-                alt="Creator Studio dashboard"
-                label="Creator Studio"
+                alt={t("landing.mockStudio")}
+                label={t("landing.mockStudio")}
               />
             </div>
           </div>
@@ -366,13 +369,11 @@ export function LandingPage() {
           <div className="shell ig__frame">
             <p className="kicker">{brand.social.handle}</p>
             <h2 className="display display--lg">
-              Behind the drills.
+              {t("landing.igTitle1")}
               <br />
-              On Instagram first.
+              {t("landing.igTitle2")}
             </h2>
-            <p className="body ig__body">
-              Follow the brand while the platform grows — mats, creators, and the culture.
-            </p>
+            <p className="body ig__body">{t("landing.igBody")}</p>
             <a
               className="btn btn--ghost btn--inline"
               href={brand.social.instagram}
@@ -380,28 +381,12 @@ export function LandingPage() {
               rel="noopener noreferrer"
             >
               <IgIcon />
-              Open Instagram
+              {t("landing.igCta")}
             </a>
           </div>
         </section>
 
-        <footer className="foot">
-          <div className="shell foot__inner">
-            <div className="foot__brand">
-              <img src="/logo-yellow.png" width={44} height={44} alt="" />
-              <span>{brand.name}</span>
-            </div>
-            <nav className="foot__nav" aria-label="Footer">
-              <a href={brand.platformUrl}>Platform</a>
-              <Link to={brand.studioUrl}>Studio</Link>
-              <a href={brand.social.instagram} target="_blank" rel="noopener noreferrer">
-                Instagram
-              </a>
-              <a href={`mailto:${brand.email}`}>{brand.email}</a>
-            </nav>
-            <p className="foot__meta">{brand.domain}</p>
-          </div>
-        </footer>
+        <SiteFooter />
       </main>
     </>
   );

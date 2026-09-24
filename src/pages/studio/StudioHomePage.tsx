@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../auth";
+import { useT } from "../../i18n";
 import {
   activateCreator,
   fetchCreatorStudentProgress,
@@ -11,6 +12,7 @@ import type { StudentProgressRow, StudioProgram } from "../../lib/database";
 
 export function StudioHomePage() {
   const { user, profile, refreshProfile } = useAuth();
+  const t = useT();
   const [programs, setPrograms] = useState<StudioProgram[]>([]);
   const [students, setStudents] = useState<StudentProgressRow[]>([]);
   const [followerCount, setFollowerCount] = useState(0);
@@ -52,12 +54,9 @@ export function StudioHomePage() {
   if (!profile?.is_creator) {
     return (
       <main className="studio-page studio-page--narrow">
-        <p className="studio-kicker">Get started</p>
-        <h1>Activate Creator Studio</h1>
-        <p className="studio-muted">
-          One click unlocks programs, the CMS, student progress, and templates — same account as the
-          athlete app.
-        </p>
+        <p className="studio-kicker">{t("studio.getStarted")}</p>
+        <h1>{t("studio.activateTitle")}</h1>
+        <p className="studio-muted">{t("studio.activateBody")}</p>
         {error ? <p className="studio-error">{error}</p> : null}
         <button
           type="button"
@@ -65,7 +64,7 @@ export function StudioHomePage() {
           disabled={busy}
           onClick={() => void onActivate()}
         >
-          {busy ? "Activating…" : "Become a creator"}
+          {busy ? t("studio.activating") : t("studio.becomeCreator")}
         </button>
       </main>
     );
@@ -78,20 +77,25 @@ export function StudioHomePage() {
       ? 0
       : Math.round(students.reduce((s, r) => s + Number(r.progress_pct), 0) / students.length);
 
+  const firstName = profile.full_name?.split(" ")[0];
+  const welcome = firstName
+    ? t("studio.welcomeBackName", { name: firstName })
+    : t("studio.welcomeBack");
+
   return (
     <main className="studio-page">
       <header className="studio-page-head">
         <div>
-          <p className="studio-kicker">Dashboard</p>
-          <h1>Welcome back{profile.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}</h1>
-          <p className="studio-muted">Ship programs fast — templates and auto-schedules do the heavy lifting.</p>
+          <p className="studio-kicker">{t("studio.navDashboard")}</p>
+          <h1>{welcome}</h1>
+          <p className="studio-muted">{t("studio.dashboardSub")}</p>
         </div>
         <div className="studio-actions">
           <Link className="studio-btn studio-btn--ghost" to="/studio/cms">
-            Open CMS
+            {t("studio.openCms")}
           </Link>
           <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
-            New program
+            {t("studio.newProgram")}
           </Link>
         </div>
       </header>
@@ -99,27 +103,27 @@ export function StudioHomePage() {
       <div className="studio-stat-row">
         <div>
           <strong>{programs.length}</strong>
-          <span>Programs</span>
+          <span>{t("studio.statPrograms")}</span>
         </div>
         <div>
           <strong>{published}</strong>
-          <span>Published</span>
+          <span>{t("studio.statPublished")}</span>
         </div>
         <div>
           <strong>{draft}</strong>
-          <span>Drafts</span>
+          <span>{t("studio.statDrafts")}</span>
         </div>
         <div>
           <strong>{students.length}</strong>
-          <span>Students</span>
+          <span>{t("studio.statStudents")}</span>
         </div>
         <div>
           <strong>{followerCount}</strong>
-          <span>Followers</span>
+          <span>{t("studio.statFollowers")}</span>
         </div>
         <div>
           <strong>{avg}%</strong>
-          <span>Avg progress</span>
+          <span>{t("studio.statAvgProgress")}</span>
         </div>
       </div>
 

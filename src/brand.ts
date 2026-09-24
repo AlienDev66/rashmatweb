@@ -4,6 +4,7 @@ export const brand = {
   domain: "rashmat.app",
   url: "https://rashmat.app",
   email: "hello@rashmat.app",
+  supportEmail: "support@rashmat.app",
   social: {
     instagram: "https://www.instagram.com/rashmatapp/",
     handle: "@rashmatapp",
@@ -11,6 +12,20 @@ export const brand = {
   platformUrl: "https://app.rashmat.app",
   /** Web Creator Studio (this package). */
   studioUrl: "/studio",
+  /**
+   * Native store listings. Update iOS to the real App Store ID when published.
+   * Android package matches app.json (`com.rashmat.app`).
+   */
+  stores: {
+    ios: "https://apps.apple.com/app/rashmat",
+    android: "https://play.google.com/store/apps/details?id=com.rashmat.app",
+  },
+  legal: {
+    privacyUrl: "/privacy",
+    termsUrl: "/terms",
+    effectiveDate: "September 24, 2026",
+    governingLaw: "Portugal",
+  },
 } as const;
 
 /** Full-bleed hero — local brand still (gi + black belt). */

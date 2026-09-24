@@ -114,6 +114,11 @@
   gap: 0.25rem;
 }
 
+.studio-side-lang {
+  margin-top: 0.55rem;
+  justify-self: start;
+}
+
 .studio-side-user {
   margin: 0;
   font-size: 0.9rem;
