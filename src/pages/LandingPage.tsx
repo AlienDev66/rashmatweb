@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
+  appScreens,
   athletesImage,
   brand,
   creatorsImage,
   heroImage,
   igImage,
+  mocksStage,
 } from "../brand";
 
 const IgIcon = () => (
@@ -23,6 +25,48 @@ const IgIcon = () => (
     <circle cx="17.2" cy="6.8" r="1.1" fill="#fff" />
   </svg>
 );
+
+type PhoneProps = {
+  src: string;
+  alt: string;
+  label: string;
+  className?: string;
+  /** Welcome: hero photo + CSS chrome (screenshot was missing the image). */
+  welcome?: boolean;
+};
+
+function PhoneMock({ src, alt, label, className = "", welcome }: PhoneProps) {
+  return (
+    <figure className={`phone ${className}`}>
+      <div className="phone__device" aria-hidden={!welcome}>
+        <div className="phone__bezel">
+          <span className="phone__island" />
+          {welcome ? (
+            <div className="phone__screen phone__screen--welcome">
+              <img src={src} alt="" className="phone__shot" />
+              <div className="phone__welcome">
+                <p className="phone__welcome-kicker">
+                  TRAIN ON THE <span>MAT</span>
+                </p>
+                <p className="phone__welcome-title">
+                  <span className="phone__welcome-outline">BUILD</span>
+                  <span className="phone__welcome-solid">YOUR GAME</span>
+                </p>
+                <p className="phone__welcome-sub">
+                  Train with creators who live your sport.
+                </p>
+                <span className="phone__welcome-cta">FIND YOUR JOURNEY</span>
+              </div>
+            </div>
+          ) : (
+            <img src={src} alt={alt} className="phone__shot" loading="lazy" />
+          )}
+        </div>
+      </div>
+      <figcaption className="phone__cap">{label}</figcaption>
+    </figure>
+  );
+}
 
 export function LandingPage() {
   useEffect(() => {
@@ -102,8 +146,8 @@ export function LandingPage() {
                 <span className="solid">YOUR GAME</span>
               </h1>
               <p className="hero__sub" data-reveal="hero" data-d="3">
-                Structured programs from real martial arts creators — drill, track your week, and
-                show up ready for live rounds.
+                Train with creators who live your sport — drill, track your week, and show up ready
+                for live rounds.
               </p>
               <div className="hero__ctas" data-reveal="hero" data-d="4">
                 <a className="btn btn--accent" href={brand.platformUrl}>
@@ -144,13 +188,16 @@ export function LandingPage() {
 
         <section className="band" data-reveal>
           <div className="shell band__inner">
-            <p className="band__kicker">WHAT YOU GET</p>
+            <div className="band__head">
+              <p className="band__kicker">WHAT YOU GET</p>
+              <h2 className="band__title">One hub. Real systems. Measurable weeks.</h2>
+            </div>
             <ul className="band__list">
               <li>
                 <span className="band__n">01</span>
                 <div>
-                  <strong>Creator programs</strong>
-                  <p>Follow creators who publish real systems — not random clips.</p>
+                  <strong>Train with creators</strong>
+                  <p>Follow creators and unlock real systems — not random clips.</p>
                 </div>
               </li>
               <li>
@@ -171,45 +218,153 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="split" data-reveal>
-          <div className="shell split__grid">
-            <div className="split__copy">
+        <section className="feature" data-reveal>
+          <div
+            className="feature__media"
+            style={{ ["--img" as string]: `url('${athletesImage}')` }}
+            aria-hidden="true"
+          />
+          <div className="feature__veil feature__veil--left" aria-hidden="true" />
+          <div className="shell feature__frame">
+            <div className="feature__copy">
               <p className="kicker">FOR ATHLETES</p>
-              <h2 className="display">Show up with a plan — not guesswork.</h2>
+              <h2 className="display">
+                Show up with a plan —
+                <br />
+                <span className="accent">not guesswork.</span>
+              </h2>
               <p className="body">
                 Pick a program, open today&apos;s session, drill with video, and close the loop.
                 Built for gi, no-gi, and striking — the same cadence you need between classes.
               </p>
+              <ul className="feature__points">
+                <li>Session video + rest timers</li>
+                <li>Week strip with rest days</li>
+                <li>XP, streaks, follow creators</li>
+              </ul>
               <a className="btn btn--accent btn--inline" href={brand.platformUrl}>
                 Start training →
               </a>
             </div>
-            <div className="split__visual">
-              <div
-                className="split__img"
-                style={{ ["--img" as string]: `url('${athletesImage}')` }}
-              />
-            </div>
           </div>
         </section>
 
-        <section className="split split--flip" data-reveal>
-          <div className="shell split__grid">
-            <div className="split__copy">
+        <section className="feature feature--flip" data-reveal>
+          <div
+            className="feature__media"
+            style={{ ["--img" as string]: `url('${creatorsImage}')` }}
+            aria-hidden="true"
+          />
+          <div className="feature__veil feature__veil--right" aria-hidden="true" />
+          <div className="shell feature__frame feature__frame--end">
+            <div className="feature__copy">
               <p className="kicker">FOR CREATORS</p>
-              <h2 className="display">Publish drills. See who shows up.</h2>
+              <h2 className="display">
+                Publish drills.
+                <br />
+                <span className="accent">See who shows up.</span>
+              </h2>
               <p className="body">
-                Creator Studio is the same RASHMAT platform — ship programs, structure weeks, and
-                track student progress without leaving the brand.
+                Creator Studio is the RASHMAT web CMS — ship programs, structure weeks, track
+                students, and see who follows your profile.
               </p>
+              <ul className="feature__points">
+                <li>Programs → sessions → drills</li>
+                <li>Storage video uploads</li>
+                <li>Students + followers</li>
+              </ul>
               <Link className="btn btn--accent btn--inline" to={brand.studioUrl}>
                 Open Creator Studio →
               </Link>
             </div>
-            <div className="split__visual">
-              <div
-                className="split__img"
-                style={{ ["--img" as string]: `url('${creatorsImage}')` }}
+          </div>
+        </section>
+
+        <section className="mocks" data-reveal>
+          <div
+            className="mocks__stage"
+            style={{ ["--stage" as string]: `url('${mocksStage}')` }}
+            aria-hidden="true"
+          />
+          <div className="mocks__veil" aria-hidden="true" />
+          <div className="shell mocks__inner">
+            <div className="mocks__head">
+              <p className="kicker">INSIDE THE APP</p>
+              <h2 className="display">
+                From welcome to
+                <br />
+                <span className="accent">live rounds.</span>
+              </h2>
+              <p className="body">
+                Hub, session player, creators you follow, XP, and the rules library — the athlete
+                product in one glance.
+              </p>
+            </div>
+
+            <div className="phone-fan" role="list">
+              <PhoneMock
+                className="phone--fan phone--f1"
+                src={appScreens.welcomeHero}
+                alt="Welcome — Build your game"
+                label="Welcome"
+                welcome
+              />
+              <PhoneMock
+                className="phone--fan phone--f2"
+                src={appScreens.signIn}
+                alt="Sign in to RASHMAT"
+                label="Sign in"
+              />
+              <PhoneMock
+                className="phone--fan phone--f3 phone--featured"
+                src={appScreens.hub}
+                alt="Training hub with week strip and start session"
+                label="Training hub"
+              />
+              <PhoneMock
+                className="phone--fan phone--f4"
+                src={appScreens.recover}
+                alt="Session rest timer"
+                label="Session player"
+              />
+              <PhoneMock
+                className="phone--fan phone--f5"
+                src={appScreens.programs}
+                alt="Programs catalog"
+                label="Programs"
+              />
+              <PhoneMock
+                className="phone--fan phone--f6"
+                src={appScreens.profile}
+                alt="Profile with XP and achievements"
+                label="Profile"
+              />
+            </div>
+
+            <div className="phone-rail" role="list">
+              <PhoneMock
+                className="phone--rail"
+                src={appScreens.creators}
+                alt="Creators directory — follow and train"
+                label="Follow creators"
+              />
+              <PhoneMock
+                className="phone--rail"
+                src={appScreens.complete}
+                alt="Session complete with XP share card"
+                label="XP & share"
+              />
+              <PhoneMock
+                className="phone--rail"
+                src={appScreens.studio}
+                alt="Creator Studio dashboard"
+                label="Creator Studio"
+              />
+              <PhoneMock
+                className="phone--rail"
+                src={appScreens.library}
+                alt="Rules library"
+                label="Rules library"
               />
             </div>
           </div>

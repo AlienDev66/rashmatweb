@@ -4,6 +4,7 @@ import { useAuth } from "../../auth";
 import {
   activateCreator,
   fetchCreatorStudentProgress,
+  fetchMyCreatorFollowers,
   fetchMyPrograms,
 } from "../../lib/studio";
 import type { StudentProgressRow, StudioProgram } from "../../lib/database";
@@ -12,6 +13,7 @@ export function StudioHomePage() {
   const { user, profile, refreshProfile } = useAuth();
   const [programs, setPrograms] = useState<StudioProgram[]>([]);
   const [students, setStudents] = useState<StudentProgressRow[]>([]);
+  const [followerCount, setFollowerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,12 +21,14 @@ export function StudioHomePage() {
   const load = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const [progs, studs] = await Promise.all([
+    const [progs, studs, followers] = await Promise.all([
       fetchMyPrograms(user.id),
       fetchCreatorStudentProgress(),
+      fetchMyCreatorFollowers(),
     ]);
     setPrograms(progs.programs);
     setStudents(studs.rows);
+    setFollowerCount(followers.rows.length);
     setLoading(false);
   }, [user]);
 
@@ -110,6 +114,10 @@ export function StudioHomePage() {
           <span>Students</span>
         </div>
         <div>
+          <strong>{followerCount}</strong>
+          <span>Followers</span>
+        </div>
+        <div>
           <strong>{avg}%</strong>
           <span>Avg progress</span>
         </div>
@@ -131,6 +139,10 @@ export function StudioHomePage() {
           <Link to="/studio/students">
             <strong>Students</strong>
             <span>See who is showing up and where they are</span>
+          </Link>
+          <Link to="/studio/followers">
+            <strong>Followers</strong>
+            <span>Athletes who follow your creator profile</span>
           </Link>
           <Link to="/studio/library">
             <strong>Drill library</strong>
