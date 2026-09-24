@@ -3,25 +3,98 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RASHMAT — Train on the mat</title>
+    <meta name="theme-color" content="#141111" />
+    <meta name="color-scheme" content="dark" />
+
+    <title>RASHMAT — Train with creators on the mat</title>
     <meta
       name="description"
-      content="Martial arts programs that transfer to live rounds. Follow @rashmatapp — build your game."
+      content="RASHMAT is martial arts training from real creators — structured programs, week hub, session video, XP, and Creator Studio to publish drills and track students."
     />
-    <meta property="og:title" content="RASHMAT" />
+    <meta
+      name="keywords"
+      content="RASHMAT, BJJ, no-gi, MMA, martial arts training, creator programs, jiu-jitsu app"
+    />
+    <meta name="author" content="RASHMAT" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://rashmat.app/" />
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="RASHMAT" />
+    <meta property="og:title" content="RASHMAT — Train with creators on the mat" />
     <meta
       property="og:description"
-      content="Build your game. Structured training from creators on the mats."
+      content="Structured martial arts programs from creators. Drill, track your week, earn XP — or publish in Creator Studio."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://rashmat.app" />
+    <meta property="og:url" content="https://rashmat.app/" />
+    <meta property="og:image" content="https://rashmat.app/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="RASHMAT — Build your game on the mats" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RASHMAT — Train with creators on the mat" />
+    <meta
+      name="twitter:description"
+      content="Structured martial arts programs from creators. Drill, track your week, earn XP — or publish in Creator Studio."
+    />
+    <meta name="twitter:image" content="https://rashmat.app/og-image.jpg" />
+    <meta name="twitter:image:alt" content="RASHMAT — Build your game on the mats" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" href="/logo-yellow.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Alumni+Sans:ital,wght@0,700;1,700&family=Alumni+Sans+SC:ital,wght@1,600&family=Bebas+Neue&family=Poppins:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://rashmat.app/#organization",
+            "name": "RASHMAT",
+            "url": "https://rashmat.app",
+            "logo": "https://rashmat.app/logo-yellow.png",
+            "email": "hello@rashmat.app",
+            "sameAs": ["https://www.instagram.com/rashmatapp/"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://rashmat.app/#website",
+            "url": "https://rashmat.app",
+            "name": "RASHMAT",
+            "description": "Martial arts training from real creators — programs, week hub, and Creator Studio.",
+            "publisher": { "@id": "https://rashmat.app/#organization" },
+            "inLanguage": "en"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://rashmat.app/#app",
+            "name": "RASHMAT",
+            "applicationCategory": "HealthApplication",
+            "operatingSystem": "iOS, Android, Web",
+            "url": "https://app.rashmat.app",
+            "description": "Train with martial arts creators — structured programs, session video, XP, and progress tracking.",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "publisher": { "@id": "https://rashmat.app/#organization" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>

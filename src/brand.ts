@@ -41,5 +41,4 @@ export const appScreens = {
   library: "/screens/library.png",
 } as const;
 
-export const igImage =
-  "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=2000&q=80";
+export const igImage = "/ig-section.jpg";

@@ -296,8 +296,8 @@ export function LandingPage() {
                 <span className="accent">live rounds.</span>
               </h2>
               <p className="body">
-                Hub, session player, creators you follow, XP, and the rules library — the athlete
-                product in one glance.
+                Hub, session player, creators you follow, XP, and Creator Studio — the product in
+                one glance.
               </p>
             </div>
 
@@ -310,88 +310,49 @@ export function LandingPage() {
                 welcome
               />
               <PhoneMock
-                className="phone--fan phone--f2"
-                src={appScreens.signIn}
-                alt="Sign in to RASHMAT"
-                label="Sign in"
-              />
-              <PhoneMock
-                className="phone--fan phone--f3 phone--featured"
+                className="phone--fan phone--f2 phone--featured"
                 src={appScreens.hub}
                 alt="Training hub with week strip and start session"
                 label="Training hub"
               />
               <PhoneMock
-                className="phone--fan phone--f4"
-                src={appScreens.recover}
-                alt="Session rest timer"
-                label="Session player"
+                className="phone--fan phone--f3"
+                src={appScreens.sessionPreview}
+                alt="Session preview before starting"
+                label="Session"
               />
               <PhoneMock
-                className="phone--fan phone--f5"
+                className="phone--fan phone--f4"
                 src={appScreens.programOverview}
                 alt="Program overview with progress and next session"
                 label="Program"
               />
               <PhoneMock
+                className="phone--fan phone--f5"
+                src={appScreens.creators}
+                alt="Creators directory — follow and train"
+                label="Creators"
+              />
+              <PhoneMock
                 className="phone--fan phone--f6"
-                src={appScreens.profile}
-                alt="Profile with XP and achievements"
-                label="Profile"
+                src={appScreens.complete}
+                alt="Session complete with XP share card"
+                label="XP & share"
               />
             </div>
 
             <div className="phone-rail" role="list">
               <PhoneMock
                 className="phone--rail"
-                src={appScreens.programDays}
-                alt="Program day list with reorder"
-                label="Camp days"
-              />
-              <PhoneMock
-                className="phone--rail"
-                src={appScreens.sessionPreview}
-                alt="Session preview before starting"
-                label="Session preview"
-              />
-              <PhoneMock
-                className="phone--rail"
-                src={appScreens.creators}
-                alt="Creators directory — follow and train"
-                label="Follow creators"
-              />
-              <PhoneMock
-                className="phone--rail"
                 src={appScreens.creatorProfile}
                 alt="Creator profile with Follow and Train"
                 label="Creator profile"
-              />
-            </div>
-
-            <div className="phone-rail phone-rail--secondary" role="list">
-              <PhoneMock
-                className="phone--rail"
-                src={appScreens.complete}
-                alt="Session complete with XP share card"
-                label="XP & share"
               />
               <PhoneMock
                 className="phone--rail"
                 src={appScreens.studio}
                 alt="Creator Studio dashboard"
                 label="Creator Studio"
-              />
-              <PhoneMock
-                className="phone--rail"
-                src={appScreens.programs}
-                alt="Programs catalog"
-                label="Catalog"
-              />
-              <PhoneMock
-                className="phone--rail"
-                src={appScreens.library}
-                alt="Rules library"
-                label="Rules library"
               />
             </div>
           </div>
