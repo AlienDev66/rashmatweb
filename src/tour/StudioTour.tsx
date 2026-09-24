@@ -8,10 +8,11 @@ import {
   type ReactNode,
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useT } from "../i18n";
 import {
+  getStudioTour,
   loadTourState,
   saveTourState,
-  STUDIO_TOUR,
   type TourStep,
 } from "./tours";
 
@@ -33,13 +34,14 @@ export function StudioTourProvider({
   enabled,
 }: {
   children: ReactNode;
-  /** Only run when creator is activated */
   enabled: boolean;
 }) {
+  const t = useT();
   const navigate = useNavigate();
   const location = useLocation();
   const [active, setActive] = useState(false);
   const [index, setIndex] = useState(0);
+  const steps = useMemo(() => getStudioTour(t), [t]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -50,15 +52,14 @@ export function StudioTourProvider({
     }
   }, [enabled]);
 
-  // Keep user on the correct route for the current step
   useEffect(() => {
     if (!active) return;
-    const step = STUDIO_TOUR[index];
+    const step = steps[index];
     if (!step) return;
     if (location.pathname !== step.route) {
       navigate(step.route, { replace: true });
     }
-  }, [active, index, location.pathname, navigate]);
+  }, [active, index, location.pathname, navigate, steps]);
 
   const persist = useCallback((next: { done: boolean; step: number }) => {
     saveTourState(next);
@@ -68,8 +69,8 @@ export function StudioTourProvider({
     setIndex(0);
     setActive(true);
     persist({ done: false, step: 0 });
-    navigate(STUDIO_TOUR[0].route);
-  }, [navigate, persist]);
+    navigate(steps[0].route);
+  }, [navigate, persist, steps]);
 
   const skip = useCallback(() => {
     setActive(false);
@@ -77,37 +78,37 @@ export function StudioTourProvider({
   }, [index, persist]);
 
   const next = useCallback(() => {
-    if (index >= STUDIO_TOUR.length - 1) {
+    if (index >= steps.length - 1) {
       setActive(false);
-      persist({ done: true, step: STUDIO_TOUR.length - 1 });
+      persist({ done: true, step: steps.length - 1 });
       return;
     }
     const nextIndex = index + 1;
     setIndex(nextIndex);
     persist({ done: false, step: nextIndex });
-    navigate(STUDIO_TOUR[nextIndex].route);
-  }, [index, navigate, persist]);
+    navigate(steps[nextIndex].route);
+  }, [index, navigate, persist, steps]);
 
   const back = useCallback(() => {
     if (index <= 0) return;
     const prev = index - 1;
     setIndex(prev);
     persist({ done: false, step: prev });
-    navigate(STUDIO_TOUR[prev].route);
-  }, [index, navigate, persist]);
+    navigate(steps[prev].route);
+  }, [index, navigate, persist, steps]);
 
   const value = useMemo<TourContextValue>(
     () => ({
       active,
-      step: active ? STUDIO_TOUR[index] ?? null : null,
+      step: active ? steps[index] ?? null : null,
       index,
-      total: STUDIO_TOUR.length,
+      total: steps.length,
       start,
       next,
       back,
       skip,
     }),
-    [active, index, start, next, back, skip],
+    [active, index, start, next, back, skip, steps],
   );
 
   return <TourContext.Provider value={value}>{children}</TourContext.Provider>;
@@ -120,6 +121,7 @@ export function useStudioTour() {
 }
 
 export function StudioTourOverlay() {
+  const t = useT();
   const { active, step, index, total, next, back, skip } = useStudioTour();
   if (!active || !step) return null;
 
@@ -130,22 +132,25 @@ export function StudioTourOverlay() {
       <div className="tour-backdrop" onClick={skip} />
       <div className="tour-card">
         <div className="tour-progress">
-          <span>
-            {index + 1} / {total}
-          </span>
+          <span>{t("tour.progress", { current: index + 1, total })}</span>
           <button type="button" className="tour-skip" onClick={skip}>
-            Skip tour
+            {t("tour.skip")}
           </button>
         </div>
-        <p className="tour-kicker">Studio guide</p>
+        <p className="tour-kicker">{t("tour.kicker")}</p>
         <h2 id="tour-title">{step.title}</h2>
         <p className="tour-body">{step.body}</p>
         <div className="tour-actions">
-          <button type="button" className="studio-btn studio-btn--ghost" disabled={index === 0} onClick={back}>
-            Back
+          <button
+            type="button"
+            className="studio-btn studio-btn--ghost"
+            disabled={index === 0}
+            onClick={back}
+          >
+            {t("common.back")}
           </button>
           <button type="button" className="studio-btn studio-btn--accent" onClick={next}>
-            {isLast ? "Finish" : "Next"}
+            {isLast ? t("common.finish") : t("common.next")}
           </button>
         </div>
       </div>

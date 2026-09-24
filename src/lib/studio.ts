@@ -25,7 +25,7 @@ const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1555597673-b21d5c935865?w=1200&q=80";
 
 export async function activateCreator(slug?: string) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured", profile: null };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing", profile: null };
   const { data, error } = await supabase.rpc("activate_creator", {
     p_slug: slug ?? null,
   });
@@ -81,7 +81,7 @@ export type CreateProgramInput = {
 };
 
 export async function createProgram(opts: CreateProgramInput) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured", program: null };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing", program: null };
 
   const template: ProgramTemplate =
     PROGRAM_TEMPLATES.find((t) => t.id === opts.templateId) ?? PROGRAM_TEMPLATES[0];
@@ -158,7 +158,7 @@ export async function updateProgram(
     status: "draft" | "published";
   }>,
 ) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured" };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing" };
   const { error } = await supabase.from("programs").update(patch).eq("id", programId);
   return { error: error?.message ?? null };
 }
@@ -166,20 +166,15 @@ export async function updateProgram(
 export async function publishProgram(programId: string, published: boolean) {
   if (published) {
     const { program } = await fetchProgram(programId);
-    if (!program) return { error: "Program not found" };
+    if (!program) return { error: "errors.programNotFound" };
     const gate = await getPublishReadiness(program);
-    if (!gate.ready) {
-      const missing = gate.checks.filter((c) => !c.ok).map((c) => c.label);
-      return {
-        error: `Not ready to publish: ${missing.join("; ")}`,
-      };
-    }
+    if (!gate.ready) return { error: "errors.publishNotReady" };
   }
   return updateProgram(programId, { status: published ? "published" : "draft" });
 }
 
 export async function deleteProgram(programId: string) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured" };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing" };
   const { sessions } = await fetchProgramSessions(programId);
   for (const s of sessions) {
     await deleteSession(s.id);
@@ -190,7 +185,7 @@ export async function deleteProgram(programId: string) {
 
 export async function duplicateProgram(programId: string, userId: string, creatorSlug: string) {
   const { program } = await fetchProgram(programId);
-  if (!program) return { error: "Program not found", program: null };
+  if (!program) return { error: "errors.programNotFound", program: null };
 
   const { program: copy, error } = await createProgram({
     userId,
@@ -208,7 +203,7 @@ export async function duplicateProgram(programId: string, userId: string, creato
     autoSchedule: false,
     seedDrills: false,
   });
-  if (error || !copy) return { error: error ?? "Copy failed", program: null };
+  if (error || !copy) return { error: error ?? "errors.copyFailed", program: null };
 
   // Remove the Day 1 placeholder from createProgram(autoSchedule:false)
   const { sessions: placeholders } = await fetchProgramSessions(copy.id);
@@ -259,7 +254,7 @@ export async function createSession(opts: {
   minutes?: number;
   muxPlaybackId?: string;
 }) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured", session: null };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing", session: null };
   const id = `${opts.programId}-d${opts.day}-${Date.now().toString(36)}`;
   const { data, error } = await supabase
     .from("workout_sessions")
@@ -293,13 +288,13 @@ export async function updateSession(
     video_url: string | null;
   }>,
 ) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured" };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing" };
   const { error } = await supabase.from("workout_sessions").update(patch).eq("id", sessionId);
   return { error: error?.message ?? null };
 }
 
 export async function deleteSession(sessionId: string) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured" };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing" };
   const { exercises } = await fetchSessionExercises(sessionId);
   for (const e of exercises) {
     await deleteExercise(e.id);
@@ -311,7 +306,7 @@ export async function deleteSession(sessionId: string) {
 export async function duplicateSession(sessionId: string, programId: string, nextDay: number) {
   const { sessions } = await fetchProgramSessions(programId);
   const source = sessions.find((s) => s.id === sessionId);
-  if (!source) return { error: "Session not found", session: null };
+  if (!source) return { error: "errors.sessionNotFound", session: null };
 
   const { session, error } = await createSession({
     programId,
@@ -321,7 +316,7 @@ export async function duplicateSession(sessionId: string, programId: string, nex
     minutes: source.minutes,
     muxPlaybackId: source.mux_playback_id ?? undefined,
   });
-  if (error || !session) return { error: error ?? "Failed", session: null };
+  if (error || !session) return { error: error ?? "errors.failed", session: null };
 
   const { exercises } = await fetchSessionExercises(sessionId);
   await seedDrillsOntoSession(
@@ -384,7 +379,7 @@ export async function createExercise(opts: {
   muxPlaybackId?: string | null;
   videoUrl?: string | null;
 }) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured", exercise: null };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing", exercise: null };
   const id = `ex-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
   const { data, error } = await supabase
     .from("exercises")
@@ -433,19 +428,19 @@ export async function updateExercise(
     video_url: string | null;
   }>,
 ) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured" };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing" };
   const { error } = await supabase.from("exercises").update(patch).eq("id", exerciseId);
   return { error: error?.message ?? null };
 }
 
 export async function deleteExercise(exerciseId: string) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured" };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing" };
   const { error } = await supabase.from("exercises").delete().eq("id", exerciseId);
   return { error: error?.message ?? null };
 }
 
 export async function reorderExercises(orderedIds: string[]) {
-  if (!isSupabaseConfigured) return { error: "Supabase not configured" };
+  if (!isSupabaseConfigured) return { error: "errors.supabaseMissing" };
   for (let i = 0; i < orderedIds.length; i++) {
     const { error } = await supabase
       .from("exercises")

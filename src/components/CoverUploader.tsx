@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useT } from "../i18n";
 import { uploadProgramCover, validateCoverFile } from "../lib/cover";
 
 type Props = {
@@ -20,6 +21,7 @@ export function CoverUploader({
   onPendingFile,
   disabled,
 }: Props) {
+  const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -33,7 +35,7 @@ export function CoverUploader({
 
     const invalid = validateCoverFile(file);
     if (invalid) {
-      setError(invalid);
+      setError(t(invalid));
       return;
     }
 
@@ -49,7 +51,7 @@ export function CoverUploader({
     const { url, error: upErr } = await uploadProgramCover(userId, programId, file);
     setBusy(false);
     if (upErr || !url) {
-      setError(upErr ?? "Upload failed");
+      setError(upErr ? t(upErr) : t("errors.uploadFailed"));
       return;
     }
     onPendingFile?.(null);
@@ -64,8 +66,8 @@ export function CoverUploader({
       >
         {!shown ? (
           <div className="cover-uploader__empty">
-            <strong>Program cover</strong>
-            <span>Mat / training photo · JPEG, PNG, WebP · max 5MB</span>
+            <strong>{t("upload.coverTitle")}</strong>
+            <span>{t("upload.coverSpecs")}</span>
           </div>
         ) : null}
         <div className="cover-uploader__actions">
@@ -75,7 +77,11 @@ export function CoverUploader({
             disabled={disabled || busy}
             onClick={() => inputRef.current?.click()}
           >
-            {busy ? "Uploading…" : shown ? "Change cover" : "Upload cover"}
+            {busy
+              ? t("common.uploading")
+              : shown
+                ? t("upload.coverChange")
+                : t("upload.coverUpload")}
           </button>
         </div>
       </div>
@@ -87,9 +93,7 @@ export function CoverUploader({
         onChange={(e) => void onPick(e.target.files?.[0] ?? null)}
       />
       {error ? <p className="studio-error">{error}</p> : null}
-      <p className="studio-muted cover-uploader__hint">
-        Stored in Supabase Storage (<code>covers</code>). Avoid gym-lift stock — mats, rounds, drilling.
-      </p>
+      <p className="studio-muted cover-uploader__hint">{t("upload.coverHint")}</p>
     </div>
   );
 }

@@ -6,51 +6,27 @@ export type TourStep = {
   body: string;
 };
 
-/** First-run walkthrough across Studio sections. */
-export const STUDIO_TOUR: TourStep[] = [
-  {
-    id: "dash",
-    route: "/studio",
-    title: "Dashboard",
-    body: "Your command center. See programs, students, and jump into the wizard or CMS in one tap.",
-  },
-  {
-    id: "programs",
-    route: "/studio/programs",
-    title: "Programs",
-    body: "Your catalog. Search, publish, duplicate, or delete camps. Duplicate is the fastest way to ship a variant.",
-  },
-  {
-    id: "wizard",
-    route: "/studio/programs/new",
-    title: "Program wizard",
-    body: "Pick a BJJ / No-Gi / Striking template. We auto-build weeks × days and seed starter drills so you don’t start from zero.",
-  },
-  {
-    id: "cms",
-    route: "/studio/cms",
-    title: "CMS editor",
-    body: "Programs → sessions → drills. Use quick-adds, starter blocks, and duplicate day to stay on the mats instead of in forms.",
-  },
-  {
-    id: "students",
-    route: "/studio/students",
-    title: "Students",
-    body: "See who enrolled, completion %, and drop-off. This is the creator-side of progress — protect this loop.",
-  },
-  {
-    id: "library",
-    route: "/studio/library",
-    title: "Library & playbook",
-    body: "Templates, drill presets, and the white-glove onboarding playbook for your first creators.",
-  },
-  {
-    id: "settings",
-    route: "/studio/settings",
-    title: "Settings",
-    body: "Account and links. Replay this tour anytime from here when you bring a new coach into Studio.",
-  },
+type TFn = (key: string, params?: Record<string, string | number>) => string;
+
+const STEP_ROUTES: { id: string; route: string }[] = [
+  { id: "dash", route: "/studio" },
+  { id: "programs", route: "/studio/programs" },
+  { id: "wizard", route: "/studio/programs/new" },
+  { id: "cms", route: "/studio/cms" },
+  { id: "students", route: "/studio/students" },
+  { id: "library", route: "/studio/library" },
+  { id: "settings", route: "/studio/settings" },
 ];
+
+/** First-run walkthrough across Studio sections (localized). */
+export function getStudioTour(t: TFn): TourStep[] {
+  return STEP_ROUTES.map(({ id, route }) => ({
+    id,
+    route,
+    title: t(`tour.steps.${id}.title`),
+    body: t(`tour.steps.${id}.body`),
+  }));
+}
 
 export const TOUR_STORAGE_KEY = "rashmat.studio.tour.v1";
 

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useAuth } from "../auth";
+import { useT } from "../i18n";
 import { uploadVideoToStorage, validateVideoFile } from "../lib/videoUpload";
 
 export type VideoValue = {
@@ -18,13 +19,9 @@ type Props = {
  * Default path: Supabase Storage MP4 (no Mux cost).
  * Optional paste of Mux playback ID if you add Mux later.
  */
-export function VideoUploader({
-  label = "Video",
-  value,
-  onChange,
-  disabled,
-}: Props) {
+export function VideoUploader({ label, value, onChange, disabled }: Props) {
   const { user } = useAuth();
+  const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,30 +34,30 @@ export function VideoUploader({
     setInfo(null);
     if (!file) return;
     if (!user) {
-      setError("Sign in required");
+      setError(t("errors.signInRequired"));
       return;
     }
 
     const invalid = validateVideoFile(file);
     if (invalid) {
-      setError(invalid);
+      setError(t(invalid));
       return;
     }
 
     setBusy(true);
-    setInfo(`Uploading ${(file.size / (1024 * 1024)).toFixed(1)}MB to Storage…`);
+    setInfo(t("upload.videoProgress", { size: (file.size / (1024 * 1024)).toFixed(1) }));
 
     try {
       const { url, error: upErr } = await uploadVideoToStorage(user.id, file);
       if (upErr || !url) {
-        setError(upErr ?? "Upload failed");
+        setError(upErr ? t(upErr) : t("errors.uploadFailed"));
         setInfo(null);
         return;
       }
       onChange({ muxPlaybackId: "", videoUrl: url });
-      setInfo("Ready — video stored (no Mux needed).");
+      setInfo(t("upload.videoReady"));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload failed");
+      setError(e instanceof Error ? e.message : t("errors.uploadFailed"));
       setInfo(null);
     } finally {
       setBusy(false);
@@ -76,7 +73,7 @@ export function VideoUploader({
           disabled={disabled || busy}
           onClick={() => inputRef.current?.click()}
         >
-          {busy ? "Uploading…" : "Upload video"}
+          {busy ? t("common.uploading") : t("upload.videoUpload")}
         </button>
         <input
           className="video-uploader__id"
@@ -90,9 +87,9 @@ export function VideoUploader({
               onChange({ muxPlaybackId: v, videoUrl: "" });
             }
           }}
-          placeholder="Or paste video URL / Mux ID"
+          placeholder={t("upload.videoPlaceholder")}
           disabled={disabled || busy}
-          aria-label={label}
+          aria-label={label ?? t("upload.videoLabel")}
         />
       </div>
       <input
@@ -105,8 +102,8 @@ export function VideoUploader({
       {info ? <p className="studio-flash">{info}</p> : null}
       {error ? <p className="studio-error">{error}</p> : null}
       <p className="studio-muted video-uploader__hint">
-        Videos go to <strong>Supabase Storage</strong> (included in your plan). Mux is optional
-        later for HLS — not required now.
+        {t("upload.videoHintStart")} <strong>{t("upload.videoHintStorage")}</strong>{" "}
+        {t("upload.videoHintEnd")}
       </p>
     </div>
   );

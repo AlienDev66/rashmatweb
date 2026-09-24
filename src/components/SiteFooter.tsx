@@ -66,7 +66,7 @@ export function SiteFooter({ showStores = true }: Props) {
           </div>
         ) : null}
 
-        <nav className="foot__nav" aria-label="Footer">
+        <nav className="foot__nav" aria-label={t("common.navFooter")}>
           <a href={brand.platformUrl}>{t("common.platform")}</a>
           <Link to={brand.studioUrl}>{t("common.studio")}</Link>
           <a href={brand.social.instagram} target="_blank" rel="noopener noreferrer">

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { CoverUploader } from "../../components/CoverUploader";
+import { useT } from "../../i18n";
 import type { StudioProgram, StudioSession } from "../../lib/database";
 import { getPublishReadiness, type PublishReadiness } from "../../lib/publishGate";
 import {
@@ -17,6 +18,7 @@ export function StudioProgramDetailPage() {
   const { id = "" } = useParams();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const t = useT();
   const [program, setProgram] = useState<StudioProgram | null>(null);
   const [sessions, setSessions] = useState<StudioSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +70,7 @@ export function StudioProgramDetailPage() {
   if (!profile?.is_creator) {
     return (
       <main className="studio-page studio-page--narrow">
-        <Link to="/studio">← Dashboard</Link>
+        <Link to="/studio">{t("common.dashboardBack")}</Link>
       </main>
     );
   }
@@ -76,7 +78,7 @@ export function StudioProgramDetailPage() {
   if (loading) {
     return (
       <main className="studio-page">
-        <p className="studio-muted">Loading…</p>
+        <p className="studio-muted">{t("common.loading")}</p>
       </main>
     );
   }
@@ -84,8 +86,8 @@ export function StudioProgramDetailPage() {
   if (!program) {
     return (
       <main className="studio-page">
-        <p className="studio-error">Program not found.</p>
-        <Link to="/studio/programs">← Programs</Link>
+        <p className="studio-error">{t("studio.detail.notFound")}</p>
+        <Link to="/studio/programs">{t("studio.detail.backPrograms")}</Link>
       </main>
     );
   }
@@ -93,8 +95,8 @@ export function StudioProgramDetailPage() {
   const target = weeks * daysPerWeek;
   const missing = Math.max(0, target - sessions.length);
 
-  const flash = (t: string) => {
-    setMessage(t);
+  const flash = (text: string) => {
+    setMessage(text);
     window.setTimeout(() => setMessage(null), 2400);
   };
 
@@ -104,11 +106,11 @@ export function StudioProgramDetailPage() {
     const { error } = await updateProgram(program.id, { cover_url: url });
     setBusy(false);
     if (error) {
-      flash(error);
+      flash(t(error));
       return;
     }
     setProgram({ ...program, cover_url: url });
-    flash("Cover uploaded");
+    flash(t("studio.detail.flashCover"));
     const readiness = await getPublishReadiness({ ...program, cover_url: url });
     setGate(readiness);
   };
@@ -126,16 +128,16 @@ export function StudioProgramDetailPage() {
       level,
       tags: tags
         .split(",")
-        .map((t) => t.trim())
+        .map((tag) => tag.trim())
         .filter(Boolean),
       is_premium: isPremium,
     });
     setBusy(false);
     if (error) {
-      flash(error);
+      flash(t(error));
       return;
     }
-    flash("Saved");
+    flash(t("studio.detail.flashSaved"));
     await load();
   };
 
@@ -147,10 +149,14 @@ export function StudioProgramDetailPage() {
     const { created, error } = await fillProgramSchedule(refreshed);
     setBusy(false);
     if (error) {
-      flash(error);
+      flash(t(error));
       return;
     }
-    flash(`Added ${created} session${created === 1 ? "" : "s"}`);
+    flash(
+      created === 1
+        ? t("studio.detail.flashAddedOne")
+        : t("studio.detail.flashAdded", { count: created }),
+    );
     await load();
   };
 
@@ -160,20 +166,20 @@ export function StudioProgramDetailPage() {
     const { error } = await publishProgram(program.id, next);
     setBusy(false);
     if (error) {
-      flash(error);
+      flash(t(error));
       return;
     }
     setProgram({ ...program, status: next ? "published" : "draft" });
-    flash(next ? "Published" : "Unpublished");
+    flash(next ? t("studio.detail.flashPublished") : t("studio.detail.flashUnpublished"));
   };
 
   const onDelete = async () => {
-    if (!window.confirm(`Delete “${program.title}”?`)) return;
+    if (!window.confirm(t("studio.detail.confirmDelete", { title: program.title }))) return;
     setBusy(true);
     const { error } = await deleteProgram(program.id);
     setBusy(false);
     if (error) {
-      flash(error);
+      flash(t(error));
       return;
     }
     navigate("/studio/programs", { replace: true });
@@ -183,22 +189,24 @@ export function StudioProgramDetailPage() {
     <main className="studio-page">
       <header className="studio-page-head">
         <div>
-          <p className="studio-kicker">Program</p>
+          <p className="studio-kicker">{t("studio.detail.kicker")}</p>
           <h1>{program.title}</h1>
           <p className="studio-muted">
-            {sessions.length}/{target} sessions ·{" "}
-            <span className={`studio-pill studio-pill--${program.status}`}>{program.status}</span>
+            {t("studio.detail.sessionsMeta", { count: sessions.length, target })} ·{" "}
+            <span className={`studio-pill studio-pill--${program.status}`}>
+              {t(`studio.status.${program.status}`)}
+            </span>
           </p>
         </div>
         <div className="studio-actions">
           {message ? <span className="studio-flash">{message}</span> : null}
           {program.status === "published" ? (
             <a className="studio-btn studio-btn--ghost" href={`/p/${program.id}`} target="_blank" rel="noreferrer">
-              Share link
+              {t("studio.detail.shareLink")}
             </a>
           ) : null}
           <Link className="studio-btn studio-btn--ghost" to={`/studio/cms?program=${program.id}`}>
-            Open in CMS
+            {t("studio.detail.openCms")}
           </Link>
           <button
             type="button"
@@ -207,11 +215,11 @@ export function StudioProgramDetailPage() {
             onClick={() => void onPublish()}
             title={
               gate && !gate.ready && program.status !== "published"
-                ? "Fix publish checklist first"
+                ? t("studio.detail.publishHint")
                 : undefined
             }
           >
-            {program.status === "published" ? "Unpublish" : "Publish"}
+            {program.status === "published" ? t("common.unpublish") : t("common.publish")}
           </button>
         </div>
       </header>
@@ -219,9 +227,9 @@ export function StudioProgramDetailPage() {
       {gate ? (
         <section className="studio-panel publish-gate">
           <div className="studio-panel-head">
-            <h2>Publish checklist</h2>
+            <h2>{t("studio.detail.checklistTitle")}</h2>
             <span className={gate.ready ? "studio-flash" : "studio-muted"}>
-              {gate.ready ? "Ready to publish" : "Complete before publish"}
+              {gate.ready ? t("studio.detail.ready") : t("studio.detail.incomplete")}
             </span>
           </div>
           <ul className="publish-checks">
@@ -229,8 +237,8 @@ export function StudioProgramDetailPage() {
               <li key={c.id} className={c.ok ? "is-ok" : "is-miss"}>
                 <strong>{c.ok ? "✓" : "○"}</strong>
                 <div>
-                  <span>{c.label}</span>
-                  {!c.ok && c.hint ? <em>{c.hint}</em> : null}
+                  <span>{t(`studio.gate.${c.id}.label`)}</span>
+                  {!c.ok ? <em>{c.hint ?? t(`studio.gate.${c.id}.hint`)}</em> : null}
                 </div>
               </li>
             ))}
@@ -241,7 +249,7 @@ export function StudioProgramDetailPage() {
       <div className="studio-split-2">
         <form className="studio-panel" onSubmit={(e) => void onSave(e)}>
           <div className="studio-panel-head">
-            <h2>Details</h2>
+            <h2>{t("studio.detail.details")}</h2>
           </div>
           <div className="studio-form studio-form--grid">
             <div className="span-2">
@@ -256,15 +264,15 @@ export function StudioProgramDetailPage() {
               ) : null}
             </div>
             <label className="span-2">
-              Title
+              {t("common.title")}
               <input value={title} onChange={(e) => setTitle(e.target.value)} required />
             </label>
             <label className="span-2">
-              Description
+              {t("common.description")}
               <textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
             </label>
             <label>
-              Weeks
+              {t("common.weeks")}
               <input
                 type="number"
                 min={1}
@@ -274,7 +282,7 @@ export function StudioProgramDetailPage() {
               />
             </label>
             <label>
-              Days / week
+              {t("common.daysPerWeek")}
               <input
                 type="number"
                 min={1}
@@ -284,7 +292,7 @@ export function StudioProgramDetailPage() {
               />
             </label>
             <label>
-              Minutes
+              {t("common.minutes")}
               <input
                 type="number"
                 min={15}
@@ -294,16 +302,16 @@ export function StudioProgramDetailPage() {
               />
             </label>
             <label>
-              Level
+              {t("common.level")}
               <select value={level} onChange={(e) => setLevel(e.target.value)}>
-                <option>Beginner</option>
-                <option>Intermediate</option>
-                <option>Advanced</option>
-                <option>All levels</option>
+                <option value="Beginner">{t("studio.levels.Beginner")}</option>
+                <option value="Intermediate">{t("studio.levels.Intermediate")}</option>
+                <option value="Advanced">{t("studio.levels.Advanced")}</option>
+                <option value="All levels">{t("studio.levels.All levels")}</option>
               </select>
             </label>
             <label className="span-2">
-              Tags (comma-separated)
+              {t("studio.detail.tags")}
               <input value={tags} onChange={(e) => setTags(e.target.value)} />
             </label>
             <label className="studio-check span-2">
@@ -312,12 +320,12 @@ export function StudioProgramDetailPage() {
                 checked={isPremium}
                 onChange={(e) => setIsPremium(e.target.checked)}
               />
-              Mark as premium
+              {t("studio.detail.premium")}
             </label>
           </div>
           <div className="studio-actions">
             <button className="studio-btn studio-btn--accent" type="submit" disabled={busy}>
-              Save details
+              {t("studio.detail.saveDetails")}
             </button>
             <button
               type="button"
@@ -325,14 +333,14 @@ export function StudioProgramDetailPage() {
               disabled={busy}
               onClick={() => void onDelete()}
             >
-              Delete program
+              {t("studio.detail.deleteProgram")}
             </button>
           </div>
         </form>
 
         <section className="studio-panel">
           <div className="studio-panel-head">
-            <h2>Schedule</h2>
+            <h2>{t("studio.detail.schedule")}</h2>
             {missing > 0 ? (
               <button
                 type="button"
@@ -340,10 +348,10 @@ export function StudioProgramDetailPage() {
                 disabled={busy}
                 onClick={() => void onFill()}
               >
-                Auto-fill {missing} missing
+                {t("studio.detail.autoFillMissing", { count: missing })}
               </button>
             ) : (
-              <span className="studio-muted">Complete</span>
+              <span className="studio-muted">{t("studio.detail.complete")}</span>
             )}
           </div>
           <ul className="studio-table">
@@ -351,23 +359,25 @@ export function StudioProgramDetailPage() {
               <li key={s.id}>
                 <Link to={`/studio/cms?program=${program.id}&session=${s.id}`}>
                   <span className="studio-table-title">
-                    Day {s.day} · {s.title}
+                    {t("studio.detail.dayTitle", { day: s.day, title: s.title })}
                   </span>
-                  <span className="studio-table-meta">{s.minutes} min</span>
+                  <span className="studio-table-meta">
+                    {t("studio.detail.minutesMeta", { minutes: s.minutes })}
+                  </span>
                 </Link>
               </li>
             ))}
           </ul>
           {sessions.length === 0 ? (
             <div className="studio-empty">
-              <p>No sessions yet.</p>
+              <p>{t("studio.detail.noSessions")}</p>
               <button
                 type="button"
                 className="studio-btn studio-btn--accent"
                 disabled={busy}
                 onClick={() => void onFill()}
               >
-                Generate schedule
+                {t("studio.detail.generateSchedule")}
               </button>
             </div>
           ) : null}

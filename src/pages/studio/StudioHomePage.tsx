@@ -44,7 +44,7 @@ export function StudioHomePage() {
     const { error: err } = await activateCreator(profile?.full_name ?? undefined);
     setBusy(false);
     if (err) {
-      setError(err);
+      setError(t(err));
       return;
     }
     await refreshProfile();
@@ -129,44 +129,44 @@ export function StudioHomePage() {
 
       <section className="studio-panel">
         <div className="studio-panel-head">
-          <h2>Quick actions</h2>
+          <h2>{t("studio.home.quickTitle")}</h2>
         </div>
         <div className="studio-quick">
           <Link to="/studio/programs/new">
-            <strong>Wizard + templates</strong>
-            <span>Auto-build weeks, days, and starter drills</span>
+            <strong>{t("studio.home.quickWizard")}</strong>
+            <span>{t("studio.home.quickWizardHint")}</span>
           </Link>
           <Link to="/studio/cms">
-            <strong>Deep CMS</strong>
-            <span>Edit sessions, Mux IDs, and drill order</span>
+            <strong>{t("studio.home.quickCms")}</strong>
+            <span>{t("studio.home.quickCmsHint")}</span>
           </Link>
           <Link to="/studio/students">
-            <strong>Students</strong>
-            <span>See who is showing up and where they are</span>
+            <strong>{t("studio.home.quickStudents")}</strong>
+            <span>{t("studio.home.quickStudentsHint")}</span>
           </Link>
           <Link to="/studio/followers">
-            <strong>Followers</strong>
-            <span>Athletes who follow your creator profile</span>
+            <strong>{t("studio.home.quickFollowers")}</strong>
+            <span>{t("studio.home.quickFollowersHint")}</span>
           </Link>
           <Link to="/studio/library">
-            <strong>Drill library</strong>
-            <span>One-tap presets for warm-up, technique, rounds</span>
+            <strong>{t("studio.home.quickLibrary")}</strong>
+            <span>{t("studio.home.quickLibraryHint")}</span>
           </Link>
         </div>
       </section>
 
       <section className="studio-panel">
         <div className="studio-panel-head">
-          <h2>Recent programs</h2>
-          <Link to="/studio/programs">View all</Link>
+          <h2>{t("studio.home.recentTitle")}</h2>
+          <Link to="/studio/programs">{t("studio.home.viewAll")}</Link>
         </div>
         {loading ? (
-          <p className="studio-muted">Loading…</p>
+          <p className="studio-muted">{t("common.loading")}</p>
         ) : programs.length === 0 ? (
           <div className="studio-empty">
-            <p>No programs yet — start from a template in under a minute.</p>
+            <p>{t("studio.home.empty")}</p>
             <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
-              Create program
+              {t("studio.home.createProgram")}
             </Link>
           </div>
         ) : (
@@ -176,9 +176,15 @@ export function StudioHomePage() {
                 <Link to={`/studio/programs/${p.id}`}>
                   <span className="studio-table-title">{p.title}</span>
                   <span className="studio-table-meta">
-                    {p.weeks}w · {p.days_per_week}d/w · {p.level}
+                    {t("studio.home.programMeta", {
+                      weeks: p.weeks,
+                      days: p.days_per_week,
+                      level: t(`studio.levels.${p.level}`),
+                    })}
                   </span>
-                  <span className={`studio-pill studio-pill--${p.status}`}>{p.status}</span>
+                  <span className={`studio-pill studio-pill--${p.status}`}>
+                    {t(`studio.status.${p.status}`)}
+                  </span>
                 </Link>
               </li>
             ))}

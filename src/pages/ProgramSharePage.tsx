@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { brand } from "../brand";
+import { useT } from "../i18n";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 
 type PublicProgram = {
@@ -17,6 +18,7 @@ type PublicProgram = {
 
 export function ProgramSharePage() {
   const { id = "" } = useParams();
+  const t = useT();
   const [program, setProgram] = useState<PublicProgram | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,12 +30,12 @@ export function ProgramSharePage() {
     let cancelled = false;
     const run = async () => {
       if (!id) {
-        setError("Missing program id");
+        setError("errors.missingProgramId");
         setLoading(false);
         return;
       }
       if (!isSupabaseConfigured) {
-        setError("Supabase not configured");
+        setError("errors.supabaseMissing");
         setLoading(false);
         return;
       }
@@ -51,7 +53,7 @@ export function ProgramSharePage() {
         return;
       }
       if (!data || data.status !== "published") {
-        setError("This program isn’t published or wasn’t found.");
+        setError("errors.programUnavailable");
         setLoading(false);
         return;
       }
@@ -81,13 +83,13 @@ export function ProgramSharePage() {
       </header>
 
       <main className="share-main">
-        {loading ? <p className="studio-muted">Loading program…</p> : null}
+        {loading ? <p className="studio-muted">{t("share.loading")}</p> : null}
         {error ? (
           <div className="share-card">
-            <h1>Program unavailable</h1>
-            <p className="studio-muted">{error}</p>
+            <h1>{t("share.unavailable")}</h1>
+            <p className="studio-muted">{t(error)}</p>
             <Link className="studio-btn studio-btn--accent" to="/">
-              Back to site
+              {t("share.backToSite")}
             </Link>
           </div>
         ) : null}
@@ -101,30 +103,31 @@ export function ProgramSharePage() {
                   : undefined
               }
             />
-            <p className="studio-kicker">Creator program</p>
+            <p className="studio-kicker">{t("share.kicker")}</p>
             <h1>{program.title}</h1>
             <p className="studio-muted">
-              {program.weeks} weeks · {program.days_per_week} days/week · {program.minutes} min ·{" "}
-              {program.level}
+              {t("share.meta", {
+                weeks: program.weeks,
+                days: program.days_per_week,
+                minutes: program.minutes,
+                level: t(`studio.levels.${program.level}`),
+              })}
             </p>
             {program.description ? <p className="share-desc">{program.description}</p> : null}
 
             <div className="share-actions">
               <button type="button" className="studio-btn studio-btn--accent" onClick={openApp}>
-                Open in RASHMAT app
+                {t("share.openApp")}
               </button>
               <a className="studio-btn studio-btn--ghost" href={storeHint}>
-                Get the app / platform
+                {t("share.getApp")}
               </a>
             </div>
 
             <p className="share-deeplink">
-              Deep link: <code>{deepLink}</code>
+              {t("share.deepLink")} <code>{deepLink}</code>
             </p>
-            <p className="studio-muted share-note">
-              On a phone with the app installed, Open jumps straight into this program. Otherwise use
-              the platform link.
-            </p>
+            <p className="studio-muted share-note">{t("share.note")}</p>
           </div>
         ) : null}
       </main>

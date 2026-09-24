@@ -1,16 +1,18 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../auth";
+import { useT } from "../../i18n";
 import { DRILL_QUICK_ADDS, PROGRAM_TEMPLATES } from "../../lib/templates";
 import { useStudioTour } from "../../tour/StudioTour";
 
 export function StudioLibraryPage() {
   const { profile } = useAuth();
   const { start } = useStudioTour();
+  const t = useT();
 
   if (!profile?.is_creator) {
     return (
       <main className="studio-page studio-page--narrow">
-        <Link to="/studio">← Dashboard</Link>
+        <Link to="/studio">{t("common.dashboardBack")}</Link>
       </main>
     );
   }
@@ -19,125 +21,117 @@ export function StudioLibraryPage() {
     <main className="studio-page">
       <header className="studio-page-head">
         <div>
-          <p className="studio-kicker">Automation</p>
-          <h1>Library</h1>
-          <p className="studio-muted">
-            Templates, drill presets, and the white-glove playbook for your first creators.
-          </p>
+          <p className="studio-kicker">{t("studio.library.kicker")}</p>
+          <h1>{t("studio.library.title")}</h1>
+          <p className="studio-muted">{t("studio.library.sub")}</p>
         </div>
         <div className="studio-actions">
           <button type="button" className="studio-btn studio-btn--ghost" onClick={start}>
-            Replay tour
+            {t("studio.library.replayTour")}
           </button>
           <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
-            Use in wizard
+            {t("studio.library.useInWizard")}
           </Link>
         </div>
       </header>
 
       <section className="studio-panel" id="playbook">
         <div className="studio-panel-head">
-          <h2>Creator onboarding playbook</h2>
-          <span className="studio-muted">First 5–10 · grappling-first</span>
+          <h2>{t("studio.library.playbookTitle")}</h2>
+          <span className="studio-muted">{t("studio.library.playbookHint")}</span>
         </div>
         <div className="playbook">
           <p>
-            <strong>Thesis:</strong> creator builds program → athlete executes → RASHMAT tracks →
-            creator sees evolution. Studio is the moat — protect that loop.
+            <strong>{t("studio.library.thesisLabel")}</strong> {t("studio.library.thesisBody")}
           </p>
-          <h3>Offer</h3>
-          <p className="studio-muted">
-            “Send videos + the system in your head. We turn it into Week → Day → Session → Drill.
-            You publish. Athletes follow. You see who finishes.”
-          </p>
-          <h3>7-day white-glove</h3>
+          <h3>{t("studio.library.offerTitle")}</h3>
+          <p className="studio-muted">{t("studio.library.offerBody")}</p>
+          <h3>{t("studio.library.whiteGloveTitle")}</h3>
           <ol className="playbook-steps">
             <li>
-              <strong>Day 0 — Recruit</strong>
-              <span>15-min call. Theme + 4–6 weeks. Promise live program ≤7 days with your help.</span>
+              <strong>{t("studio.library.day0Title")}</strong>
+              <span>{t("studio.library.day0Body")}</span>
             </li>
             <li>
-              <strong>Day 1 — Kickoff</strong>
-              <span>Activate creator, run Studio tour, pick wizard template, name the camp.</span>
+              <strong>{t("studio.library.day1Title")}</strong>
+              <span>{t("studio.library.day1Body")}</span>
             </li>
             <li>
-              <strong>Day 2–3 — Structure (you)</strong>
-              <span>Auto-schedule, map curriculum, paste Mux IDs, auto-fill missing days.</span>
+              <strong>{t("studio.library.day23Title")}</strong>
+              <span>{t("studio.library.day23Body")}</span>
             </li>
             <li>
-              <strong>Day 4 — Review</strong>
-              <span>CMS together: rename drills, reorder, duplicate a strong day. Keep draft.</span>
+              <strong>{t("studio.library.day4Title")}</strong>
+              <span>{t("studio.library.day4Body")}</span>
             </li>
             <li>
-              <strong>Day 5 — Smoke test</strong>
-              <span>Test athlete completes 1–2 sessions. Confirm Students progress.</span>
+              <strong>{t("studio.library.day5Title")}</strong>
+              <span>{t("studio.library.day5Body")}</span>
             </li>
             <li>
-              <strong>Day 6 — Soft publish</strong>
-              <span>Publish + one story: “Don’t just watch. Progress.”</span>
+              <strong>{t("studio.library.day6Title")}</strong>
+              <span>{t("studio.library.day6Body")}</span>
             </li>
             <li>
-              <strong>Day 7 — Debrief</strong>
-              <span>Blockers? Ask for 1 peer intro. Track completion %, not vanity downloads.</span>
+              <strong>{t("studio.library.day7Title")}</strong>
+              <span>{t("studio.library.day7Body")}</span>
             </li>
           </ol>
-          <h3>Validate in 30 days</h3>
+          <h3>{t("studio.library.validateTitle")}</h3>
           <ul className="playbook-metrics">
-            <li>≥5 programs from real coaches published</li>
-            <li>≥30% of enrolled athletes finish ≥3 sessions</li>
+            <li>{t("studio.library.validate1")}</li>
+            <li>{t("studio.library.validate2")}</li>
           </ul>
           <p className="studio-muted">
-            Full write-up: <code>web/docs/CREATOR_ONBOARDING.md</code>
+            {t("studio.library.writeupLabel")} <code>web/docs/CREATOR_ONBOARDING.md</code>
           </p>
         </div>
       </section>
 
       <section className="studio-panel" id="hotmart">
         <div className="studio-panel-head">
-          <h2>Hotmart / course sellers → RASHMAT</h2>
-          <span className="studio-muted">Convert catalog owners</span>
+          <h2>{t("studio.library.hotmartTitle")}</h2>
+          <span className="studio-muted">{t("studio.library.hotmartHint")}</span>
         </div>
         <div className="playbook">
           <p>
-            <strong>Wedge:</strong> they already sell videos (Hotmart, Eduzz, Kiwify, Teachable…).
-            Buyers binge and quit. RASHMAT turns the best course into a{" "}
-            <em>Week → Day → Session → Drill</em> camp with completion tracking.
+            <strong>{t("studio.library.wedgeLabel")}</strong> {t("studio.library.wedgeBefore")}{" "}
+            <em>{t("studio.library.wedgeEm")}</em> {t("studio.library.wedgeAfter")}
           </p>
-          <h3>Do not ask them to leave Hotmart first</h3>
-          <p className="studio-muted">
-            Phase 1 = companion training layer (checkout stays). Phase 2 = sell inside RASHMAT when
-            payments exist. Lead with completion and reputation, not “migrate your funnel.”
-          </p>
-          <h3>Map their course</h3>
+          <h3>{t("studio.library.phaseTitle")}</h3>
+          <p className="studio-muted">{t("studio.library.phaseBody")}</p>
+          <h3>{t("studio.library.mapTitle")}</h3>
           <ul className="playbook-metrics">
-            <li>Product → Program</li>
-            <li>Module → Week (or group modules into weeks)</li>
-            <li>Lesson → Session (Day)</li>
-            <li>Technique clip → Drill</li>
-            <li>Course cover → Upload to Storage (mats, not gym stock)</li>
+            <li>{t("studio.library.map1")}</li>
+            <li>{t("studio.library.map2")}</li>
+            <li>{t("studio.library.map3")}</li>
+            <li>{t("studio.library.map4")}</li>
+            <li>{t("studio.library.map5")}</li>
           </ul>
-          <h3>Pitch</h3>
+          <h3>{t("studio.library.pitchTitle")}</h3>
+          <p className="studio-muted">{t("studio.library.pitchBody")}</p>
           <p className="studio-muted">
-            “Keep selling on Hotmart. We turn your core system into a 4–6 week camp athletes finish —
-            you see who completes.”
-          </p>
-          <p className="studio-muted">
-            Full playbook + objections: <code>web/docs/HOTMART_CONVERSION.md</code>
+            {t("studio.library.objectionsLabel")} <code>web/docs/HOTMART_CONVERSION.md</code>
           </p>
         </div>
       </section>
 
       <section className="studio-panel">
         <div className="studio-panel-head">
-          <h2>Program templates</h2>
+          <h2>{t("studio.library.templatesTitle")}</h2>
         </div>
         <div className="wizard-templates">
-          {PROGRAM_TEMPLATES.map((t) => (
-            <Link key={t.id} to="/studio/programs/new" className="library-card">
-              <strong>{t.name}</strong>
-              <span>{t.blurb}</span>
+          {PROGRAM_TEMPLATES.map((tpl) => (
+            <Link key={tpl.id} to="/studio/programs/new" className="library-card">
+              <strong>{t(tpl.nameKey)}</strong>
+              <span>{t(tpl.blurbKey)}</span>
               <em>
-                {t.weeks}w · {t.daysPerWeek}d/w · {t.dayPatterns.length} day patterns · {t.sport}
+                {t("studio.library.templateMeta", {
+                  weeks: tpl.weeks,
+                  days: tpl.daysPerWeek,
+                  patterns: tpl.dayPatterns.length,
+                  sport: t(tpl.sportKey),
+                })}
               </em>
             </Link>
           ))}
@@ -146,15 +140,15 @@ export function StudioLibraryPage() {
 
       <section className="studio-panel">
         <div className="studio-panel-head">
-          <h2>One-tap drill presets</h2>
-          <span className="studio-muted">Available inside the CMS session editor</span>
+          <h2>{t("studio.library.presetsTitle")}</h2>
+          <span className="studio-muted">{t("studio.library.presetsHint")}</span>
         </div>
         <ul className="library-drills">
           {DRILL_QUICK_ADDS.map((d) => (
             <li key={d.name}>
-              <strong>{d.name}</strong>
+              <strong>{d.nameKey ? t(d.nameKey) : d.name}</strong>
               <span>{d.reps}</span>
-              <em>rest {d.rest_seconds}s</em>
+              <em>{t("studio.library.presetRest", { seconds: d.rest_seconds })}</em>
             </li>
           ))}
         </ul>
@@ -162,28 +156,28 @@ export function StudioLibraryPage() {
 
       <section className="studio-panel">
         <div className="studio-panel-head">
-          <h2>Built-in automations</h2>
+          <h2>{t("studio.library.automationsTitle")}</h2>
         </div>
         <ul className="library-auto">
           <li>
-            <strong>Auto-schedule</strong>
-            <span>weeks × days/week → full session calendar with titled days</span>
+            <strong>{t("studio.library.auto1Title")}</strong>
+            <span>{t("studio.library.auto1Body")}</span>
           </li>
           <li>
-            <strong>Seed drills</strong>
-            <span>template patterns rotate across the block so every day starts useful</span>
+            <strong>{t("studio.library.auto2Title")}</strong>
+            <span>{t("studio.library.auto2Body")}</span>
           </li>
           <li>
-            <strong>Fill missing days</strong>
-            <span>expand a program later without rebuilding by hand</span>
+            <strong>{t("studio.library.auto3Title")}</strong>
+            <span>{t("studio.library.auto3Body")}</span>
           </li>
           <li>
-            <strong>Duplicate day / program</strong>
-            <span>clone structure + drills, then tweak</span>
+            <strong>{t("studio.library.auto4Title")}</strong>
+            <span>{t("studio.library.auto4Body")}</span>
           </li>
           <li>
-            <strong>Starter block</strong>
-            <span>warm-up → technique → positional → live → cool-down in one click</span>
+            <strong>{t("studio.library.auto5Title")}</strong>
+            <span>{t("studio.library.auto5Body")}</span>
           </li>
         </ul>
       </section>

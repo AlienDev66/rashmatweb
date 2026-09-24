@@ -22,10 +22,10 @@ function extensionFor(contentType: string) {
 
 export function validateCoverFile(file: File) {
   if (file.size > MAX_BYTES) {
-    return "Cover must be under 5MB.";
+    return "errors.coverTooLarge";
   }
   if (!resolveImageContentType(file)) {
-    return "Use JPEG, PNG, or WebP.";
+    return "errors.coverType";
   }
   return null;
 }
@@ -33,7 +33,7 @@ export function validateCoverFile(file: File) {
 /** Path: {userId}/programs/{programId}.{ext} */
 export async function uploadProgramCover(userId: string, programId: string, file: File) {
   if (!isSupabaseConfigured) {
-    return { error: "Supabase not configured", url: null as string | null };
+    return { error: "errors.supabaseMissing", url: null as string | null };
   }
 
   const validation = validateCoverFile(file);

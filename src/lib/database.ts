@@ -130,6 +130,10 @@ export type Database = {
         Args: { p_program_id?: string | null };
         Returns: Json;
       };
+      my_creator_followers: {
+        Args: { p_limit?: number };
+        Returns: Json;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth";
+import { useT } from "../../i18n";
 import type { StudioProgram } from "../../lib/database";
 import {
   deleteProgram,
@@ -13,6 +14,7 @@ import { getPublishReadiness } from "../../lib/publishGate";
 export function StudioProgramsPage() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const t = useT();
   const [programs, setPrograms] = useState<StudioProgram[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -34,8 +36,8 @@ export function StudioProgramsPage() {
   if (!profile?.is_creator) {
     return (
       <main className="studio-page studio-page--narrow">
-        <p className="studio-muted">Activate creator mode from the dashboard first.</p>
-        <Link to="/studio">← Dashboard</Link>
+        <p className="studio-muted">{t("studio.programs.activateFirst")}</p>
+        <Link to="/studio">{t("common.dashboardBack")}</Link>
       </main>
     );
   }
@@ -52,7 +54,7 @@ export function StudioProgramsPage() {
     const { program, error } = await duplicateProgram(id, user.id, profile.creator_slug);
     setBusyId(null);
     if (error || !program) {
-      window.alert(error ?? "Could not duplicate");
+      window.alert(error ? t(error) : t("errors.duplicateProgram"));
       return;
     }
     await load();
@@ -64,8 +66,10 @@ export function StudioProgramsPage() {
     if (next) {
       const readiness = await getPublishReadiness(p);
       if (!readiness.ready) {
-        const missing = readiness.checks.filter((c) => !c.ok).map((c) => c.label);
-        window.alert(`Finish publish checklist first:\n• ${missing.join("\n• ")}`);
+        const missing = readiness.checks
+          .filter((c) => !c.ok)
+          .map((c) => t(`studio.gate.${c.id}.label`));
+        window.alert(`${t("studio.programs.checklistAlert")}\n• ${missing.join("\n• ")}`);
         return;
       }
     }
@@ -73,7 +77,7 @@ export function StudioProgramsPage() {
     const { error } = await publishProgram(p.id, next);
     setBusyId(null);
     if (error) {
-      window.alert(error);
+      window.alert(t(error));
       return;
     }
     setPrograms((prev) =>
@@ -82,12 +86,12 @@ export function StudioProgramsPage() {
   };
 
   const onDelete = async (p: StudioProgram) => {
-    if (!window.confirm(`Delete “${p.title}”? This removes sessions and drills.`)) return;
+    if (!window.confirm(t("studio.programs.confirmDelete", { title: p.title }))) return;
     setBusyId(p.id);
     const { error } = await deleteProgram(p.id);
     setBusyId(null);
     if (error) {
-      window.alert(error);
+      window.alert(t(error));
       return;
     }
     setPrograms((prev) => prev.filter((x) => x.id !== p.id));
@@ -97,18 +101,18 @@ export function StudioProgramsPage() {
     <main className="studio-page">
       <header className="studio-page-head">
         <div>
-          <p className="studio-kicker">Catalog</p>
-          <h1>Programs</h1>
+          <p className="studio-kicker">{t("studio.programs.kicker")}</p>
+          <h1>{t("studio.programs.title")}</h1>
         </div>
         <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
-          New program
+          {t("studio.newProgram")}
         </Link>
       </header>
 
       <div className="studio-toolbar">
         <input
           className="studio-search"
-          placeholder="Search programs…"
+          placeholder={t("studio.programs.searchPlaceholder")}
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
@@ -120,19 +124,19 @@ export function StudioProgramsPage() {
               className={filter === f ? "is-active" : undefined}
               onClick={() => setFilter(f)}
             >
-              {f}
+              {t(`studio.filter.${f}`)}
             </button>
           ))}
         </div>
       </div>
 
       {loading ? (
-        <p className="studio-muted">Loading…</p>
+        <p className="studio-muted">{t("common.loading")}</p>
       ) : filtered.length === 0 ? (
         <div className="studio-empty">
-          <p>No programs match.</p>
+          <p>{t("studio.programs.emptyMatch")}</p>
           <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
-            Create one
+            {t("studio.programs.createOne")}
           </Link>
         </div>
       ) : (
@@ -152,20 +156,27 @@ export function StudioProgramsPage() {
                   {p.title}
                 </Link>
                 <p className="studio-muted">
-                  {p.weeks} weeks · {p.days_per_week} days/week · {p.minutes} min · {p.level}
+                  {t("studio.programs.meta", {
+                    weeks: p.weeks,
+                    days: p.days_per_week,
+                    minutes: p.minutes,
+                    level: t(`studio.levels.${p.level}`),
+                  })}
                 </p>
                 <div className="studio-tags">
-                  <span className={`studio-pill studio-pill--${p.status}`}>{p.status}</span>
-                  {p.tags.slice(0, 4).map((t) => (
-                    <span key={t} className="studio-tag">
-                      {t}
+                  <span className={`studio-pill studio-pill--${p.status}`}>
+                    {t(`studio.status.${p.status}`)}
+                  </span>
+                  {p.tags.slice(0, 4).map((tag) => (
+                    <span key={tag} className="studio-tag">
+                      {tag}
                     </span>
                   ))}
                 </div>
               </div>
               <div className="studio-card-actions">
                 <Link className="studio-btn studio-btn--ghost" to={`/studio/cms?program=${p.id}`}>
-                  CMS
+                  {t("studio.programs.cms")}
                 </Link>
                 <button
                   type="button"
@@ -173,7 +184,7 @@ export function StudioProgramsPage() {
                   disabled={busyId === p.id}
                   onClick={() => void onToggle(p)}
                 >
-                  {p.status === "published" ? "Unpublish" : "Publish"}
+                  {p.status === "published" ? t("common.unpublish") : t("common.publish")}
                 </button>
                 <button
                   type="button"
@@ -181,7 +192,7 @@ export function StudioProgramsPage() {
                   disabled={busyId === p.id}
                   onClick={() => void onDuplicate(p.id)}
                 >
-                  Duplicate
+                  {t("common.duplicate")}
                 </button>
                 <button
                   type="button"
@@ -189,7 +200,7 @@ export function StudioProgramsPage() {
                   disabled={busyId === p.id}
                   onClick={() => void onDelete(p)}
                 >
-                  Delete
+                  {t("common.delete")}
                 </button>
               </div>
             </li>

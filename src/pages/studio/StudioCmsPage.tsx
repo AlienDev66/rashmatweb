@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../auth";
+import { useT } from "../../i18n";
 import type { StudioExercise, StudioProgram, StudioSession } from "../../lib/database";
 import {
   applyDrillPresets,
@@ -24,6 +25,7 @@ import { DRILL_QUICK_ADDS } from "../../lib/templates";
 
 export function StudioCmsPage() {
   const { user, profile } = useAuth();
+  const t = useT();
   const [params, setParams] = useSearchParams();
   const paramProgram = params.get("program") ?? "";
   const paramSession = params.get("session") ?? "";
@@ -54,6 +56,16 @@ export function StudioCmsPage() {
   const selectedProgram = useMemo(
     () => programs.find((p) => p.id === programId) ?? null,
     [programs, programId],
+  );
+
+  /** Quick-adds are UI presets, so their names are stored in the creator's language. */
+  const quickAdds = useMemo(
+    () =>
+      DRILL_QUICK_ADDS.map((preset) => ({
+        ...preset,
+        name: preset.nameKey ? t(preset.nameKey) : preset.name,
+      })),
+    [t],
   );
 
   const flash = (text: string) => {
@@ -143,8 +155,8 @@ export function StudioCmsPage() {
   if (!profile?.is_creator) {
     return (
       <main className="studio-page studio-page--narrow">
-        <p className="studio-muted">Activate creator mode first.</p>
-        <Link to="/studio">← Dashboard</Link>
+        <p className="studio-muted">{t("studio.cms.activateFirst")}</p>
+        <Link to="/studio">{t("common.dashboardBack")}</Link>
       </main>
     );
   }
@@ -156,21 +168,22 @@ export function StudioCmsPage() {
   const onSaveSession = async () => {
     if (!sessionId) return;
     setBusy(true);
+    const fallbackTitle = t("studio.cms.sessionFallback");
     const { error } = await updateSession(sessionId, {
-      title: sessionTitle.trim() || "Session",
+      title: sessionTitle.trim() || fallbackTitle,
       description: sessionDesc,
       minutes: sessionMinutes,
       mux_playback_id: sessionMux.trim() || null,
       video_url: sessionVideoUrl.trim() || null,
     });
     setBusy(false);
-    if (error) return flash(error);
+    if (error) return flash(t(error));
     setSessions((prev) =>
       prev.map((s) =>
         s.id === sessionId
           ? {
               ...s,
-              title: sessionTitle.trim() || "Session",
+              title: sessionTitle.trim() || fallbackTitle,
               description: sessionDesc,
               minutes: sessionMinutes,
               mux_playback_id: sessionMux.trim() || null,
@@ -179,7 +192,7 @@ export function StudioCmsPage() {
           : s,
       ),
     );
-    flash("Session saved");
+    flash(t("studio.cms.flashSessionSaved"));
   };
 
   const onAddSession = async () => {
@@ -188,15 +201,15 @@ export function StudioCmsPage() {
     setBusy(true);
     const { session, error } = await createSession({
       programId,
-      title: `Day ${nextDay}`,
+      title: t("studio.cms.dayTitle", { day: nextDay }),
       day: nextDay,
       minutes: selectedProgram.minutes,
     });
     setBusy(false);
-    if (error || !session) return flash(error ?? "Could not create session");
+    if (error || !session) return flash(error ? t(error) : t("errors.createSession"));
     setSessions((prev) => [...prev, session]);
     setSessionId(session.id);
-    flash("Session added");
+    flash(t("studio.cms.flashSessionAdded"));
   };
 
   const onDuplicateSession = async () => {
@@ -205,23 +218,23 @@ export function StudioCmsPage() {
     setBusy(true);
     const { session, error } = await duplicateSession(sessionId, programId, nextDay);
     setBusy(false);
-    if (error || !session) return flash(error ?? "Duplicate failed");
+    if (error || !session) return flash(error ? t(error) : t("errors.duplicateSession"));
     setSessions((prev) => [...prev, session].sort((a, b) => a.day - b.day));
     setSessionId(session.id);
-    flash("Session duplicated with drills");
+    flash(t("studio.cms.flashSessionDuplicated"));
   };
 
   const onDeleteSession = async () => {
     if (!sessionId) return;
-    if (!window.confirm("Delete this session and its drills?")) return;
+    if (!window.confirm(t("studio.cms.confirmDeleteSession"))) return;
     setBusy(true);
     const { error } = await deleteSession(sessionId);
     setBusy(false);
-    if (error) return flash(error);
+    if (error) return flash(t(error));
     const next = sessions.filter((s) => s.id !== sessionId);
     setSessions(next);
     setSessionId(next[0]?.id ?? "");
-    flash("Session deleted");
+    flash(t("studio.cms.flashSessionDeleted"));
   };
 
   const onFillSchedule = async () => {
@@ -229,10 +242,14 @@ export function StudioCmsPage() {
     setBusy(true);
     const { created, error } = await fillProgramSchedule(selectedProgram);
     setBusy(false);
-    if (error) return flash(error);
+    if (error) return flash(t(error));
     const { sessions: list } = await fetchProgramSessions(selectedProgram.id);
     setSessions(list);
-    flash(`Filled ${created} missing day${created === 1 ? "" : "s"}`);
+    flash(
+      created === 1
+        ? t("studio.cms.flashFilledOne")
+        : t("studio.cms.flashFilled", { count: created }),
+    );
   };
 
   const onAddDrill = async (preset?: { name: string; reps: string; rest_seconds: number }) => {
@@ -250,14 +267,14 @@ export function StudioCmsPage() {
       videoUrl: preset ? null : drillVideoUrl.trim() || null,
     });
     setBusy(false);
-    if (error || !exercise) return flash(error ?? "Could not add drill");
+    if (error || !exercise) return flash(error ? t(error) : t("errors.addDrill"));
     setExercises((prev) => [...prev, exercise]);
     if (!preset) {
       setDrillName("");
       setDrillMux("");
       setDrillVideoUrl("");
     }
-    flash("Drill added");
+    flash(t("studio.cms.flashDrillAdded"));
   };
 
   const onApplyStarterBlock = async () => {
@@ -265,13 +282,13 @@ export function StudioCmsPage() {
     setBusy(true);
     const { exercises: created, error } = await applyDrillPresets(
       sessionId,
-      DRILL_QUICK_ADDS,
+      quickAdds,
       exercises.length,
     );
     setBusy(false);
-    if (error) return flash(error);
+    if (error) return flash(t(error));
     setExercises((prev) => [...prev, ...created]);
-    flash("Starter block applied");
+    flash(t("studio.cms.flashStarterApplied"));
   };
 
   const onSaveDrill = async (ex: StudioExercise) => {
@@ -284,16 +301,16 @@ export function StudioCmsPage() {
       video_url: ex.video_url,
     });
     setBusy(false);
-    if (error) return flash(error);
+    if (error) return flash(t(error));
     setEditingDrill(null);
-    flash("Drill updated");
+    flash(t("studio.cms.flashDrillUpdated"));
   };
 
   const onDeleteDrill = async (id: string) => {
     setBusy(true);
     const { error } = await deleteExercise(id);
     setBusy(false);
-    if (error) return flash(error);
+    if (error) return flash(t(error));
     const next = exercises.filter((e) => e.id !== id);
     setExercises(next);
     await reorderExercises(next.map((e) => e.id));
@@ -318,7 +335,7 @@ export function StudioCmsPage() {
     setBusy(true);
     const { exercise, error } = await createExercise({
       sessionId,
-      name: `${last.name} (copy)`,
+      name: t("studio.cms.copySuffix", { name: last.name }),
       reps: last.reps ?? "Reps: 8 8 8",
       restSeconds: last.rest_seconds,
       sortOrder: exercises.length,
@@ -326,9 +343,9 @@ export function StudioCmsPage() {
       videoUrl: last.video_url,
     });
     setBusy(false);
-    if (error || !exercise) return flash(error ?? "Failed");
+    if (error || !exercise) return flash(error ? t(error) : t("errors.failed"));
     setExercises((prev) => [...prev, exercise]);
-    flash("Drill duplicated");
+    flash(t("studio.cms.flashDrillDuplicated"));
   };
 
   const onTogglePublish = async () => {
@@ -337,21 +354,23 @@ export function StudioCmsPage() {
     if (next) {
       const readiness = await getPublishReadiness(selectedProgram);
       if (!readiness.ready) {
-        const missing = readiness.checks.filter((c) => !c.ok).map((c) => c.label);
-        flash(`Finish checklist: ${missing.join(" · ")}`);
+        const missing = readiness.checks
+          .filter((c) => !c.ok)
+          .map((c) => t(`studio.gate.${c.id}.label`));
+        flash(t("studio.cms.flashChecklist", { missing: missing.join(" · ") }));
         return;
       }
     }
     setBusy(true);
     const { error } = await publishProgram(selectedProgram.id, next);
     setBusy(false);
-    if (error) return flash(error);
+    if (error) return flash(t(error));
     setPrograms((prev) =>
       prev.map((p) =>
         p.id === selectedProgram.id ? { ...p, status: next ? "published" : "draft" } : p,
       ),
     );
-    flash(next ? "Published" : "Unpublished");
+    flash(next ? t("studio.cms.flashPublished") : t("studio.cms.flashUnpublished"));
   };
 
   const targetSessions = selectedProgram
@@ -362,16 +381,14 @@ export function StudioCmsPage() {
     <main className="studio-page studio-page--wide">
       <header className="studio-page-head">
         <div>
-          <p className="studio-kicker">Editor</p>
-          <h1>CMS</h1>
-          <p className="studio-muted">
-            Programs → sessions → drills. Quick-adds and duplicates keep you out of busywork.
-          </p>
+          <p className="studio-kicker">{t("studio.cms.kicker")}</p>
+          <h1>{t("studio.cms.title")}</h1>
+          <p className="studio-muted">{t("studio.cms.sub")}</p>
         </div>
         <div className="studio-actions">
           {message ? <span className="studio-flash">{message}</span> : null}
           <Link className="studio-btn studio-btn--ghost" to="/studio/programs/new">
-            Wizard
+            {t("studio.cms.wizard")}
           </Link>
         </div>
       </header>
@@ -379,12 +396,12 @@ export function StudioCmsPage() {
       <div className="cms-grid">
         <aside className="cms-col">
           <div className="cms-col-head">
-            <h2>Programs</h2>
-            <Link to="/studio/programs/new">+ New</Link>
+            <h2>{t("studio.cms.programs")}</h2>
+            <Link to="/studio/programs/new">{t("studio.cms.newProgram")}</Link>
           </div>
           <input
             className="studio-search studio-search--compact"
-            placeholder="Filter…"
+            placeholder={t("studio.cms.filterPlaceholder")}
             value={programQuery}
             onChange={(e) => setProgramQuery(e.target.value)}
           />
@@ -400,7 +417,7 @@ export function StudioCmsPage() {
                   }}
                 >
                   <span>{p.title}</span>
-                  <em>{p.status}</em>
+                  <em>{t(`studio.status.${p.status}`)}</em>
                 </button>
               </li>
             ))}
@@ -408,7 +425,10 @@ export function StudioCmsPage() {
           {selectedProgram ? (
             <div className="cms-side-actions">
               <p className="studio-muted">
-                {sessions.length}/{targetSessions} days
+                {t("studio.cms.dayCount", {
+                  count: sessions.length,
+                  target: targetSessions,
+                })}
               </p>
               <button
                 type="button"
@@ -416,7 +436,7 @@ export function StudioCmsPage() {
                 disabled={busy}
                 onClick={() => void onFillSchedule()}
               >
-                Auto-fill missing days
+                {t("studio.cms.autoFill")}
               </button>
               <button
                 type="button"
@@ -424,10 +444,12 @@ export function StudioCmsPage() {
                 disabled={busy}
                 onClick={() => void onTogglePublish()}
               >
-                {selectedProgram.status === "published" ? "Unpublish" : "Publish"}
+                {selectedProgram.status === "published"
+                  ? t("common.unpublish")
+                  : t("common.publish")}
               </button>
               <Link className="studio-btn studio-btn--ghost" to={`/studio/programs/${selectedProgram.id}`}>
-                Program details
+                {t("studio.cms.programDetails")}
               </Link>
             </div>
           ) : null}
@@ -435,9 +457,9 @@ export function StudioCmsPage() {
 
         <aside className="cms-col">
           <div className="cms-col-head">
-            <h2>Sessions</h2>
+            <h2>{t("studio.cms.sessions")}</h2>
             <button type="button" disabled={!programId || busy} onClick={() => void onAddSession()}>
-              + Day
+              {t("studio.cms.addDay")}
             </button>
           </div>
           <ul className="cms-list">
@@ -463,7 +485,7 @@ export function StudioCmsPage() {
                 disabled={busy}
                 onClick={() => void onDuplicateSession()}
               >
-                Duplicate day + drills
+                {t("studio.cms.duplicateDay")}
               </button>
               <button
                 type="button"
@@ -471,7 +493,7 @@ export function StudioCmsPage() {
                 disabled={busy}
                 onClick={() => void onDeleteSession()}
               >
-                Delete session
+                {t("studio.cms.deleteSession")}
               </button>
             </div>
           ) : null}
@@ -479,19 +501,19 @@ export function StudioCmsPage() {
 
         <section className="cms-col cms-col--editor">
           {!sessionId ? (
-            <p className="studio-muted">Select or create a session.</p>
+            <p className="studio-muted">{t("studio.cms.selectSession")}</p>
           ) : (
             <>
               <div className="cms-col-head">
-                <h2>Session editor</h2>
+                <h2>{t("studio.cms.sessionEditor")}</h2>
               </div>
               <div className="studio-form studio-form--grid">
                 <label className="span-2">
-                  Title
+                  {t("common.title")}
                   <input value={sessionTitle} onChange={(e) => setSessionTitle(e.target.value)} />
                 </label>
                 <label className="span-2">
-                  Notes for athletes
+                  {t("studio.cms.notes")}
                   <textarea
                     rows={2}
                     value={sessionDesc}
@@ -499,7 +521,7 @@ export function StudioCmsPage() {
                   />
                 </label>
                 <label>
-                  Minutes
+                  {t("common.minutes")}
                   <input
                     type="number"
                     min={10}
@@ -509,7 +531,7 @@ export function StudioCmsPage() {
                 </label>
                 <div className="span-2">
                   <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
-                    Session video
+                    {t("studio.cms.sessionVideo")}
                   </p>
                   <VideoUploader
                     value={{ muxPlaybackId: sessionMux, videoUrl: sessionVideoUrl }}
@@ -522,7 +544,7 @@ export function StudioCmsPage() {
                           mux_playback_id: next.muxPlaybackId.trim() || null,
                           video_url: next.videoUrl.trim() || null,
                         }).then(({ error }) => {
-                          if (error) flash(error);
+                          if (error) flash(t(error));
                           else {
                             setSessions((prev) =>
                               prev.map((s) =>
@@ -535,7 +557,7 @@ export function StudioCmsPage() {
                                   : s,
                               ),
                             );
-                            flash("Session video saved");
+                            flash(t("studio.cms.flashSessionVideoSaved"));
                           }
                         });
                       }
@@ -550,27 +572,27 @@ export function StudioCmsPage() {
                 disabled={busy}
                 onClick={() => void onSaveSession()}
               >
-                Save session
+                {t("studio.cms.saveSession")}
               </button>
 
               <div className="cms-col-head cms-col-head--spaced">
-                <h2>Drills ({exercises.length})</h2>
+                <h2>{t("studio.cms.drills", { count: exercises.length })}</h2>
                 <div className="cms-inline-actions">
                   <button type="button" disabled={busy} onClick={() => void onApplyStarterBlock()}>
-                    + Starter block
+                    {t("studio.cms.starterBlock")}
                   </button>
                   <button
                     type="button"
                     disabled={busy || exercises.length === 0}
                     onClick={() => void onDuplicateLastDrill()}
                   >
-                    Duplicate last
+                    {t("studio.cms.duplicateLast")}
                   </button>
                 </div>
               </div>
 
               <div className="cms-quick-drills">
-                {DRILL_QUICK_ADDS.map((p) => (
+                {quickAdds.map((p) => (
                   <button key={p.name} type="button" disabled={busy} onClick={() => void onAddDrill(p)}>
                     {p.name}
                   </button>
@@ -584,6 +606,7 @@ export function StudioCmsPage() {
                       <div className="studio-form">
                         <input
                           value={ex.name}
+                          aria-label={t("studio.cms.drillName")}
                           onChange={(e) =>
                             setExercises((prev) =>
                               prev.map((x) => (x.id === ex.id ? { ...x, name: e.target.value } : x)),
@@ -592,6 +615,7 @@ export function StudioCmsPage() {
                         />
                         <input
                           value={ex.reps ?? ""}
+                          aria-label={t("studio.cms.reps")}
                           onChange={(e) =>
                             setExercises((prev) =>
                               prev.map((x) => (x.id === ex.id ? { ...x, reps: e.target.value } : x)),
@@ -601,6 +625,7 @@ export function StudioCmsPage() {
                         <input
                           type="number"
                           value={ex.rest_seconds}
+                          aria-label={t("studio.cms.rest")}
                           onChange={(e) =>
                             setExercises((prev) =>
                               prev.map((x) =>
@@ -613,7 +638,7 @@ export function StudioCmsPage() {
                         />
                         <div className="span-2">
                           <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
-                            Drill video
+                            {t("studio.cms.drillVideo")}
                           </p>
                           <VideoUploader
                             value={{
@@ -637,8 +662,8 @@ export function StudioCmsPage() {
                                   video_url: next.videoUrl.trim() || null,
                                   mux_playback_id: next.muxPlaybackId.trim() || null,
                                 }).then(({ error }) => {
-                                  if (error) flash(error);
-                                  else flash("Drill video saved");
+                                  if (error) flash(t(error));
+                                  else flash(t("studio.cms.flashDrillVideoSaved"));
                                 });
                               }
                             }}
@@ -651,7 +676,7 @@ export function StudioCmsPage() {
                             className="studio-btn studio-btn--accent"
                             onClick={() => void onSaveDrill(ex)}
                           >
-                            Save
+                            {t("common.save")}
                           </button>
                           <button
                             type="button"
@@ -661,7 +686,7 @@ export function StudioCmsPage() {
                               void reloadExercises(sessionId);
                             }}
                           >
-                            Cancel
+                            {t("common.cancel")}
                           </button>
                         </div>
                       </div>
@@ -672,25 +697,46 @@ export function StudioCmsPage() {
                             {index + 1}. {ex.name}
                           </strong>
                           <span>
-                            {ex.reps} · rest {ex.rest_seconds}s
+                            {t("studio.cms.drillMeta", {
+                              reps: ex.reps ?? "",
+                              seconds: ex.rest_seconds,
+                            })}
                           </span>
                           {ex.video_url ? (
-                            <em>Video · Storage</em>
+                            <em>{t("studio.cms.videoStorage")}</em>
                           ) : ex.mux_playback_id ? (
-                            <em>Mux · {ex.mux_playback_id}</em>
+                            <em>{t("studio.cms.videoMux", { id: ex.mux_playback_id })}</em>
                           ) : null}
                         </div>
                         <div className="cms-drill-actions">
-                          <button type="button" disabled={busy} onClick={() => void moveDrill(index, -1)}>
+                          <button
+                            type="button"
+                            disabled={busy}
+                            aria-label={t("studio.cms.moveUp")}
+                            title={t("studio.cms.moveUp")}
+                            onClick={() => void moveDrill(index, -1)}
+                          >
                             ↑
                           </button>
-                          <button type="button" disabled={busy} onClick={() => void moveDrill(index, 1)}>
+                          <button
+                            type="button"
+                            disabled={busy}
+                            aria-label={t("studio.cms.moveDown")}
+                            title={t("studio.cms.moveDown")}
+                            onClick={() => void moveDrill(index, 1)}
+                          >
                             ↓
                           </button>
                           <button type="button" onClick={() => setEditingDrill(ex.id)}>
-                            Edit
+                            {t("common.edit")}
                           </button>
-                          <button type="button" disabled={busy} onClick={() => void onDeleteDrill(ex.id)}>
+                          <button
+                            type="button"
+                            disabled={busy}
+                            aria-label={t("studio.cms.removeDrill")}
+                            title={t("studio.cms.removeDrill")}
+                            onClick={() => void onDeleteDrill(ex.id)}
+                          >
                             ✕
                           </button>
                         </div>
@@ -702,15 +748,15 @@ export function StudioCmsPage() {
 
               <div className="studio-form studio-form--grid cms-add-drill">
                 <label>
-                  Drill name
+                  {t("studio.cms.drillName")}
                   <input value={drillName} onChange={(e) => setDrillName(e.target.value)} />
                 </label>
                 <label>
-                  Reps / scheme
+                  {t("studio.cms.reps")}
                   <input value={drillReps} onChange={(e) => setDrillReps(e.target.value)} />
                 </label>
                 <label>
-                  Rest (sec)
+                  {t("studio.cms.rest")}
                   <input
                     type="number"
                     value={drillRest}
@@ -719,7 +765,7 @@ export function StudioCmsPage() {
                 </label>
                 <div className="span-2">
                   <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
-                    Drill video
+                    {t("studio.cms.drillVideo")}
                   </p>
                   <VideoUploader
                     value={{ muxPlaybackId: drillMux, videoUrl: drillVideoUrl }}
@@ -736,7 +782,7 @@ export function StudioCmsPage() {
                   disabled={busy || !drillName.trim()}
                   onClick={() => void onAddDrill()}
                 >
-                  Add custom drill
+                  {t("studio.cms.addCustom")}
                 </button>
               </div>
             </>

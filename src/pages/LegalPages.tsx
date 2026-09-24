@@ -34,7 +34,7 @@ function LegalDoc({
             <img src="/logo-yellow.png" width={40} height={40} alt="" />
             <span>{brand.name}</span>
           </Link>
-          <nav className="legal-top__nav" aria-label="Legal">
+          <nav className="legal-top__nav" aria-label={t("common.navLegal")}>
             <Link to={brand.legal.privacyUrl}>{t("legal.navPrivacy")}</Link>
             <Link to={brand.legal.termsUrl}>{t("legal.navTerms")}</Link>
             <a href={brand.platformUrl}>{t("common.platform")}</a>

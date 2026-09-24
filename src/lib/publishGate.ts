@@ -4,9 +4,12 @@ import { isSupabaseConfigured, supabase } from "./supabase";
 const PLACEHOLDER_COVER =
   "https://images.unsplash.com/photo-1555597673-b21d5c935865";
 
+/**
+ * `id` maps to `studio.gate.<id>.label` / `.hint` in i18n messages.
+ * `hint` is only set when the reason is dynamic (e.g. a Supabase error).
+ */
 export type PublishCheck = {
   id: string;
-  label: string;
   ok: boolean;
   hint?: string;
 };
@@ -31,14 +34,7 @@ export async function getPublishReadiness(program: StudioProgram): Promise<Publi
   if (!isSupabaseConfigured) {
     return {
       ready: false,
-      checks: [
-        {
-          id: "supabase",
-          label: "Supabase configured",
-          ok: false,
-          hint: "Add web/.env keys.",
-        },
-      ],
+      checks: [{ id: "supabase", ok: false }],
     };
   }
 
@@ -50,14 +46,7 @@ export async function getPublishReadiness(program: StudioProgram): Promise<Publi
   if (sErr) {
     return {
       ready: false,
-      checks: [
-        {
-          id: "sessions",
-          label: "At least 1 session",
-          ok: false,
-          hint: sErr.message,
-        },
-      ],
+      checks: [{ id: "sessions", ok: false, hint: sErr.message }],
     };
   }
 
@@ -88,36 +77,11 @@ export async function getPublishReadiness(program: StudioProgram): Promise<Publi
     sessionRows.length > 0 && sessionsWithVideo === sessionRows.length;
 
   const checks: PublishCheck[] = [
-    {
-      id: "cover",
-      label: "Custom program cover",
-      ok: hasRealCover(program.cover_url),
-      hint: "Upload a mat/training cover (not the default placeholder).",
-    },
-    {
-      id: "sessions",
-      label: "At least 1 session",
-      ok: sessionRows.length >= 1,
-      hint: "Add a day in the CMS or use Auto-fill schedule.",
-    },
-    {
-      id: "drills",
-      label: "At least 1 drill",
-      ok: totalDrills >= 1,
-      hint: "Add drills to a session (or quick-add starter block).",
-    },
-    {
-      id: "session_videos",
-      label: "Every session has a video",
-      ok: allSessionsHaveVideo,
-      hint: "Upload an MP4 to Storage for each session (or add Mux later).",
-    },
-    {
-      id: "drill_videos",
-      label: "Every drill has a video",
-      ok: allDrillsHaveVideo,
-      hint: "Upload an MP4 for each drill before publishing.",
-    },
+    { id: "cover", ok: hasRealCover(program.cover_url) },
+    { id: "sessions", ok: sessionRows.length >= 1 },
+    { id: "drills", ok: totalDrills >= 1 },
+    { id: "session_videos", ok: allSessionsHaveVideo },
+    { id: "drill_videos", ok: allDrillsHaveVideo },
   ];
 
   return {

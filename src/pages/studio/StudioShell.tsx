@@ -41,7 +41,7 @@ function StudioChrome() {
           </div>
         </Link>
 
-        <nav className="studio-side-nav" aria-label="Studio">
+        <nav className="studio-side-nav" aria-label={t("studio.sideLabel")}>
           {nav.map((item) => (
             <NavLink
               key={item.to}
@@ -65,7 +65,7 @@ function StudioChrome() {
           <LanguageSwitcher className="studio-side-lang" />
           <div className="studio-side-actions">
             <TourHintButton />
-            <Link to="/">Site</Link>
+            <Link to="/">{t("common.site")}</Link>
             <button type="button" onClick={() => void signOut()}>
               {t("studio.signOut")}
             </button>
@@ -96,11 +96,8 @@ export function StudioShell() {
   if (!configured) {
     return (
       <div className="studio-boot">
-        <h1>Studio</h1>
-        <p>
-          Copy <code>.env.example</code> → <code>.env</code> with your Supabase URL and anon key,
-          then restart <code>bun run dev</code>.
-        </p>
+        <h1>{t("studio.envTitle")}</h1>
+        <p>{t("studio.envMissing")}</p>
         <Link to="/">← {t("common.backHome")}</Link>
       </div>
     );

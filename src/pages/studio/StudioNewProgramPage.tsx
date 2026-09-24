@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { CoverUploader } from "../../components/CoverUploader";
+import { useT } from "../../i18n";
 import { uploadProgramCover } from "../../lib/cover";
 import { createProgram, updateProgram } from "../../lib/studio";
 import { PROGRAM_TEMPLATES, buildSessionPlan } from "../../lib/templates";
@@ -9,10 +10,11 @@ import { PROGRAM_TEMPLATES, buildSessionPlan } from "../../lib/templates";
 export function StudioNewProgramPage() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const t = useT();
   const [templateId, setTemplateId] = useState("bjj-fundamentals");
-  const template = PROGRAM_TEMPLATES.find((t) => t.id === templateId) ?? PROGRAM_TEMPLATES[0];
+  const template = PROGRAM_TEMPLATES.find((x) => x.id === templateId) ?? PROGRAM_TEMPLATES[0];
 
-  const [title, setTitle] = useState(template.name);
+  const [title, setTitle] = useState(() => t(template.nameKey));
   const [description, setDescription] = useState("");
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [pendingCover, setPendingCover] = useState<File | null>(null);
@@ -33,21 +35,21 @@ export function StudioNewProgramPage() {
   if (!profile?.is_creator) {
     return (
       <main className="studio-page studio-page--narrow">
-        <p className="studio-muted">Activate creator mode first.</p>
-        <Link to="/studio">← Dashboard</Link>
+        <p className="studio-muted">{t("studio.wizard.activateFirst")}</p>
+        <Link to="/studio">{t("common.dashboardBack")}</Link>
       </main>
     );
   }
 
   const pickTemplate = (id: string) => {
-    const t = PROGRAM_TEMPLATES.find((x) => x.id === id);
-    if (!t) return;
+    const next = PROGRAM_TEMPLATES.find((x) => x.id === id);
+    if (!next) return;
     setTemplateId(id);
-    setTitle(t.name);
-    setWeeks(t.weeks);
-    setDaysPerWeek(t.daysPerWeek);
-    setMinutes(t.minutes);
-    setLevel(t.level);
+    setTitle(t(next.nameKey));
+    setWeeks(next.weeks);
+    setDaysPerWeek(next.daysPerWeek);
+    setMinutes(next.minutes);
+    setLevel(next.level);
     setSeedDrills(id !== "blank");
   };
 
@@ -72,7 +74,7 @@ export function StudioNewProgramPage() {
     });
     if (err || !program) {
       setBusy(false);
-      setError(err ?? "Could not create program");
+      setError(err ? t(err) : t("errors.createProgram"));
       return;
     }
 
@@ -80,7 +82,7 @@ export function StudioNewProgramPage() {
       const { url, error: upErr } = await uploadProgramCover(user.id, program.id, pendingCover);
       if (upErr || !url) {
         setBusy(false);
-        setError(upErr ?? "Program created, but cover upload failed — add it on the next screen.");
+        setError(upErr ? t(upErr) : t("errors.coverUploadLater"));
         navigate(`/studio/programs/${program.id}`, { replace: true });
         return;
       }
@@ -95,31 +97,33 @@ export function StudioNewProgramPage() {
     <main className="studio-page">
       <header className="studio-page-head">
         <div>
-          <p className="studio-kicker">Wizard</p>
-          <h1>New program</h1>
-          <p className="studio-muted">
-            Pick a template — we generate the full calendar and starter drills so you only tweak.
-          </p>
+          <p className="studio-kicker">{t("studio.wizard.kicker")}</p>
+          <h1>{t("studio.wizard.title")}</h1>
+          <p className="studio-muted">{t("studio.wizard.sub")}</p>
         </div>
       </header>
 
       <form className="wizard" onSubmit={(e) => void onSubmit(e)}>
         <section className="studio-panel">
           <div className="studio-panel-head">
-            <h2>1 · Template</h2>
+            <h2>{t("studio.wizard.step1")}</h2>
           </div>
           <div className="wizard-templates">
-            {PROGRAM_TEMPLATES.map((t) => (
+            {PROGRAM_TEMPLATES.map((tpl) => (
               <button
-                key={t.id}
+                key={tpl.id}
                 type="button"
-                className={t.id === templateId ? "is-active" : undefined}
-                onClick={() => pickTemplate(t.id)}
+                className={tpl.id === templateId ? "is-active" : undefined}
+                onClick={() => pickTemplate(tpl.id)}
               >
-                <strong>{t.name}</strong>
-                <span>{t.blurb}</span>
+                <strong>{t(tpl.nameKey)}</strong>
+                <span>{t(tpl.blurbKey)}</span>
                 <em>
-                  {t.weeks}w · {t.daysPerWeek}d · {t.sport}
+                  {t("studio.wizard.templateMeta", {
+                    weeks: tpl.weeks,
+                    days: tpl.daysPerWeek,
+                    sport: t(tpl.sportKey),
+                  })}
                 </em>
               </button>
             ))}
@@ -128,7 +132,7 @@ export function StudioNewProgramPage() {
 
         <section className="studio-panel">
           <div className="studio-panel-head">
-            <h2>2 · Details</h2>
+            <h2>{t("studio.wizard.step2")}</h2>
           </div>
           <div className="studio-form studio-form--grid">
             <div className="span-2">
@@ -143,20 +147,20 @@ export function StudioNewProgramPage() {
               ) : null}
             </div>
             <label className="span-2">
-              Title
+              {t("common.title")}
               <input value={title} onChange={(e) => setTitle(e.target.value)} required />
             </label>
             <label className="span-2">
-              Description
+              {t("common.description")}
               <textarea
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="What athletes will build over this block…"
+                placeholder={t("studio.wizard.descPlaceholder")}
               />
             </label>
             <label>
-              Weeks
+              {t("common.weeks")}
               <input
                 type="number"
                 min={1}
@@ -166,7 +170,7 @@ export function StudioNewProgramPage() {
               />
             </label>
             <label>
-              Days / week
+              {t("common.daysPerWeek")}
               <input
                 type="number"
                 min={1}
@@ -176,7 +180,7 @@ export function StudioNewProgramPage() {
               />
             </label>
             <label>
-              Session minutes
+              {t("studio.wizard.sessionMinutes")}
               <input
                 type="number"
                 min={15}
@@ -186,12 +190,12 @@ export function StudioNewProgramPage() {
               />
             </label>
             <label>
-              Level
+              {t("common.level")}
               <select value={level} onChange={(e) => setLevel(e.target.value)}>
-                <option>Beginner</option>
-                <option>Intermediate</option>
-                <option>Advanced</option>
-                <option>All levels</option>
+                <option value="Beginner">{t("studio.levels.Beginner")}</option>
+                <option value="Intermediate">{t("studio.levels.Intermediate")}</option>
+                <option value="Advanced">{t("studio.levels.Advanced")}</option>
+                <option value="All levels">{t("studio.levels.All levels")}</option>
               </select>
             </label>
           </div>
@@ -203,7 +207,7 @@ export function StudioNewProgramPage() {
                 checked={autoSchedule}
                 onChange={(e) => setAutoSchedule(e.target.checked)}
               />
-              Auto-create all {weeks * daysPerWeek} sessions
+              {t("studio.wizard.autoCreate", { count: weeks * daysPerWeek })}
             </label>
             <label className="studio-check">
               <input
@@ -212,28 +216,35 @@ export function StudioNewProgramPage() {
                 disabled={templateId === "blank"}
                 onChange={(e) => setSeedDrills(e.target.checked)}
               />
-              Seed starter drills from template
+              {t("studio.wizard.seedDrills")}
             </label>
           </div>
         </section>
 
         <section className="studio-panel">
           <div className="studio-panel-head">
-            <h2>3 · Preview schedule</h2>
-            <span className="studio-muted">{preview.length} sessions</span>
+            <h2>{t("studio.wizard.step3")}</h2>
+            <span className="studio-muted">
+              {t("studio.wizard.previewCount", { count: preview.length })}
+            </span>
           </div>
           <ol className="wizard-preview">
             {preview.slice(0, 12).map((s) => (
               <li key={s.day}>
-                <strong>Day {s.day}</strong>
+                <strong>{t("studio.wizard.previewDay", { day: s.day })}</strong>
                 <span>{s.title}</span>
                 <em>
-                  {s.drills.length} drills · {s.minutes}m
+                  {t("studio.wizard.previewDrills", {
+                    count: s.drills.length,
+                    minutes: s.minutes,
+                  })}
                 </em>
               </li>
             ))}
             {preview.length > 12 ? (
-              <li className="studio-muted">…and {preview.length - 12} more days</li>
+              <li className="studio-muted">
+                {t("studio.wizard.previewMore", { count: preview.length - 12 })}
+              </li>
             ) : null}
           </ol>
         </section>
@@ -242,10 +253,10 @@ export function StudioNewProgramPage() {
 
         <div className="studio-actions">
           <Link className="studio-btn studio-btn--ghost" to="/studio/programs">
-            Cancel
+            {t("common.cancel")}
           </Link>
           <button className="studio-btn studio-btn--accent" type="submit" disabled={busy}>
-            {busy ? "Building…" : "Create program"}
+            {busy ? t("studio.wizard.building") : t("studio.wizard.create")}
           </button>
         </div>
       </form>

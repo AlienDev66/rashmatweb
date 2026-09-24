@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    if (!isSupabaseConfigured) return "Supabase not configured";
+    if (!isSupabaseConfigured) return "errors.supabaseMissing";
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return error?.message ?? null;
   }, []);

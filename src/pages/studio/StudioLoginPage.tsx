@@ -2,10 +2,12 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { brand } from "../../brand";
+import { useT } from "../../i18n";
 
 export function StudioLoginPage() {
   const { ready, user, signIn, configured } = useAuth();
   const navigate = useNavigate();
+  const t = useT();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +22,7 @@ export function StudioLoginPage() {
     const err = await signIn(email.trim(), password);
     setBusy(false);
     if (err) {
-      setError(err);
+      setError(t(err));
       return;
     }
     navigate("/studio", { replace: true });
@@ -31,19 +33,17 @@ export function StudioLoginPage() {
       <Link className="studio-brand" to="/">
         <img src="/logo-yellow.png" width={48} height={48} alt="" />
         <span>
-          {brand.name} <em>Studio</em>
+          {brand.name} <em>{t("common.studio")}</em>
         </span>
       </Link>
-      <h1>Sign in to publish</h1>
-      <p className="studio-muted">
-        Same account as the athlete app. Activate creator mode after you sign in.
-      </p>
+      <h1>{t("studio.login.title")}</h1>
+      <p className="studio-muted">{t("studio.login.sub")}</p>
       {!configured ? (
-        <p className="studio-error">Supabase keys missing — add web/.env first.</p>
+        <p className="studio-error">{t("errors.supabaseKeys")}</p>
       ) : (
         <form className="studio-form" onSubmit={(e) => void onSubmit(e)}>
           <label>
-            Email
+            {t("common.email")}
             <input
               type="email"
               autoComplete="email"
@@ -53,7 +53,7 @@ export function StudioLoginPage() {
             />
           </label>
           <label>
-            Password
+            {t("common.password")}
             <input
               type="password"
               autoComplete="current-password"
@@ -64,7 +64,7 @@ export function StudioLoginPage() {
           </label>
           {error ? <p className="studio-error">{error}</p> : null}
           <button className="studio-btn studio-btn--accent" type="submit" disabled={busy}>
-            {busy ? "Signing in…" : "Sign in"}
+            {busy ? t("studio.login.signingIn") : t("studio.login.signIn")}
           </button>
         </form>
       )}

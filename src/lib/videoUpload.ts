@@ -19,9 +19,9 @@ function extensionFor(file: File) {
 }
 
 export function validateVideoFile(file: File) {
-  if (file.size > MAX_BYTES) return "Video must be under 100MB.";
+  if (file.size > MAX_BYTES) return "errors.videoTooLarge";
   if (file.type && !ALLOWED.has(file.type) && !file.type.startsWith("video/")) {
-    return "Use MP4, MOV, or WebM.";
+    return "errors.videoType";
   }
   return null;
 }
@@ -29,7 +29,7 @@ export function validateVideoFile(file: File) {
 /** Path: {userId}/clips/{timestamp}-{safeName}.ext */
 export async function uploadVideoToStorage(userId: string, file: File) {
   if (!isSupabaseConfigured) {
-    return { error: "Supabase not configured", url: null as string | null };
+    return { error: "errors.supabaseMissing", url: null as string | null };
   }
 
   const invalid = validateVideoFile(file);

@@ -4,6 +4,8 @@ export type DrillPreset = {
   name: string;
   reps: string;
   rest_seconds: number;
+  /** i18n key for presets surfaced as UI (quick-adds, library) */
+  nameKey?: string;
 };
 
 export type SessionBlueprint = {
@@ -17,6 +19,10 @@ export type ProgramTemplate = {
   name: string;
   blurb: string;
   sport: string;
+  /** i18n keys for the wizard / library cards */
+  nameKey: string;
+  blurbKey: string;
+  sportKey: string;
   level: string;
   weeks: number;
   daysPerWeek: number;
@@ -27,11 +33,36 @@ export type ProgramTemplate = {
 };
 
 export const DRILL_QUICK_ADDS: DrillPreset[] = [
-  { name: "Mobility warm-up", reps: "5 min continuous", rest_seconds: 0 },
-  { name: "Technique reps", reps: "Reps: 8 8 8", rest_seconds: 45 },
-  { name: "Positional rounds", reps: "3 x 3 min", rest_seconds: 60 },
-  { name: "Live rounds", reps: "4 x 5 min", rest_seconds: 90 },
-  { name: "Cool-down stretch", reps: "4 min", rest_seconds: 0 },
+  {
+    name: "Mobility warm-up",
+    nameKey: "studio.drillPresets.mobility",
+    reps: "5 min continuous",
+    rest_seconds: 0,
+  },
+  {
+    name: "Technique reps",
+    nameKey: "studio.drillPresets.technique",
+    reps: "Reps: 8 8 8",
+    rest_seconds: 45,
+  },
+  {
+    name: "Positional rounds",
+    nameKey: "studio.drillPresets.positional",
+    reps: "3 x 3 min",
+    rest_seconds: 60,
+  },
+  {
+    name: "Live rounds",
+    nameKey: "studio.drillPresets.live",
+    reps: "4 x 5 min",
+    rest_seconds: 90,
+  },
+  {
+    name: "Cool-down stretch",
+    nameKey: "studio.drillPresets.cooldown",
+    reps: "4 min",
+    rest_seconds: 0,
+  },
 ];
 
 export const PROGRAM_TEMPLATES: ProgramTemplate[] = [
@@ -40,6 +71,9 @@ export const PROGRAM_TEMPLATES: ProgramTemplate[] = [
     name: "Blank schedule",
     blurb: "Empty days — you fill drills later.",
     sport: "General",
+    nameKey: "studio.templates.blank.name",
+    blurbKey: "studio.templates.blank.blurb",
+    sportKey: "studio.sports.general",
     level: "All levels",
     weeks: 4,
     daysPerWeek: 3,
@@ -54,6 +88,9 @@ export const PROGRAM_TEMPLATES: ProgramTemplate[] = [
     name: "BJJ Fundamentals",
     blurb: "Guard, passes, and positional sparring — auto-built weeks.",
     sport: "BJJ",
+    nameKey: "studio.templates.bjjFundamentals.name",
+    blurbKey: "studio.templates.bjjFundamentals.blurb",
+    sportKey: "studio.sports.bjj",
     level: "Beginner",
     weeks: 4,
     daysPerWeek: 3,
@@ -94,6 +131,9 @@ export const PROGRAM_TEMPLATES: ProgramTemplate[] = [
     name: "No-Gi Pressure",
     blurb: "Wrestling entries, half guard, and submissions.",
     sport: "No-Gi",
+    nameKey: "studio.templates.nogiPressure.name",
+    blurbKey: "studio.templates.nogiPressure.blurb",
+    sportKey: "studio.sports.nogi",
     level: "Intermediate",
     weeks: 6,
     daysPerWeek: 3,
@@ -134,6 +174,9 @@ export const PROGRAM_TEMPLATES: ProgramTemplate[] = [
     name: "Striking Padwork",
     blurb: "Combos, defense, and conditioning rounds.",
     sport: "Striking",
+    nameKey: "studio.templates.strikingPadwork.name",
+    blurbKey: "studio.templates.strikingPadwork.blurb",
+    sportKey: "studio.sports.striking",
     level: "Beginner",
     weeks: 4,
     daysPerWeek: 4,
