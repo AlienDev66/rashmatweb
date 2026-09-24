@@ -329,9 +329,9 @@ export function LandingPage() {
               />
               <PhoneMock
                 className="phone--fan phone--f5"
-                src={appScreens.programs}
-                alt="Programs catalog"
-                label="Programs"
+                src={appScreens.programOverview}
+                alt="Program overview with progress and next session"
+                label="Program"
               />
               <PhoneMock
                 className="phone--fan phone--f6"
@@ -344,10 +344,31 @@ export function LandingPage() {
             <div className="phone-rail" role="list">
               <PhoneMock
                 className="phone--rail"
+                src={appScreens.programDays}
+                alt="Program day list with reorder"
+                label="Camp days"
+              />
+              <PhoneMock
+                className="phone--rail"
+                src={appScreens.sessionPreview}
+                alt="Session preview before starting"
+                label="Session preview"
+              />
+              <PhoneMock
+                className="phone--rail"
                 src={appScreens.creators}
                 alt="Creators directory — follow and train"
                 label="Follow creators"
               />
+              <PhoneMock
+                className="phone--rail"
+                src={appScreens.creatorProfile}
+                alt="Creator profile with Follow and Train"
+                label="Creator profile"
+              />
+            </div>
+
+            <div className="phone-rail phone-rail--secondary" role="list">
               <PhoneMock
                 className="phone--rail"
                 src={appScreens.complete}
@@ -359,6 +380,12 @@ export function LandingPage() {
                 src={appScreens.studio}
                 alt="Creator Studio dashboard"
                 label="Creator Studio"
+              />
+              <PhoneMock
+                className="phone--rail"
+                src={appScreens.programs}
+                alt="Programs catalog"
+                label="Catalog"
               />
               <PhoneMock
                 className="phone--rail"
