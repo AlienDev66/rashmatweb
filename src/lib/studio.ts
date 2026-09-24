@@ -480,3 +480,18 @@ export async function fetchCreatorStudentProgress(programId?: string) {
   if (error) return { error: error.message, rows: [] as StudentProgressRow[] };
   return { error: null, rows: (data ?? []) as StudentProgressRow[] };
 }
+
+export type CreatorFollowerRow = {
+  user_id: string;
+  full_name: string;
+  avatar_url: string | null;
+  followed_at: string;
+  creator_id: string;
+};
+
+export async function fetchMyCreatorFollowers(limit = 100) {
+  if (!isSupabaseConfigured) return { error: null, rows: [] as CreatorFollowerRow[] };
+  const { data, error } = await supabase.rpc("my_creator_followers", { p_limit: limit });
+  if (error) return { error: error.message, rows: [] as CreatorFollowerRow[] };
+  return { error: null, rows: (data ?? []) as CreatorFollowerRow[] };
+}

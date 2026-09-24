@@ -1218,3 +1218,28 @@
     place-items: end stretch;
   }
 }
+
+.studio-person {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.studio-person img {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.studio-avatar-fallback {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(241, 188, 3, 0.2);
+  color: #f1bc03;
+  font-weight: 700;
+  font-size: 0.85rem;
+}

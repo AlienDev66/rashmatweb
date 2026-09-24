@@ -5,6 +5,7 @@ import { AuthProvider } from "./auth";
 import { ProgramSharePage } from "./pages/ProgramSharePage";
 import { LandingPage } from "./pages/LandingPage";
 import { StudioCmsPage } from "./pages/studio/StudioCmsPage";
+import { StudioFollowersPage } from "./pages/studio/StudioFollowersPage";
 import { StudioHomePage } from "./pages/studio/StudioHomePage";
 import { StudioLibraryPage } from "./pages/studio/StudioLibraryPage";
 import { StudioLoginPage } from "./pages/studio/StudioLoginPage";
@@ -35,6 +36,7 @@ createRoot(el).render(
             <Route path="programs/:id" element={<StudioProgramDetailPage />} />
             <Route path="cms" element={<StudioCmsPage />} />
             <Route path="students" element={<StudioStudentsPage />} />
+            <Route path="followers" element={<StudioFollowersPage />} />
             <Route path="library" element={<StudioLibraryPage />} />
             <Route path="settings" element={<StudioSettingsPage />} />
             <Route path="new" element={<Navigate to="/studio/programs/new" replace />} />

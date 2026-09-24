@@ -13,15 +13,29 @@ export const brand = {
   studioUrl: "/studio",
 } as const;
 
-/** Full-bleed mats — Unsplash (reliable CDN params). */
-export const heroImage =
-  "https://images.unsplash.com/photo-1555597673-b21d5c935865?auto=format&fit=crop&w=2400&q=80";
+/** Full-bleed hero — local brand still (gi + black belt). */
+export const heroImage = "/hero-landing.jpg";
 
-export const athletesImage =
-  "https://images.unsplash.com/photo-1599058945522-28d272b47b3e?auto=format&fit=crop&w=1800&q=80";
+export const athletesImage = "/section-plan.jpg";
 
-export const creatorsImage =
-  "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1800&q=80";
+export const creatorsImage = "/section-creators.jpg";
+
+/** Atmosphere behind the CSS phone fan. */
+export const mocksStage = "/mocks-stage.png";
+
+/** Individual app screenshots for device frames. */
+export const appScreens = {
+  welcomeHero: "/screens/welcome-hero.jpg",
+  signIn: "/screens/sign-in.png",
+  hub: "/screens/hub.jpg",
+  recover: "/screens/recover.png",
+  programs: "/screens/programs.jpg",
+  profile: "/screens/profile.png",
+  creators: "/screens/creators.jpg",
+  complete: "/screens/complete.jpg",
+  studio: "/screens/studio.png",
+  library: "/screens/library.png",
+} as const;
 
 export const igImage =
   "https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=2000&q=80";
