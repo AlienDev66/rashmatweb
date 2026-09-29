@@ -13,13 +13,15 @@ type Props = {
   value: VideoValue;
   onChange: (next: VideoValue) => void;
   disabled?: boolean;
+  /** Hide paste/Mux by default — upload stays primary */
+  compact?: boolean;
 };
 
 /**
  * Default path: Supabase Storage MP4 (no Mux cost).
  * Optional paste of Mux playback ID if you add Mux later.
  */
-export function VideoUploader({ label, value, onChange, disabled }: Props) {
+export function VideoUploader({ label, value, onChange, disabled, compact }: Props) {
   const { user } = useAuth();
   const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -28,6 +30,7 @@ export function VideoUploader({ label, value, onChange, disabled }: Props) {
   const [info, setInfo] = useState<string | null>(null);
 
   const display = value.videoUrl || value.muxPlaybackId;
+  const hasVideo = Boolean(display);
 
   const onFile = async (file: File | null) => {
     setError(null);
@@ -64,8 +67,26 @@ export function VideoUploader({ label, value, onChange, disabled }: Props) {
     }
   };
 
+  const pasteField = (
+    <input
+      className="video-uploader__id"
+      value={display}
+      onChange={(e) => {
+        const v = e.target.value.trim();
+        if (/^https?:\/\//i.test(v)) {
+          onChange({ muxPlaybackId: "", videoUrl: v });
+        } else {
+          onChange({ muxPlaybackId: v, videoUrl: "" });
+        }
+      }}
+      placeholder={t("upload.videoPlaceholder")}
+      disabled={disabled || busy}
+      aria-label={label ?? t("upload.videoLabel")}
+    />
+  );
+
   return (
-    <div className="video-uploader">
+    <div className={`video-uploader${compact ? " video-uploader--compact" : ""}`}>
       <div className="video-uploader__row">
         <button
           type="button"
@@ -73,24 +94,12 @@ export function VideoUploader({ label, value, onChange, disabled }: Props) {
           disabled={disabled || busy}
           onClick={() => inputRef.current?.click()}
         >
-          {busy ? t("common.uploading") : t("upload.videoUpload")}
+          {busy ? t("common.uploading") : hasVideo ? t("upload.videoReplace") : t("upload.videoUpload")}
         </button>
-        <input
-          className="video-uploader__id"
-          value={display}
-          onChange={(e) => {
-            const v = e.target.value.trim();
-            // Heuristic: full URL → video_url; else treat as Mux id
-            if (/^https?:\/\//i.test(v)) {
-              onChange({ muxPlaybackId: "", videoUrl: v });
-            } else {
-              onChange({ muxPlaybackId: v, videoUrl: "" });
-            }
-          }}
-          placeholder={t("upload.videoPlaceholder")}
-          disabled={disabled || busy}
-          aria-label={label ?? t("upload.videoLabel")}
-        />
+        {!compact ? pasteField : null}
+        {compact && hasVideo ? (
+          <span className="video-uploader__status studio-muted">{t("upload.videoAttached")}</span>
+        ) : null}
       </div>
       <input
         ref={inputRef}
@@ -101,10 +110,21 @@ export function VideoUploader({ label, value, onChange, disabled }: Props) {
       />
       {info ? <p className="studio-flash">{info}</p> : null}
       {error ? <p className="studio-error">{error}</p> : null}
-      <p className="studio-muted video-uploader__hint">
-        {t("upload.videoHintStart")} <strong>{t("upload.videoHintStorage")}</strong>{" "}
-        {t("upload.videoHintEnd")}
-      </p>
+      {compact ? (
+        <details className="video-uploader__advanced">
+          <summary>{t("upload.videoAdvanced")}</summary>
+          {pasteField}
+          <p className="studio-muted video-uploader__hint">
+            {t("upload.videoHintStart")} <strong>{t("upload.videoHintStorage")}</strong>{" "}
+            {t("upload.videoHintEnd")}
+          </p>
+        </details>
+      ) : (
+        <p className="studio-muted video-uploader__hint">
+          {t("upload.videoHintStart")} <strong>{t("upload.videoHintStorage")}</strong>{" "}
+          {t("upload.videoHintEnd")}
+        </p>
+      )}
     </div>
   );
 }
