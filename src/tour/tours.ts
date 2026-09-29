@@ -8,14 +8,12 @@ export type TourStep = {
 
 type TFn = (key: string, params?: Record<string, string | number>) => string;
 
+/** First-run path for new creators — templates → editor → audience. */
 const STEP_ROUTES: { id: string; route: string }[] = [
   { id: "dash", route: "/studio" },
-  { id: "programs", route: "/studio/programs" },
   { id: "wizard", route: "/studio/programs/new" },
   { id: "cms", route: "/studio/cms" },
   { id: "students", route: "/studio/students" },
-  { id: "library", route: "/studio/library" },
-  { id: "settings", route: "/studio/settings" },
 ];
 
 /** First-run walkthrough across Studio sections (localized). */

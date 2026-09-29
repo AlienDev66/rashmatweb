@@ -47,10 +47,11 @@ export function StudioTourProvider({
     if (!enabled) return;
     const state = loadTourState();
     if (!state.done) {
-      setIndex(state.step);
+      const safeStep = Math.min(Math.max(0, state.step), Math.max(0, steps.length - 1));
+      setIndex(safeStep);
       setActive(true);
     }
-  }, [enabled]);
+  }, [enabled, steps.length]);
 
   useEffect(() => {
     if (!active) return;
