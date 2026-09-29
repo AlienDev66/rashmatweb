@@ -68,6 +68,12 @@ export function StudioLoginPage() {
           </button>
         </form>
       )}
+      <p className="studio-muted studio-auth-signup">
+        {t("studio.login.createAccount")}{" "}
+        <a href={brand.platformUrl} target="_blank" rel="noreferrer">
+          {t("studio.login.createAccountCta")}
+        </a>
+      </p>
     </div>
   );
 }

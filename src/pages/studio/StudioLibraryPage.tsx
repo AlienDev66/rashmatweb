@@ -35,90 +35,10 @@ export function StudioLibraryPage() {
         </div>
       </header>
 
-      <section className="studio-panel" id="playbook">
-        <div className="studio-panel-head">
-          <h2>{t("studio.library.playbookTitle")}</h2>
-          <span className="studio-muted">{t("studio.library.playbookHint")}</span>
-        </div>
-        <div className="playbook">
-          <p>
-            <strong>{t("studio.library.thesisLabel")}</strong> {t("studio.library.thesisBody")}
-          </p>
-          <h3>{t("studio.library.offerTitle")}</h3>
-          <p className="studio-muted">{t("studio.library.offerBody")}</p>
-          <h3>{t("studio.library.whiteGloveTitle")}</h3>
-          <ol className="playbook-steps">
-            <li>
-              <strong>{t("studio.library.day0Title")}</strong>
-              <span>{t("studio.library.day0Body")}</span>
-            </li>
-            <li>
-              <strong>{t("studio.library.day1Title")}</strong>
-              <span>{t("studio.library.day1Body")}</span>
-            </li>
-            <li>
-              <strong>{t("studio.library.day23Title")}</strong>
-              <span>{t("studio.library.day23Body")}</span>
-            </li>
-            <li>
-              <strong>{t("studio.library.day4Title")}</strong>
-              <span>{t("studio.library.day4Body")}</span>
-            </li>
-            <li>
-              <strong>{t("studio.library.day5Title")}</strong>
-              <span>{t("studio.library.day5Body")}</span>
-            </li>
-            <li>
-              <strong>{t("studio.library.day6Title")}</strong>
-              <span>{t("studio.library.day6Body")}</span>
-            </li>
-            <li>
-              <strong>{t("studio.library.day7Title")}</strong>
-              <span>{t("studio.library.day7Body")}</span>
-            </li>
-          </ol>
-          <h3>{t("studio.library.validateTitle")}</h3>
-          <ul className="playbook-metrics">
-            <li>{t("studio.library.validate1")}</li>
-            <li>{t("studio.library.validate2")}</li>
-          </ul>
-          <p className="studio-muted">
-            {t("studio.library.writeupLabel")} <code>web/docs/CREATOR_ONBOARDING.md</code>
-          </p>
-        </div>
-      </section>
-
-      <section className="studio-panel" id="hotmart">
-        <div className="studio-panel-head">
-          <h2>{t("studio.library.hotmartTitle")}</h2>
-          <span className="studio-muted">{t("studio.library.hotmartHint")}</span>
-        </div>
-        <div className="playbook">
-          <p>
-            <strong>{t("studio.library.wedgeLabel")}</strong> {t("studio.library.wedgeBefore")}{" "}
-            <em>{t("studio.library.wedgeEm")}</em> {t("studio.library.wedgeAfter")}
-          </p>
-          <h3>{t("studio.library.phaseTitle")}</h3>
-          <p className="studio-muted">{t("studio.library.phaseBody")}</p>
-          <h3>{t("studio.library.mapTitle")}</h3>
-          <ul className="playbook-metrics">
-            <li>{t("studio.library.map1")}</li>
-            <li>{t("studio.library.map2")}</li>
-            <li>{t("studio.library.map3")}</li>
-            <li>{t("studio.library.map4")}</li>
-            <li>{t("studio.library.map5")}</li>
-          </ul>
-          <h3>{t("studio.library.pitchTitle")}</h3>
-          <p className="studio-muted">{t("studio.library.pitchBody")}</p>
-          <p className="studio-muted">
-            {t("studio.library.objectionsLabel")} <code>web/docs/HOTMART_CONVERSION.md</code>
-          </p>
-        </div>
-      </section>
-
       <section className="studio-panel">
         <div className="studio-panel-head">
           <h2>{t("studio.library.templatesTitle")}</h2>
+          <span className="studio-muted">{t("studio.library.templatesHint")}</span>
         </div>
         <div className="wizard-templates">
           {PROGRAM_TEMPLATES.map((tpl) => (
@@ -141,8 +61,13 @@ export function StudioLibraryPage() {
       <section className="studio-panel">
         <div className="studio-panel-head">
           <h2>{t("studio.library.presetsTitle")}</h2>
-          <span className="studio-muted">{t("studio.library.presetsHint")}</span>
+          <Link className="studio-muted" to="/studio/cms">
+            {t("studio.library.presetsOpenCms")}
+          </Link>
         </div>
+        <p className="studio-muted" style={{ marginBottom: "0.85rem" }}>
+          {t("studio.library.presetsHint")}
+        </p>
         <ul className="library-drills">
           {DRILL_QUICK_ADDS.map((d) => (
             <li key={d.name}>
@@ -154,10 +79,11 @@ export function StudioLibraryPage() {
         </ul>
       </section>
 
-      <section className="studio-panel">
-        <div className="studio-panel-head">
+      <details className="studio-panel studio-panel--details">
+        <summary className="studio-panel-head studio-panel-head--summary">
           <h2>{t("studio.library.automationsTitle")}</h2>
-        </div>
+          <span className="studio-muted">{t("studio.library.automationsHint")}</span>
+        </summary>
         <ul className="library-auto">
           <li>
             <strong>{t("studio.library.auto1Title")}</strong>
@@ -180,7 +106,7 @@ export function StudioLibraryPage() {
             <span>{t("studio.library.auto5Body")}</span>
           </li>
         </ul>
-      </section>
+      </details>
     </main>
   );
 }

@@ -48,6 +48,7 @@ export function StudioCmsPage() {
   const [drillMux, setDrillMux] = useState("");
   const [drillVideoUrl, setDrillVideoUrl] = useState("");
   const [editingDrill, setEditingDrill] = useState<string | null>(null);
+  const [showAddDrill, setShowAddDrill] = useState(false);
 
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -135,8 +136,12 @@ export function StudioCmsPage() {
         setSessionMinutes(45);
         setSessionMux("");
         setSessionVideoUrl("");
+        setShowAddDrill(false);
+        setEditingDrill(null);
         return;
       }
+      setShowAddDrill(false);
+      setEditingDrill(null);
       const sess = sessions.find((s) => s.id === sessionId);
       setSessionTitle(sess?.title ?? "");
       setSessionDesc(sess?.description ?? "");
@@ -273,6 +278,7 @@ export function StudioCmsPage() {
       setDrillName("");
       setDrillMux("");
       setDrillVideoUrl("");
+      setShowAddDrill(false);
     }
     flash(t("studio.cms.flashDrillAdded"));
   };
@@ -377,6 +383,29 @@ export function StudioCmsPage() {
     ? selectedProgram.weeks * selectedProgram.days_per_week
     : 0;
 
+  if (programs.length === 0) {
+    return (
+      <main className="studio-page studio-page--narrow">
+        <header className="studio-page-head">
+          <div>
+            <p className="studio-kicker">{t("studio.cms.kicker")}</p>
+            <h1>{t("studio.cms.title")}</h1>
+            <p className="studio-muted">{t("studio.cms.sub")}</p>
+          </div>
+        </header>
+        <div className="studio-empty">
+          <p>
+            <strong>{t("studio.cms.emptyProgramsTitle")}</strong>
+          </p>
+          <p className="studio-muted">{t("studio.cms.emptyProgramsBody")}</p>
+          <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
+            {t("studio.cms.emptyProgramsCta")}
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="studio-page studio-page--wide">
       <header className="studio-page-head">
@@ -430,27 +459,35 @@ export function StudioCmsPage() {
                   target: targetSessions,
                 })}
               </p>
-              <button
-                type="button"
-                className="studio-btn studio-btn--ghost"
-                disabled={busy}
-                onClick={() => void onFillSchedule()}
-              >
-                {t("studio.cms.autoFill")}
-              </button>
-              <button
-                type="button"
-                className="studio-btn studio-btn--ghost"
-                disabled={busy}
-                onClick={() => void onTogglePublish()}
-              >
-                {selectedProgram.status === "published"
-                  ? t("common.unpublish")
-                  : t("common.publish")}
-              </button>
-              <Link className="studio-btn studio-btn--ghost" to={`/studio/programs/${selectedProgram.id}`}>
-                {t("studio.cms.programDetails")}
-              </Link>
+              {sessions.length < targetSessions ? (
+                <button
+                  type="button"
+                  className="studio-btn studio-btn--accent"
+                  disabled={busy}
+                  onClick={() => void onFillSchedule()}
+                >
+                  {t("studio.cms.autoFill")}
+                </button>
+              ) : null}
+              <details className="cms-side-actions cms-side-actions--details">
+                <summary>{t("studio.cms.programActions")}</summary>
+                <button
+                  type="button"
+                  className="studio-btn studio-btn--ghost"
+                  disabled={busy}
+                  onClick={() => void onTogglePublish()}
+                >
+                  {selectedProgram.status === "published"
+                    ? t("common.unpublish")
+                    : t("common.publish")}
+                </button>
+                <Link
+                  className="studio-btn studio-btn--ghost"
+                  to={`/studio/programs/${selectedProgram.id}`}
+                >
+                  {t("studio.cms.programDetails")}
+                </Link>
+              </details>
             </div>
           ) : null}
         </aside>
@@ -478,7 +515,8 @@ export function StudioCmsPage() {
             ))}
           </ul>
           {sessionId ? (
-            <div className="cms-side-actions">
+            <details className="cms-side-actions cms-side-actions--details">
+              <summary>{t("studio.cms.moreOptions")}</summary>
               <button
                 type="button"
                 className="studio-btn studio-btn--ghost"
@@ -495,296 +533,360 @@ export function StudioCmsPage() {
               >
                 {t("studio.cms.deleteSession")}
               </button>
-            </div>
+            </details>
           ) : null}
         </aside>
 
         <section className="cms-col cms-col--editor">
           {!sessionId ? (
-            <p className="studio-muted">{t("studio.cms.selectSession")}</p>
+            <div className="studio-empty">
+              {selectedProgram && sessions.length === 0 ? (
+                <>
+                  <p>
+                    <strong>{t("studio.cms.emptySessionsTitle")}</strong>
+                  </p>
+                  <p className="studio-muted">{t("studio.cms.emptySessionsBody")}</p>
+                  <button
+                    type="button"
+                    className="studio-btn studio-btn--accent"
+                    disabled={busy}
+                    onClick={() => void onFillSchedule()}
+                  >
+                    {t("studio.cms.emptySessionsCta")}
+                  </button>
+                </>
+              ) : (
+                <p className="studio-muted">{t("studio.cms.selectSession")}</p>
+              )}
+            </div>
           ) : (
             <>
               <div className="cms-col-head">
                 <h2>{t("studio.cms.sessionEditor")}</h2>
               </div>
-              <div className="studio-form studio-form--grid">
-                <label className="span-2">
-                  {t("common.title")}
-                  <input value={sessionTitle} onChange={(e) => setSessionTitle(e.target.value)} />
-                </label>
-                <label className="span-2">
-                  {t("studio.cms.notes")}
-                  <textarea
-                    rows={2}
-                    value={sessionDesc}
-                    onChange={(e) => setSessionDesc(e.target.value)}
-                  />
-                </label>
-                <label>
-                  {t("common.minutes")}
-                  <input
-                    type="number"
-                    min={10}
-                    value={sessionMinutes}
-                    onChange={(e) => setSessionMinutes(Number(e.target.value) || 45)}
-                  />
-                </label>
-                <div className="span-2">
-                  <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
-                    {t("studio.cms.sessionVideo")}
-                  </p>
-                  <VideoUploader
-                    value={{ muxPlaybackId: sessionMux, videoUrl: sessionVideoUrl }}
-                    onChange={(next) => {
-                      setSessionMux(next.muxPlaybackId);
-                      setSessionVideoUrl(next.videoUrl);
-                      // Persist immediately after Storage upload so video isn't lost
-                      if (sessionId && next.videoUrl) {
-                        void updateSession(sessionId, {
-                          mux_playback_id: next.muxPlaybackId.trim() || null,
-                          video_url: next.videoUrl.trim() || null,
-                        }).then(({ error }) => {
-                          if (error) flash(t(error));
-                          else {
-                            setSessions((prev) =>
-                              prev.map((s) =>
-                                s.id === sessionId
-                                  ? {
-                                      ...s,
-                                      mux_playback_id: next.muxPlaybackId.trim() || null,
-                                      video_url: next.videoUrl.trim() || null,
-                                    }
-                                  : s,
-                              ),
-                            );
-                            flash(t("studio.cms.flashSessionVideoSaved"));
-                          }
-                        });
-                      }
-                    }}
-                    disabled={busy}
-                  />
-                </div>
-              </div>
-              <button
-                type="button"
-                className="studio-btn studio-btn--accent"
-                disabled={busy}
-                onClick={() => void onSaveSession()}
-              >
-                {t("studio.cms.saveSession")}
-              </button>
 
-              <div className="cms-col-head cms-col-head--spaced">
-                <h2>{t("studio.cms.drills", { count: exercises.length })}</h2>
-                <div className="cms-inline-actions">
-                  <button type="button" disabled={busy} onClick={() => void onApplyStarterBlock()}>
-                    {t("studio.cms.starterBlock")}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy || exercises.length === 0}
-                    onClick={() => void onDuplicateLastDrill()}
-                  >
-                    {t("studio.cms.duplicateLast")}
-                  </button>
-                </div>
-              </div>
-
-              <div className="cms-quick-drills">
-                {quickAdds.map((p) => (
-                  <button key={p.name} type="button" disabled={busy} onClick={() => void onAddDrill(p)}>
-                    {p.name}
-                  </button>
-                ))}
-              </div>
-
-              <ul className="cms-drills">
-                {exercises.map((ex, index) => (
-                  <li key={ex.id}>
-                    {editingDrill === ex.id ? (
-                      <div className="studio-form">
-                        <input
-                          value={ex.name}
-                          aria-label={t("studio.cms.drillName")}
-                          onChange={(e) =>
-                            setExercises((prev) =>
-                              prev.map((x) => (x.id === ex.id ? { ...x, name: e.target.value } : x)),
-                            )
-                          }
-                        />
-                        <input
-                          value={ex.reps ?? ""}
-                          aria-label={t("studio.cms.reps")}
-                          onChange={(e) =>
-                            setExercises((prev) =>
-                              prev.map((x) => (x.id === ex.id ? { ...x, reps: e.target.value } : x)),
-                            )
-                          }
-                        />
-                        <input
-                          type="number"
-                          value={ex.rest_seconds}
-                          aria-label={t("studio.cms.rest")}
-                          onChange={(e) =>
-                            setExercises((prev) =>
-                              prev.map((x) =>
-                                x.id === ex.id
-                                  ? { ...x, rest_seconds: Number(e.target.value) || 0 }
-                                  : x,
-                              ),
-                            )
-                          }
-                        />
-                        <div className="span-2">
-                          <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
-                            {t("studio.cms.drillVideo")}
-                          </p>
-                          <VideoUploader
-                            value={{
-                              muxPlaybackId: ex.mux_playback_id ?? "",
-                              videoUrl: ex.video_url ?? "",
-                            }}
-                            onChange={(next) => {
-                              setExercises((prev) =>
-                                prev.map((x) =>
-                                  x.id === ex.id
+              <section className="cms-block">
+                <h3 className="cms-block-title">{t("studio.cms.dayMeta")}</h3>
+                <div className="studio-form studio-form--grid">
+                  <label className="span-2">
+                    {t("common.title")}
+                    <input value={sessionTitle} onChange={(e) => setSessionTitle(e.target.value)} />
+                  </label>
+                  <label className="span-2">
+                    {t("studio.cms.notes")}
+                    <textarea
+                      rows={2}
+                      value={sessionDesc}
+                      onChange={(e) => setSessionDesc(e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    {t("common.minutes")}
+                    <input
+                      type="number"
+                      min={10}
+                      value={sessionMinutes}
+                      onChange={(e) => setSessionMinutes(Number(e.target.value) || 45)}
+                    />
+                  </label>
+                  <div className="span-2">
+                    <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
+                      {t("studio.cms.sessionVideo")}
+                    </p>
+                    <VideoUploader
+                      compact
+                      value={{ muxPlaybackId: sessionMux, videoUrl: sessionVideoUrl }}
+                      onChange={(next) => {
+                        setSessionMux(next.muxPlaybackId);
+                        setSessionVideoUrl(next.videoUrl);
+                        if (sessionId && next.videoUrl) {
+                          void updateSession(sessionId, {
+                            mux_playback_id: next.muxPlaybackId.trim() || null,
+                            video_url: next.videoUrl.trim() || null,
+                          }).then(({ error }) => {
+                            if (error) flash(t(error));
+                            else {
+                              setSessions((prev) =>
+                                prev.map((s) =>
+                                  s.id === sessionId
                                     ? {
-                                        ...x,
-                                        video_url: next.videoUrl.trim() || null,
+                                        ...s,
                                         mux_playback_id: next.muxPlaybackId.trim() || null,
+                                        video_url: next.videoUrl.trim() || null,
                                       }
-                                    : x,
+                                    : s,
                                 ),
                               );
-                              if (next.videoUrl) {
-                                void updateExercise(ex.id, {
-                                  video_url: next.videoUrl.trim() || null,
-                                  mux_playback_id: next.muxPlaybackId.trim() || null,
-                                }).then(({ error }) => {
-                                  if (error) flash(t(error));
-                                  else flash(t("studio.cms.flashDrillVideoSaved"));
-                                });
-                              }
-                            }}
-                            disabled={busy}
-                          />
-                        </div>
-                        <div className="studio-actions">
-                          <button
-                            type="button"
-                            className="studio-btn studio-btn--accent"
-                            onClick={() => void onSaveDrill(ex)}
-                          >
-                            {t("common.save")}
-                          </button>
-                          <button
-                            type="button"
-                            className="studio-btn studio-btn--ghost"
-                            onClick={() => {
-                              setEditingDrill(null);
-                              void reloadExercises(sessionId);
-                            }}
-                          >
-                            {t("common.cancel")}
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <div>
-                          <strong>
-                            {index + 1}. {ex.name}
-                          </strong>
-                          <span>
-                            {t("studio.cms.drillMeta", {
-                              reps: ex.reps ?? "",
-                              seconds: ex.rest_seconds,
-                            })}
-                          </span>
-                          {ex.video_url ? (
-                            <em>{t("studio.cms.videoStorage")}</em>
-                          ) : ex.mux_playback_id ? (
-                            <em>{t("studio.cms.videoMux", { id: ex.mux_playback_id })}</em>
-                          ) : null}
-                        </div>
-                        <div className="cms-drill-actions">
-                          <button
-                            type="button"
-                            disabled={busy}
-                            aria-label={t("studio.cms.moveUp")}
-                            title={t("studio.cms.moveUp")}
-                            onClick={() => void moveDrill(index, -1)}
-                          >
-                            ↑
-                          </button>
-                          <button
-                            type="button"
-                            disabled={busy}
-                            aria-label={t("studio.cms.moveDown")}
-                            title={t("studio.cms.moveDown")}
-                            onClick={() => void moveDrill(index, 1)}
-                          >
-                            ↓
-                          </button>
-                          <button type="button" onClick={() => setEditingDrill(ex.id)}>
-                            {t("common.edit")}
-                          </button>
-                          <button
-                            type="button"
-                            disabled={busy}
-                            aria-label={t("studio.cms.removeDrill")}
-                            title={t("studio.cms.removeDrill")}
-                            onClick={() => void onDeleteDrill(ex.id)}
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="studio-form studio-form--grid cms-add-drill">
-                <label>
-                  {t("studio.cms.drillName")}
-                  <input value={drillName} onChange={(e) => setDrillName(e.target.value)} />
-                </label>
-                <label>
-                  {t("studio.cms.reps")}
-                  <input value={drillReps} onChange={(e) => setDrillReps(e.target.value)} />
-                </label>
-                <label>
-                  {t("studio.cms.rest")}
-                  <input
-                    type="number"
-                    value={drillRest}
-                    onChange={(e) => setDrillRest(Number(e.target.value) || 0)}
-                  />
-                </label>
-                <div className="span-2">
-                  <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
-                    {t("studio.cms.drillVideo")}
-                  </p>
-                  <VideoUploader
-                    value={{ muxPlaybackId: drillMux, videoUrl: drillVideoUrl }}
-                    onChange={(next) => {
-                      setDrillMux(next.muxPlaybackId);
-                      setDrillVideoUrl(next.videoUrl);
-                    }}
-                    disabled={busy}
-                  />
+                              flash(t("studio.cms.flashSessionVideoSaved"));
+                            }
+                          });
+                        }
+                      }}
+                      disabled={busy}
+                    />
+                  </div>
                 </div>
                 <button
                   type="button"
-                  className="studio-btn studio-btn--accent span-2"
-                  disabled={busy || !drillName.trim()}
-                  onClick={() => void onAddDrill()}
+                  className="studio-btn studio-btn--accent"
+                  disabled={busy}
+                  onClick={() => void onSaveSession()}
                 >
-                  {t("studio.cms.addCustom")}
+                  {t("studio.cms.saveSession")}
                 </button>
-              </div>
+              </section>
+
+              <section className="cms-block cms-block--drills">
+                <div className="cms-col-head">
+                  <h2>{t("studio.cms.drills", { count: exercises.length })}</h2>
+                  <div className="cms-inline-actions">
+                    <button type="button" disabled={busy} onClick={() => void onApplyStarterBlock()}>
+                      {t("studio.cms.starterBlock")}
+                    </button>
+                    {exercises.length > 0 ? (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void onDuplicateLastDrill()}
+                      >
+                        {t("studio.cms.duplicateLast")}
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="cms-quick-drills">
+                  {quickAdds.map((p) => (
+                    <button
+                      key={p.name}
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void onAddDrill(p)}
+                    >
+                      {p.name}
+                    </button>
+                  ))}
+                </div>
+
+                {exercises.length === 0 ? (
+                  <p className="studio-muted cms-drills-empty">{t("studio.cms.drillsEmpty")}</p>
+                ) : (
+                  <ul className="cms-drills">
+                    {exercises.map((ex, index) => (
+                      <li key={ex.id} className={editingDrill === ex.id ? "is-editing" : undefined}>
+                        {editingDrill === ex.id ? (
+                          <div className="studio-form cms-drill-edit">
+                            <input
+                              value={ex.name}
+                              aria-label={t("studio.cms.drillName")}
+                              onChange={(e) =>
+                                setExercises((prev) =>
+                                  prev.map((x) =>
+                                    x.id === ex.id ? { ...x, name: e.target.value } : x,
+                                  ),
+                                )
+                              }
+                            />
+                            <input
+                              value={ex.reps ?? ""}
+                              aria-label={t("studio.cms.reps")}
+                              onChange={(e) =>
+                                setExercises((prev) =>
+                                  prev.map((x) =>
+                                    x.id === ex.id ? { ...x, reps: e.target.value } : x,
+                                  ),
+                                )
+                              }
+                            />
+                            <input
+                              type="number"
+                              value={ex.rest_seconds}
+                              aria-label={t("studio.cms.rest")}
+                              onChange={(e) =>
+                                setExercises((prev) =>
+                                  prev.map((x) =>
+                                    x.id === ex.id
+                                      ? { ...x, rest_seconds: Number(e.target.value) || 0 }
+                                      : x,
+                                  ),
+                                )
+                              }
+                            />
+                            <div className="span-2">
+                              <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
+                                {t("studio.cms.drillVideo")}
+                              </p>
+                              <VideoUploader
+                                compact
+                                value={{
+                                  muxPlaybackId: ex.mux_playback_id ?? "",
+                                  videoUrl: ex.video_url ?? "",
+                                }}
+                                onChange={(next) => {
+                                  setExercises((prev) =>
+                                    prev.map((x) =>
+                                      x.id === ex.id
+                                        ? {
+                                            ...x,
+                                            video_url: next.videoUrl.trim() || null,
+                                            mux_playback_id: next.muxPlaybackId.trim() || null,
+                                          }
+                                        : x,
+                                    ),
+                                  );
+                                  if (next.videoUrl) {
+                                    void updateExercise(ex.id, {
+                                      video_url: next.videoUrl.trim() || null,
+                                      mux_playback_id: next.muxPlaybackId.trim() || null,
+                                    }).then(({ error }) => {
+                                      if (error) flash(t(error));
+                                      else flash(t("studio.cms.flashDrillVideoSaved"));
+                                    });
+                                  }
+                                }}
+                                disabled={busy}
+                              />
+                            </div>
+                            <div className="studio-actions">
+                              <button
+                                type="button"
+                                className="studio-btn studio-btn--accent"
+                                onClick={() => void onSaveDrill(ex)}
+                              >
+                                {t("common.save")}
+                              </button>
+                              <button
+                                type="button"
+                                className="studio-btn studio-btn--ghost"
+                                onClick={() => {
+                                  setEditingDrill(null);
+                                  void reloadExercises(sessionId);
+                                }}
+                              >
+                                {t("common.cancel")}
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              className="cms-drill-main"
+                              onClick={() => setEditingDrill(ex.id)}
+                            >
+                              <strong>
+                                {index + 1}. {ex.name}
+                              </strong>
+                              <span>
+                                {t("studio.cms.drillMeta", {
+                                  reps: ex.reps ?? "",
+                                  seconds: ex.rest_seconds,
+                                })}
+                              </span>
+                              {ex.video_url || ex.mux_playback_id ? (
+                                <em>{t("studio.cms.videoStorage")}</em>
+                              ) : null}
+                            </button>
+                            <div className="cms-drill-actions">
+                              <button
+                                type="button"
+                                disabled={busy}
+                                aria-label={t("studio.cms.moveUp")}
+                                title={t("studio.cms.moveUp")}
+                                onClick={() => void moveDrill(index, -1)}
+                              >
+                                ↑
+                              </button>
+                              <button
+                                type="button"
+                                disabled={busy}
+                                aria-label={t("studio.cms.moveDown")}
+                                title={t("studio.cms.moveDown")}
+                                onClick={() => void moveDrill(index, 1)}
+                              >
+                                ↓
+                              </button>
+                              <button
+                                type="button"
+                                className="cms-drill-action--label"
+                                onClick={() => setEditingDrill(ex.id)}
+                              >
+                                {t("common.edit")}
+                              </button>
+                              <button
+                                type="button"
+                                disabled={busy}
+                                aria-label={t("studio.cms.removeDrill")}
+                                title={t("studio.cms.removeDrill")}
+                                onClick={() => void onDeleteDrill(ex.id)}
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {!showAddDrill ? (
+                  <button
+                    type="button"
+                    className="studio-btn studio-btn--ghost cms-add-toggle"
+                    onClick={() => setShowAddDrill(true)}
+                  >
+                    {t("studio.cms.addCustomOpen")}
+                  </button>
+                ) : (
+                  <div className="studio-form studio-form--grid cms-add-drill">
+                    <div className="cms-col-head span-2">
+                      <h3 className="cms-block-title">{t("studio.cms.addCustom")}</h3>
+                      <button type="button" onClick={() => setShowAddDrill(false)}>
+                        {t("studio.cms.addCustomClose")}
+                      </button>
+                    </div>
+                    <label>
+                      {t("studio.cms.drillName")}
+                      <input value={drillName} onChange={(e) => setDrillName(e.target.value)} />
+                    </label>
+                    <label>
+                      {t("studio.cms.reps")}
+                      <input value={drillReps} onChange={(e) => setDrillReps(e.target.value)} />
+                    </label>
+                    <label>
+                      {t("studio.cms.rest")}
+                      <input
+                        type="number"
+                        value={drillRest}
+                        onChange={(e) => setDrillRest(Number(e.target.value) || 0)}
+                      />
+                    </label>
+                    <div className="span-2">
+                      <p className="studio-muted" style={{ marginBottom: "0.35rem" }}>
+                        {t("studio.cms.drillVideo")}
+                      </p>
+                      <VideoUploader
+                        compact
+                        value={{ muxPlaybackId: drillMux, videoUrl: drillVideoUrl }}
+                        onChange={(next) => {
+                          setDrillMux(next.muxPlaybackId);
+                          setDrillVideoUrl(next.videoUrl);
+                        }}
+                        disabled={busy}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="studio-btn studio-btn--accent span-2"
+                      disabled={busy || !drillName.trim()}
+                      onClick={() => void onAddDrill()}
+                    >
+                      {t("studio.cms.addCustom")}
+                    </button>
+                  </div>
+                )}
+              </section>
             </>
           )}
         </section>

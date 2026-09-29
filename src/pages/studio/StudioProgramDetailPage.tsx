@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { CoverUploader } from "../../components/CoverUploader";
 import { useT } from "../../i18n";
@@ -18,7 +18,11 @@ export function StudioProgramDetailPage() {
   const { id = "" } = useParams();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const t = useT();
+  const [showNextVideos, setShowNextVideos] = useState(
+    () => Boolean((location.state as { fromWizard?: boolean } | null)?.fromWizard),
+  );
   const [program, setProgram] = useState<StudioProgram | null>(null);
   const [sessions, setSessions] = useState<StudioSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -223,6 +227,22 @@ export function StudioProgramDetailPage() {
           </button>
         </div>
       </header>
+
+      {showNextVideos ? (
+        <aside className="studio-next-banner">
+          <div>
+            <strong>{t("studio.detail.nextVideosTitle")}</strong>
+            <p className="studio-muted">{t("studio.detail.nextVideosBody")}</p>
+          </div>
+          <Link
+            className="studio-btn studio-btn--accent"
+            to={`/studio/cms?program=${program.id}`}
+            onClick={() => setShowNextVideos(false)}
+          >
+            {t("studio.detail.nextVideosCta")}
+          </Link>
+        </aside>
+      ) : null}
 
       {gate ? (
         <section className="studio-panel publish-gate">

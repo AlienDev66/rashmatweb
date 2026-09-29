@@ -3,7 +3,6 @@ import { useAuth } from "../../auth";
 import { brand } from "../../brand";
 import { LanguageSwitcher } from "../../components/LanguageSwitcher";
 import { useT } from "../../i18n";
-import { isSupabaseConfigured } from "../../lib/supabase";
 import { useStudioTour } from "../../tour/StudioTour";
 
 export function StudioSettingsPage() {
@@ -51,10 +50,6 @@ export function StudioSettingsPage() {
             <dt>{t("studio.settingsStatus")}</dt>
             <dd>{profile?.is_creator ? t("studio.settingsCreatorOn") : t("studio.creatorOff")}</dd>
           </div>
-          <div>
-            <dt>Supabase</dt>
-            <dd>{isSupabaseConfigured ? "OK" : "—"}</dd>
-          </div>
         </dl>
       </section>
 
@@ -62,6 +57,9 @@ export function StudioSettingsPage() {
         <div className="studio-panel-head">
           <h2>{t("studio.guide")}</h2>
         </div>
+        <p className="studio-muted" style={{ marginBottom: "0.85rem" }}>
+          {t("studio.guideHint")}
+        </p>
         <button type="button" className="studio-btn studio-btn--accent" onClick={start}>
           {t("studio.guide")}
         </button>

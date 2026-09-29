@@ -83,14 +83,14 @@ export function StudioNewProgramPage() {
       if (upErr || !url) {
         setBusy(false);
         setError(upErr ? t(upErr) : t("errors.coverUploadLater"));
-        navigate(`/studio/programs/${program.id}`, { replace: true });
+        navigate(`/studio/programs/${program.id}`, { replace: true, state: { fromWizard: true } });
         return;
       }
       await updateProgram(program.id, { cover_url: url });
     }
 
     setBusy(false);
-    navigate(`/studio/programs/${program.id}`, { replace: true });
+    navigate(`/studio/programs/${program.id}`, { replace: true, state: { fromWizard: true } });
   };
 
   return (

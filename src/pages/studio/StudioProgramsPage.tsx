@@ -175,33 +175,41 @@ export function StudioProgramsPage() {
                 </div>
               </div>
               <div className="studio-card-actions">
-                <Link className="studio-btn studio-btn--ghost" to={`/studio/cms?program=${p.id}`}>
-                  {t("studio.programs.cms")}
+                <Link className="studio-btn studio-btn--ghost" to={`/studio/programs/${p.id}`}>
+                  {t("common.open")}
                 </Link>
                 <button
                   type="button"
-                  className="studio-btn studio-btn--ghost"
+                  className="studio-btn studio-btn--accent"
                   disabled={busyId === p.id}
                   onClick={() => void onToggle(p)}
                 >
                   {p.status === "published" ? t("common.unpublish") : t("common.publish")}
                 </button>
-                <button
-                  type="button"
-                  className="studio-btn studio-btn--ghost"
-                  disabled={busyId === p.id}
-                  onClick={() => void onDuplicate(p.id)}
-                >
-                  {t("common.duplicate")}
-                </button>
-                <button
-                  type="button"
-                  className="studio-btn studio-btn--danger"
-                  disabled={busyId === p.id}
-                  onClick={() => void onDelete(p)}
-                >
-                  {t("common.delete")}
-                </button>
+                <details className="studio-card-more">
+                  <summary>{t("common.more")}</summary>
+                  <div className="studio-card-more-menu">
+                    <Link className="studio-btn studio-btn--ghost" to={`/studio/cms?program=${p.id}`}>
+                      {t("studio.programs.cms")}
+                    </Link>
+                    <button
+                      type="button"
+                      className="studio-btn studio-btn--ghost"
+                      disabled={busyId === p.id}
+                      onClick={() => void onDuplicate(p.id)}
+                    >
+                      {t("common.duplicate")}
+                    </button>
+                    <button
+                      type="button"
+                      className="studio-btn studio-btn--danger"
+                      disabled={busyId === p.id}
+                      onClick={() => void onDelete(p)}
+                    >
+                      {t("common.delete")}
+                    </button>
+                  </div>
+                </details>
               </div>
             </li>
           ))}

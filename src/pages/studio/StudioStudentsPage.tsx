@@ -73,6 +73,10 @@ export function StudioStudentsPage() {
       ) : sorted.length === 0 ? (
         <div className="studio-empty">
           <p>{t("studio.students.empty")}</p>
+          <p className="studio-muted">{t("studio.students.emptyHint")}</p>
+          <Link className="studio-btn studio-btn--accent" to="/studio/programs">
+            {t("studio.students.emptyCta")}
+          </Link>
         </div>
       ) : (
         <div className="studio-panel">

@@ -48,6 +48,10 @@ export function StudioFollowersPage() {
       ) : rows.length === 0 ? (
         <div className="studio-empty">
           <p>{t("studio.followers.empty")}</p>
+          <p className="studio-muted">{t("studio.followers.emptyHint")}</p>
+          <Link className="studio-btn studio-btn--accent" to="/studio/programs">
+            {t("studio.followers.emptyCta")}
+          </Link>
         </div>
       ) : (
         <div className="studio-panel">

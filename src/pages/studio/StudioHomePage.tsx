@@ -82,115 +82,150 @@ export function StudioHomePage() {
     ? t("studio.welcomeBackName", { name: firstName })
     : t("studio.welcomeBack");
 
+  const firstRun = !loading && programs.length === 0;
+  const cmsHref = programs[0] ? `/studio/cms?program=${programs[0].id}` : "/studio/cms";
+
   return (
     <main className="studio-page">
       <header className="studio-page-head">
         <div>
           <p className="studio-kicker">{t("studio.navDashboard")}</p>
           <h1>{welcome}</h1>
-          <p className="studio-muted">{t("studio.dashboardSub")}</p>
+          <p className="studio-muted">
+            {firstRun ? t("studio.home.firstRunSub") : t("studio.dashboardSub")}
+          </p>
         </div>
         <div className="studio-actions">
-          <Link className="studio-btn studio-btn--ghost" to="/studio/cms">
-            {t("studio.openCms")}
-          </Link>
+          {!firstRun ? (
+            <Link className="studio-btn studio-btn--ghost" to={cmsHref}>
+              {t("studio.openCms")}
+            </Link>
+          ) : null}
           <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
             {t("studio.newProgram")}
           </Link>
         </div>
       </header>
 
-      <div className="studio-stat-row">
-        <div>
-          <strong>{programs.length}</strong>
-          <span>{t("studio.statPrograms")}</span>
-        </div>
-        <div>
-          <strong>{published}</strong>
-          <span>{t("studio.statPublished")}</span>
-        </div>
-        <div>
-          <strong>{draft}</strong>
-          <span>{t("studio.statDrafts")}</span>
-        </div>
-        <div>
-          <strong>{students.length}</strong>
-          <span>{t("studio.statStudents")}</span>
-        </div>
-        <div>
-          <strong>{followerCount}</strong>
-          <span>{t("studio.statFollowers")}</span>
-        </div>
-        <div>
-          <strong>{avg}%</strong>
-          <span>{t("studio.statAvgProgress")}</span>
-        </div>
-      </div>
-
-      <section className="studio-panel">
-        <div className="studio-panel-head">
-          <h2>{t("studio.home.quickTitle")}</h2>
-        </div>
-        <div className="studio-quick">
-          <Link to="/studio/programs/new">
-            <strong>{t("studio.home.quickWizard")}</strong>
-            <span>{t("studio.home.quickWizardHint")}</span>
-          </Link>
-          <Link to="/studio/cms">
-            <strong>{t("studio.home.quickCms")}</strong>
-            <span>{t("studio.home.quickCmsHint")}</span>
-          </Link>
-          <Link to="/studio/students">
-            <strong>{t("studio.home.quickStudents")}</strong>
-            <span>{t("studio.home.quickStudentsHint")}</span>
-          </Link>
-          <Link to="/studio/followers">
-            <strong>{t("studio.home.quickFollowers")}</strong>
-            <span>{t("studio.home.quickFollowersHint")}</span>
-          </Link>
-          <Link to="/studio/library">
-            <strong>{t("studio.home.quickLibrary")}</strong>
-            <span>{t("studio.home.quickLibraryHint")}</span>
-          </Link>
-        </div>
-      </section>
-
-      <section className="studio-panel">
-        <div className="studio-panel-head">
-          <h2>{t("studio.home.recentTitle")}</h2>
-          <Link to="/studio/programs">{t("studio.home.viewAll")}</Link>
-        </div>
-        {loading ? (
-          <p className="studio-muted">{t("common.loading")}</p>
-        ) : programs.length === 0 ? (
-          <div className="studio-empty">
-            <p>{t("studio.home.empty")}</p>
-            <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
-              {t("studio.home.createProgram")}
-            </Link>
+      {firstRun ? (
+        <section className="studio-panel">
+          <div className="studio-panel-head">
+            <h2>{t("studio.home.firstRunTitle")}</h2>
           </div>
-        ) : (
-          <ul className="studio-table">
-            {programs.slice(0, 6).map((p) => (
-              <li key={p.id}>
-                <Link to={`/studio/programs/${p.id}`}>
-                  <span className="studio-table-title">{p.title}</span>
-                  <span className="studio-table-meta">
-                    {t("studio.home.programMeta", {
-                      weeks: p.weeks,
-                      days: p.days_per_week,
-                      level: t(`studio.levels.${p.level}`),
-                    })}
-                  </span>
-                  <span className={`studio-pill studio-pill--${p.status}`}>
-                    {t(`studio.status.${p.status}`)}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+          <ol className="studio-steps">
+            <li>
+              <div>
+                <strong>{t("studio.home.step1Title")}</strong>
+                <span>{t("studio.home.step1Body")}</span>
+              </div>
+              <Link className="studio-btn studio-btn--accent" to="/studio/programs/new">
+                {t("studio.home.step1Cta")}
+              </Link>
+            </li>
+            <li className="is-disabled">
+              <div>
+                <strong>{t("studio.home.step2Title")}</strong>
+                <span>{t("studio.home.step2Body")}</span>
+              </div>
+              <span className="studio-btn studio-btn--ghost">{t("studio.home.step2Locked")}</span>
+            </li>
+            <li className="is-disabled">
+              <div>
+                <strong>{t("studio.home.step3Title")}</strong>
+                <span>{t("studio.home.step3Body")}</span>
+              </div>
+              <span className="studio-btn studio-btn--ghost">{t("studio.home.step3Cta")}</span>
+            </li>
+          </ol>
+        </section>
+      ) : (
+        <>
+          <div className="studio-stat-row">
+            <div>
+              <strong>{programs.length}</strong>
+              <span>{t("studio.statPrograms")}</span>
+            </div>
+            <div>
+              <strong>{published}</strong>
+              <span>{t("studio.statPublished")}</span>
+            </div>
+            <div>
+              <strong>{draft}</strong>
+              <span>{t("studio.statDrafts")}</span>
+            </div>
+            <div>
+              <strong>{students.length}</strong>
+              <span>{t("studio.statStudents")}</span>
+            </div>
+            <div>
+              <strong>{followerCount}</strong>
+              <span>{t("studio.statFollowers")}</span>
+            </div>
+            <div>
+              <strong>{avg}%</strong>
+              <span>{t("studio.statAvgProgress")}</span>
+            </div>
+          </div>
+
+          <section className="studio-panel">
+            <div className="studio-panel-head">
+              <h2>{t("studio.home.quickTitle")}</h2>
+            </div>
+            <div className="studio-quick">
+              <Link to="/studio/programs/new">
+                <strong>{t("studio.home.quickWizard")}</strong>
+                <span>{t("studio.home.quickWizardHint")}</span>
+              </Link>
+              <Link to={cmsHref}>
+                <strong>{t("studio.home.quickCms")}</strong>
+                <span>{t("studio.home.quickCmsHint")}</span>
+              </Link>
+              <Link to="/studio/students">
+                <strong>{t("studio.home.quickStudents")}</strong>
+                <span>{t("studio.home.quickStudentsHint")}</span>
+              </Link>
+              <Link to="/studio/followers">
+                <strong>{t("studio.home.quickFollowers")}</strong>
+                <span>{t("studio.home.quickFollowersHint")}</span>
+              </Link>
+              <Link to="/studio/library">
+                <strong>{t("studio.home.quickLibrary")}</strong>
+                <span>{t("studio.home.quickLibraryHint")}</span>
+              </Link>
+            </div>
+          </section>
+
+          <section className="studio-panel">
+            <div className="studio-panel-head">
+              <h2>{t("studio.home.recentTitle")}</h2>
+              <Link to="/studio/programs">{t("studio.home.viewAll")}</Link>
+            </div>
+            {loading ? (
+              <p className="studio-muted">{t("common.loading")}</p>
+            ) : (
+              <ul className="studio-table">
+                {programs.slice(0, 6).map((p) => (
+                  <li key={p.id}>
+                    <Link to={`/studio/programs/${p.id}`}>
+                      <span className="studio-table-title">{p.title}</span>
+                      <span className="studio-table-meta">
+                        {t("studio.home.programMeta", {
+                          weeks: p.weeks,
+                          days: p.days_per_week,
+                          level: t(`studio.levels.${p.level}`),
+                        })}
+                      </span>
+                      <span className={`studio-pill studio-pill--${p.status}`}>
+                        {t(`studio.status.${p.status}`)}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
+      )}
     </main>
   );
 }
