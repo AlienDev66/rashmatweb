@@ -200,7 +200,7 @@ const en = {
     privacyKicker: "LEGAL",
     privacyTitle: "Privacy Policy",
     privacySummary:
-      "RASHMAT (“we”, “us”) respects your privacy. This policy explains what we collect, how we use it, and the choices you have when you use rashmat.app, Creator Studio, and the RASHMAT athlete apps.",
+      "RASHMAT (“we”, “us”) respects your privacy. This policy explains what we collect, how we use it, and the choices you have when you use rashmat.com, Creator Studio, and the RASHMAT athlete apps.",
     termsKicker: "LEGAL",
     termsTitle: "Terms of Service",
     termsSummary:
@@ -766,7 +766,7 @@ export const messages: Record<Locale, WebMessages> = {
       privacyKicker: "LEGAL",
       privacyTitle: "Política de Privacidade",
       privacySummary:
-        "A RASHMAT (“nós”) respeita a tua privacidade. Esta política explica o que recolhemos, como usamos e as escolhas que tens ao usar rashmat.app, o Creator Studio e as apps de atletas RASHMAT.",
+        "A RASHMAT (“nós”) respeita a tua privacidade. Esta política explica o que recolhemos, como usamos e as escolhas que tens ao usar rashmat.com, o Creator Studio e as apps de atletas RASHMAT.",
       termsKicker: "LEGAL",
       termsTitle: "Termos de Serviço",
       termsSummary:

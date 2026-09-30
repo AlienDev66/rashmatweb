@@ -7,7 +7,7 @@
 | **Mux upload (platform)** | Edge Function scaffold + Studio **Upload video** UI. Needs `MUX_TOKEN_*` secrets + deploy. Creators do **not** need Mux accounts. |
 | **Publish checklist** | Enforced: custom cover + ≥1 session + ≥1 drill + ≥1 video. |
 | **Athlete onboarding** | Recommendations → **Start first session** (enroll + open day 1). |
-| **Share program** | `https://rashmat.app/p/{id}` → Open in app (`rashmat://program/{id}`). |
+| **Share program** | `https://rashmat.com/p/{id}` → Open in app (`rashmat://program/{id}`). |
 | **Mock catalog in prod** | Mock only in `__DEV__`; production no longer invents fake camps on fetch failure. |
 
 ---
@@ -60,7 +60,7 @@ Week,Day,Title
 
 ## Explain: Códigos / link de acesso
 
-Hotmart keeps checkout. After purchase, seller gives `rashmat.app/p/{id}` or a code that calls `enroll_program` without payment.
+Hotmart keeps checkout. After purchase, seller gives `rashmat.com/p/{id}` or a code that calls `enroll_program` without payment.
 
 Use case: “Bought my guard course on Hotmart → open this link → train the 6-week camp.”
 

@@ -227,7 +227,7 @@ export function termsSections(locale: Locale): LegalSection[] {
         title: "4. Creator Studio e conteúdo",
         paragraphs: [
           "Se publicas como creator, declaras que possuis ou tens direitos sobre o conteúdo que envias (vídeo, imagens, texto) e que não infringe direitos de terceiros nem viola a lei.",
-          `Concedes à ${brand.name} uma licença mundial, não exclusiva, para alojar, fazer stream, mostrar e distribuir o teu conteúdo conforme necessário para operar a plataforma e para marketing do serviço (ex.: capas de programas em rashmat.app).`,
+          `Concedes à ${brand.name} uma licença mundial, não exclusiva, para alojar, fazer stream, mostrar e distribuir o teu conteúdo conforme necessário para operar a plataforma e para marketing do serviço (ex.: capas de programas em ${brand.domain}).`,
           "Podemos remover conteúdo ou suspender contas abusivas, ilegais, enganadoras ou prejudiciais à comunidade.",
         ],
       },
@@ -319,7 +319,7 @@ export function termsSections(locale: Locale): LegalSection[] {
       title: "4. Creator Studio & content",
       paragraphs: [
         "If you publish as a creator, you represent that you own or have rights to the content you upload (video, images, text) and that it does not infringe others’ rights or violate law.",
-        `You grant ${brand.name} a worldwide, non-exclusive license to host, stream, display, and distribute your content as needed to operate the platform for athletes and for marketing the service (for example program covers on rashmat.app).`,
+        `You grant ${brand.name} a worldwide, non-exclusive license to host, stream, display, and distribute your content as needed to operate the platform for athletes and for marketing the service (for example program covers on ${brand.domain}).`,
         "We may remove content or suspend accounts that are abusive, illegal, misleading, or harmful to the community.",
       ],
     },

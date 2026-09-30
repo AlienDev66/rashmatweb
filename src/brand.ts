@@ -1,20 +1,21 @@
 /** Canonical RASHMAT brand (web marketing + platform). */
 export const brand = {
   name: "RASHMAT",
-  domain: "rashmat.app",
-  url: "https://rashmat.app",
-  email: "hello@rashmat.app",
-  supportEmail: "support@rashmat.app",
+  domain: "rashmat.com",
+  url: "https://rashmat.com",
+  email: "hello@rashmat.com",
+  supportEmail: "support@rashmat.com",
   social: {
     instagram: "https://www.instagram.com/rashmatapp/",
     handle: "@rashmatapp",
   },
-  platformUrl: "https://app.rashmat.app",
+  /** Athlete experience (Expo web / deep links). */
+  platformUrl: "https://app.rashmat.com",
   /** Web Creator Studio (this package). */
   studioUrl: "/studio",
   /**
    * Native store listings. Update iOS to the real App Store ID when published.
-   * Android package matches app.json (`com.rashmat.app`).
+   * Android package matches app.json (`com.rashmat.app`) — leave store package IDs as-is.
    */
   stores: {
     ios: "https://apps.apple.com/app/rashmat",
@@ -23,7 +24,7 @@ export const brand = {
   legal: {
     privacyUrl: "/privacy",
     termsUrl: "/terms",
-    effectiveDate: "September 24, 2026",
+    effectiveDate: "September 30, 2026",
     governingLaw: "Portugal",
   },
 } as const;

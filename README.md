@@ -1,6 +1,6 @@
 # RASHMAT web
 
-Public site + **Creator Studio / CMS** for [rashmat.app](https://rashmat.app).
+Public site + **Creator Studio / CMS** for [rashmat.com](https://rashmat.com).
 
 ## Run
 
