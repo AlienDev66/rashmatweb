@@ -7,6 +7,7 @@ const en = {
     instagram: "Instagram",
     privacy: "Privacy",
     terms: "Terms",
+    support: "Support",
     language: "Language",
     backHome: "Back to home",
     email: "Email",
@@ -195,6 +196,7 @@ const en = {
   legal: {
     navPrivacy: "Privacy",
     navTerms: "Terms",
+    navSupport: "Support",
     effective: "Effective {{date}}",
     questions: "Questions?",
     privacyKicker: "LEGAL",
@@ -205,6 +207,21 @@ const en = {
     termsTitle: "Terms of Service",
     termsSummary:
       "These Terms govern your use of RASHMAT websites, Creator Studio, and athlete applications. By creating an account or using the service, you agree to these Terms.",
+    supportKicker: "HELP",
+    supportTitle: "Support",
+    supportSummary:
+      "Need help with RASHMAT, Creator Studio, or your account? Reach us below — we usually reply within 1–2 business days.",
+    supportEmailLabel: "Email support",
+    supportEmailHint: "Best for account, billing, and bug reports.",
+    supportAppTitle: "Athlete app",
+    supportAppBody:
+      "Training programs, sessions, XP, and follows live in the RASHMAT iOS / Android apps. Describe the screen you’re on and what you expected to happen.",
+    supportStudioTitle: "Creator Studio",
+    supportStudioBody:
+      "Publish programs, sessions, and drills at rashmat.com/studio. Include your creator handle and a short screen recording when you can.",
+    supportPrivacyTitle: "Privacy & data",
+    supportPrivacyBody:
+      "For access, deletion, or privacy requests, email us and mention “privacy” in the subject. See also our Privacy Policy.",
   },
   studio: {
     navDashboard: "Dashboard",
@@ -572,6 +589,7 @@ export const messages: Record<Locale, WebMessages> = {
       instagram: "Instagram",
       privacy: "Privacidade",
       terms: "Termos",
+      support: "Suporte",
       language: "Idioma",
       backHome: "Voltar ao início",
       email: "Email",
@@ -761,6 +779,7 @@ export const messages: Record<Locale, WebMessages> = {
     legal: {
       navPrivacy: "Privacidade",
       navTerms: "Termos",
+      navSupport: "Suporte",
       effective: "Em vigor desde {{date}}",
       questions: "Dúvidas?",
       privacyKicker: "LEGAL",
@@ -771,6 +790,21 @@ export const messages: Record<Locale, WebMessages> = {
       termsTitle: "Termos de Serviço",
       termsSummary:
         "Estes Termos regem o uso dos websites RASHMAT, do Creator Studio e das aplicações de atletas. Ao criares uma conta ou usares o serviço, aceitas estes Termos.",
+      supportKicker: "AJUDA",
+      supportTitle: "Suporte",
+      supportSummary:
+        "Precisas de ajuda com a RASHMAT, o Creator Studio ou a tua conta? Contacta-nos abaixo — respondemos normalmente em 1–2 dias úteis.",
+      supportEmailLabel: "Email de suporte",
+      supportEmailHint: "Ideal para conta, faturação e reportar bugs.",
+      supportAppTitle: "App de atleta",
+      supportAppBody:
+        "Programas, sessões, XP e follows estão nas apps iOS / Android RASHMAT. Diz em que ecrã estás e o que esperavas que acontecesse.",
+      supportStudioTitle: "Creator Studio",
+      supportStudioBody:
+        "Publica programas, sessões e drills em rashmat.com/studio. Inclui o teu handle de creator e um short screen recording quando puderes.",
+      supportPrivacyTitle: "Privacidade e dados",
+      supportPrivacyBody:
+        "Para pedidos de acesso, eliminação ou privacidade, envia email com “privacy” no assunto. Vê também a Política de Privacidade.",
     },
     studio: {
       navDashboard: "Dashboard",
