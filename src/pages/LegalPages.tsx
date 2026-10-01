@@ -1,10 +1,35 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { brand } from "../brand";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { SiteFooter } from "../components/SiteFooter";
 import { useI18n, useT } from "../i18n";
 import { privacySections, termsSections, type LegalSection } from "../i18n/legalContent";
+
+function LegalChrome({ children }: { children: ReactNode }) {
+  const t = useT();
+  return (
+    <div className="page legal-page">
+      <header className="legal-top">
+        <div className="shell legal-top__inner">
+          <Link className="legal-brand" to="/">
+            <img src="/logo-yellow.png" width={40} height={40} alt="" />
+            <span>{brand.name}</span>
+          </Link>
+          <nav className="legal-top__nav" aria-label={t("common.navLegal")}>
+            <Link to={brand.legal.supportUrl}>{t("legal.navSupport")}</Link>
+            <Link to={brand.legal.privacyUrl}>{t("legal.navPrivacy")}</Link>
+            <Link to={brand.legal.termsUrl}>{t("legal.navTerms")}</Link>
+            <a href={brand.platformUrl}>{t("common.platform")}</a>
+            <LanguageSwitcher />
+          </nav>
+        </div>
+      </header>
+      {children}
+      <SiteFooter showStores={false} />
+    </div>
+  );
+}
 
 function LegalDoc({
   kicker,
@@ -27,22 +52,7 @@ function LegalDoc({
   }, [title]);
 
   return (
-    <div className="page legal-page">
-      <header className="legal-top">
-        <div className="shell legal-top__inner">
-          <Link className="legal-brand" to="/">
-            <img src="/logo-yellow.png" width={40} height={40} alt="" />
-            <span>{brand.name}</span>
-          </Link>
-          <nav className="legal-top__nav" aria-label={t("common.navLegal")}>
-            <Link to={brand.legal.privacyUrl}>{t("legal.navPrivacy")}</Link>
-            <Link to={brand.legal.termsUrl}>{t("legal.navTerms")}</Link>
-            <a href={brand.platformUrl}>{t("common.platform")}</a>
-            <LanguageSwitcher />
-          </nav>
-        </div>
-      </header>
-
+    <LegalChrome>
       <main className="shell legal">
         <p className="kicker">{kicker}</p>
         <h1 className="legal__title">{title}</h1>
@@ -74,9 +84,7 @@ function LegalDoc({
           <a href={`mailto:${brand.email}`}>{brand.email}</a>
         </p>
       </main>
-
-      <SiteFooter showStores={false} />
-    </div>
+    </LegalChrome>
   );
 }
 
@@ -103,5 +111,64 @@ export function TermsPage() {
       summary={t("legal.termsSummary")}
       sections={termsSections(locale)}
     />
+  );
+}
+
+export function SupportPage() {
+  const t = useT();
+
+  useEffect(() => {
+    document.title = `${t("legal.supportTitle")} — ${brand.name}`;
+    return () => {
+      document.title = "RASHMAT — Train with creators on the mat";
+    };
+  }, [t]);
+
+  const cards = [
+    {
+      title: t("legal.supportAppTitle"),
+      body: t("legal.supportAppBody"),
+    },
+    {
+      title: t("legal.supportStudioTitle"),
+      body: t("legal.supportStudioBody"),
+    },
+    {
+      title: t("legal.supportPrivacyTitle"),
+      body: t("legal.supportPrivacyBody"),
+    },
+  ] as const;
+
+  return (
+    <LegalChrome>
+      <main className="shell legal support-page">
+        <p className="kicker">{t("legal.supportKicker")}</p>
+        <h1 className="legal__title">{t("legal.supportTitle")}</h1>
+        <p className="body legal__summary">{t("legal.supportSummary")}</p>
+
+        <a className="support-email" href={`mailto:${brand.supportEmail}`}>
+          <span className="support-email__label">{t("legal.supportEmailLabel")}</span>
+          <span className="support-email__addr">{brand.supportEmail}</span>
+          <span className="support-email__hint">{t("legal.supportEmailHint")}</span>
+        </a>
+
+        <div className="support-cards">
+          {cards.map((card) => (
+            <section key={card.title} className="support-card">
+              <h2>{card.title}</h2>
+              <p>{card.body}</p>
+            </section>
+          ))}
+        </div>
+
+        <p className="legal__contact">
+          <Link to={brand.legal.privacyUrl}>{t("legal.navPrivacy")}</Link>
+          {" · "}
+          <Link to={brand.legal.termsUrl}>{t("legal.navTerms")}</Link>
+          {" · "}
+          <a href={`mailto:${brand.email}`}>{brand.email}</a>
+        </p>
+      </main>
+    </LegalChrome>
   );
 }
