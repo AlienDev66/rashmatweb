@@ -74,6 +74,7 @@ export function SiteFooter({ showStores = true }: Props) {
           </a>
           <Link to={brand.legal.privacyUrl}>{t("common.privacy")}</Link>
           <Link to={brand.legal.termsUrl}>{t("common.terms")}</Link>
+          <Link to={brand.legal.supportUrl}>{t("common.support")}</Link>
           <a href={`mailto:${brand.email}`}>{brand.email}</a>
         </nav>
 
