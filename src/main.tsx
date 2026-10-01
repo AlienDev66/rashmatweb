@@ -4,7 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth";
 import { I18nProvider } from "./i18n";
 import { ProgramSharePage } from "./pages/ProgramSharePage";
-import { PrivacyPage, TermsPage } from "./pages/LegalPages";
+import { PrivacyPage, SupportPage, TermsPage } from "./pages/LegalPages";
 import { LandingPage } from "./pages/LandingPage";
 import { StudioCmsPage } from "./pages/studio/StudioCmsPage";
 import { StudioFollowersPage } from "./pages/studio/StudioFollowersPage";
@@ -32,6 +32,7 @@ createRoot(el).render(
             <Route path="/" element={<LandingPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
+            <Route path="/support" element={<SupportPage />} />
             <Route path="/p/:id" element={<ProgramSharePage />} />
             <Route path="/studio/login" element={<StudioLoginPage />} />
             <Route path="/studio" element={<StudioShell />}>

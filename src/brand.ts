@@ -24,6 +24,7 @@ export const brand = {
   legal: {
     privacyUrl: "/privacy",
     termsUrl: "/terms",
+    supportUrl: "/support",
     effectiveDate: "September 30, 2026",
     governingLaw: "Portugal",
   },
