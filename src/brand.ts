@@ -9,16 +9,22 @@ export const brand = {
     instagram: "https://www.instagram.com/rashmatapp/",
     handle: "@rashmatapp",
   },
-  /** Athlete experience (Expo web / deep links). */
-  platformUrl: "https://app.rashmat.com",
+  /**
+   * Athlete entry from the marketing site.
+   * Soft launch: /get-app (store + deep link). Switch to https://app.rashmat.com
+   * when Expo web is deployed on that host.
+   */
+  platformUrl: "/get-app",
+  /** Deep-link scheme for installed native apps. */
+  scheme: "rashmat",
   /** Web Creator Studio (this package). */
   studioUrl: "/studio",
   /**
-   * Native store listings. Update iOS to the real App Store ID when published.
-   * Android package matches app.json (`com.rashmat.app`) — leave store package IDs as-is.
+   * Native store listings.
+   * iOS: App Store Connect Apple ID 6818224124 (update slug when public).
    */
   stores: {
-    ios: "https://apps.apple.com/app/rashmat",
+    ios: "https://apps.apple.com/app/id6818224124",
     android: "https://play.google.com/store/apps/details?id=com.rashmat.app",
   },
   legal: {

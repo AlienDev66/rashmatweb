@@ -5,6 +5,7 @@ import { AuthProvider } from "./auth";
 import { I18nProvider } from "./i18n";
 import { ProgramSharePage } from "./pages/ProgramSharePage";
 import { PrivacyPage, SupportPage, TermsPage } from "./pages/LegalPages";
+import { GetAppPage } from "./pages/GetAppPage";
 import { LandingPage } from "./pages/LandingPage";
 import { StudioCmsPage } from "./pages/studio/StudioCmsPage";
 import { StudioFollowersPage } from "./pages/studio/StudioFollowersPage";
@@ -30,6 +31,8 @@ createRoot(el).render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/get-app" element={<GetAppPage />} />
+            <Route path="/app" element={<GetAppPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/support" element={<SupportPage />} />
