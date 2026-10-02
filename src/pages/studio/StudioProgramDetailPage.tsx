@@ -39,6 +39,8 @@ export function StudioProgramDetailPage() {
   const [level, setLevel] = useState("Beginner");
   const [tags, setTags] = useState("");
   const [isPremium, setIsPremium] = useState(false);
+  const [priceEuros, setPriceEuros] = useState("");
+  const [currency, setCurrency] = useState("eur");
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -59,6 +61,10 @@ export function StudioProgramDetailPage() {
       setLevel(p.level);
       setTags(p.tags.join(", "));
       setIsPremium(p.is_premium);
+      setPriceEuros(
+        p.price_cents != null && p.price_cents > 0 ? (p.price_cents / 100).toFixed(2) : "",
+      );
+      setCurrency(p.currency || "eur");
       const readiness = await getPublishReadiness(p);
       setGate(readiness);
     } else {
@@ -135,6 +141,10 @@ export function StudioProgramDetailPage() {
         .map((tag) => tag.trim())
         .filter(Boolean),
       is_premium: isPremium,
+      price_cents: isPremium
+        ? Math.round(Number(priceEuros.replace(",", ".")) * 100) || null
+        : null,
+      currency: currency.toLowerCase() || "eur",
     });
     setBusy(false);
     if (error) {
@@ -342,6 +352,30 @@ export function StudioProgramDetailPage() {
               />
               {t("studio.detail.premium")}
             </label>
+            {isPremium ? (
+              <>
+                <label>
+                  {t("studio.detail.price")}
+                  <input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={priceEuros}
+                    onChange={(e) => setPriceEuros(e.target.value)}
+                    placeholder="29.00"
+                  />
+                </label>
+                <label>
+                  {t("studio.detail.currency")}
+                  <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+                    <option value="eur">EUR</option>
+                    <option value="usd">USD</option>
+                    <option value="gbp">GBP</option>
+                  </select>
+                </label>
+                <p className="studio-muted span-2">{t("studio.detail.priceHint")}</p>
+              </>
+            ) : null}
           </div>
           <div className="studio-actions">
             <button className="studio-btn studio-btn--accent" type="submit" disabled={busy}>

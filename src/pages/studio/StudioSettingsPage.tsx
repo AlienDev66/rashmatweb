@@ -1,14 +1,53 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { brand } from "../../brand";
 import { LanguageSwitcher } from "../../components/LanguageSwitcher";
 import { useT } from "../../i18n";
+import { startStripeConnectOnboarding, creatorPayoutsReady, stripeModeForBrowser } from "../../lib/stripeConnect";
 import { useStudioTour } from "../../tour/StudioTour";
 
 export function StudioSettingsPage() {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, refreshProfile } = useAuth();
   const { start } = useStudioTour();
   const t = useT();
+  const [params] = useSearchParams();
+  const [stripeBusy, setStripeBusy] = useState(false);
+  const [stripeMsg, setStripeMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    const stripe = params.get("stripe");
+    if (stripe === "return" || stripe === "refresh") {
+      void refreshProfile();
+      setStripeMsg(
+        stripe === "return" ? t("studio.stripe.returnOk") : t("studio.stripe.refreshHint"),
+      );
+    }
+  }, [params, refreshProfile, t]);
+
+  const onConnectStripe = async () => {
+    setStripeBusy(true);
+    setStripeMsg(null);
+    const result = await startStripeConnectOnboarding();
+    setStripeBusy(false);
+    if (result.error) {
+      setStripeMsg(result.error.startsWith("errors.") ? t(result.error) : result.error);
+      return;
+    }
+    if (result.ready) {
+      await refreshProfile();
+      setStripeMsg(t("studio.stripe.ready"));
+      return;
+    }
+    if (result.url) {
+      window.location.href = result.url;
+      return;
+    }
+    setStripeMsg(t("studio.stripe.failed"));
+  };
+
+  const payoutsReady = creatorPayoutsReady(profile);
+  const stripeMode = stripeModeForBrowser();
 
   return (
     <main className="studio-page studio-page--narrow">
@@ -18,6 +57,36 @@ export function StudioSettingsPage() {
           <h1>{t("studio.settingsTitle")}</h1>
         </div>
       </header>
+
+      <section className="studio-panel">
+        <div className="studio-panel-head">
+          <h2>{t("studio.stripe.title")}</h2>
+        </div>
+        <p className="studio-muted" style={{ marginBottom: "0.85rem" }}>
+          {t("studio.stripe.body")}
+        </p>
+        <p className="studio-muted" style={{ marginBottom: "0.85rem" }}>
+          {stripeMode === "test"
+            ? t("studio.stripe.modeTest")
+            : t("studio.stripe.modeLive")}
+        </p>
+        <p className="studio-muted" style={{ marginBottom: "0.85rem" }}>
+          {payoutsReady ? t("studio.stripe.statusReady") : t("studio.stripe.statusPending")}
+        </p>
+        {stripeMsg ? <p className="studio-flash">{stripeMsg}</p> : null}
+        <button
+          type="button"
+          className="studio-btn studio-btn--accent"
+          disabled={stripeBusy}
+          onClick={() => void onConnectStripe()}
+        >
+          {stripeBusy
+            ? t("common.loading")
+            : payoutsReady
+              ? t("studio.stripe.manage")
+              : t("studio.stripe.connect")}
+        </button>
+      </section>
 
       <section className="studio-panel">
         <div className="studio-panel-head">

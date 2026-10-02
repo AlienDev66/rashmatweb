@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../auth";
 import { brand } from "../../brand";
 import { useT } from "../../i18n";
@@ -7,13 +7,17 @@ import { useT } from "../../i18n";
 export function StudioLoginPage() {
   const { ready, user, signIn, configured } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const t = useT();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  if (ready && user) return <Navigate to="/studio" replace />;
+  const nextRaw = params.get("next") || "/studio";
+  const next = nextRaw.startsWith("/") ? nextRaw : "/studio";
+
+  if (ready && user) return <Navigate to={next} replace />;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -25,7 +29,7 @@ export function StudioLoginPage() {
       setError(t(err));
       return;
     }
-    navigate("/studio", { replace: true });
+    navigate(next, { replace: true });
   };
 
   return (

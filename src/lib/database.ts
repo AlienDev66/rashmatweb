@@ -17,12 +17,24 @@ export type Database = {
           avatar_url: string | null;
           is_creator: boolean;
           creator_slug: string | null;
+          stripe_account_id: string | null;
+          stripe_charges_enabled: boolean;
+          stripe_details_submitted: boolean;
+          stripe_account_id_live: string | null;
+          stripe_charges_enabled_live: boolean;
+          stripe_details_submitted_live: boolean;
         };
         Insert: {
           id: string;
           full_name?: string | null;
           is_creator?: boolean;
           creator_slug?: string | null;
+          stripe_account_id?: string | null;
+          stripe_charges_enabled?: boolean;
+          stripe_details_submitted?: boolean;
+          stripe_account_id_live?: string | null;
+          stripe_charges_enabled_live?: boolean;
+          stripe_details_submitted_live?: boolean;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
         Relationships: [];
@@ -41,6 +53,8 @@ export type Database = {
           level: string;
           tags: string[];
           is_premium: boolean;
+          price_cents: number | null;
+          currency: string;
           status: "draft" | "published";
           created_at: string;
         };
@@ -57,6 +71,8 @@ export type Database = {
           level: string;
           tags?: string[];
           is_premium?: boolean;
+          price_cents?: number | null;
+          currency?: string;
           status?: "draft" | "published";
         };
         Update: Partial<Database["public"]["Tables"]["programs"]["Insert"]>;

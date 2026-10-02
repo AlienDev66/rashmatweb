@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useAuth } from "../auth";
 import { brand } from "../brand";
 import { useT } from "../i18n";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
+import { createProgramCheckout, formatPriceCents } from "../lib/stripeConnect";
 
 type PublicProgram = {
   id: string;
@@ -14,17 +16,30 @@ type PublicProgram = {
   days_per_week: number;
   minutes: number;
   status: string;
+  is_premium: boolean;
+  price_cents: number | null;
+  currency: string;
 };
 
 export function ProgramSharePage() {
   const { id = "" } = useParams();
+  const [search] = useSearchParams();
   const t = useT();
+  const { user, ready } = useAuth();
   const [program, setProgram] = useState<PublicProgram | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [buyBusy, setBuyBusy] = useState(false);
+  const [flash, setFlash] = useState<string | null>(null);
+  const [enrolled, setEnrolled] = useState(false);
 
   const deepLink = `rashmat://program/${id}`;
-  const storeHint = brand.platformUrl;
+  const paid = search.get("paid");
+
+  useEffect(() => {
+    if (paid === "1") setFlash(t("share.paidOk"));
+    if (paid === "0") setFlash(t("share.paidCancel"));
+  }, [paid, t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -42,7 +57,7 @@ export function ProgramSharePage() {
       const { data, error: err } = await supabase
         .from("programs")
         .select(
-          "id, title, description, cover_url, level, weeks, days_per_week, minutes, status",
+          "id, title, description, cover_url, level, weeks, days_per_week, minutes, status, is_premium, price_cents, currency",
         )
         .eq("id", id)
         .maybeSingle();
@@ -66,12 +81,57 @@ export function ProgramSharePage() {
     };
   }, [id]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (!user || !id || !isSupabaseConfigured) {
+        setEnrolled(false);
+        return;
+      }
+      const { data } = await supabase
+        .from("user_program_enrollments")
+        .select("program_id")
+        .eq("user_id", user.id)
+        .eq("program_id", id)
+        .maybeSingle();
+      if (!cancelled) setEnrolled(Boolean(data));
+    };
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, id, paid]);
+
   const openApp = () => {
     window.location.href = deepLink;
-    window.setTimeout(() => {
-      // If the app isn’t installed, user can still use platform URL
-    }, 800);
   };
+
+  const onBuy = async () => {
+    if (!program) return;
+    if (!user) {
+      window.location.href = `/studio/login?next=${encodeURIComponent(`/p/${program.id}`)}`;
+      return;
+    }
+    setBuyBusy(true);
+    const result = await createProgramCheckout(program.id);
+    setBuyBusy(false);
+    if (result.already) {
+      setEnrolled(true);
+      setFlash(t("share.alreadyOwned"));
+      return;
+    }
+    if (result.error || !result.url) {
+      setFlash(result.error ?? t("errors.failed"));
+      return;
+    }
+    window.location.href = result.url;
+  };
+
+  const priced =
+    program?.is_premium && program.price_cents != null && program.price_cents > 0;
+  const priceLabel = priced
+    ? formatPriceCents(program!.price_cents, program!.currency)
+    : null;
 
   return (
     <div className="share-page">
@@ -83,7 +143,7 @@ export function ProgramSharePage() {
       </header>
 
       <main className="share-main">
-        {loading ? <p className="studio-muted">{t("share.loading")}</p> : null}
+        {loading || !ready ? <p className="studio-muted">{t("share.loading")}</p> : null}
         {error ? (
           <div className="share-card">
             <h1>{t("share.unavailable")}</h1>
@@ -113,21 +173,35 @@ export function ProgramSharePage() {
                 level: t(`studio.levels.${program.level}`),
               })}
             </p>
+            {priceLabel ? (
+              <p className="share-price">{t("share.price", { price: priceLabel })}</p>
+            ) : null}
             {program.description ? <p className="share-desc">{program.description}</p> : null}
+            {flash ? <p className="studio-flash">{flash}</p> : null}
 
             <div className="share-actions">
-              <button type="button" className="studio-btn studio-btn--accent" onClick={openApp}>
-                {t("share.openApp")}
-              </button>
-              <a className="studio-btn studio-btn--ghost" href={storeHint}>
+              {enrolled ? (
+                <button type="button" className="studio-btn studio-btn--accent" onClick={openApp}>
+                  {t("share.openApp")}
+                </button>
+              ) : priced ? (
+                <button
+                  type="button"
+                  className="studio-btn studio-btn--accent"
+                  disabled={buyBusy}
+                  onClick={() => void onBuy()}
+                >
+                  {buyBusy ? t("common.loading") : t("share.buyAccess")}
+                </button>
+              ) : (
+                <button type="button" className="studio-btn studio-btn--accent" onClick={openApp}>
+                  {t("share.openApp")}
+                </button>
+              )}
+              <a className="studio-btn studio-btn--ghost" href={brand.platformUrl}>
                 {t("share.getApp")}
               </a>
             </div>
-
-            <p className="share-deeplink">
-              {t("share.deepLink")} <code>{deepLink}</code>
-            </p>
-            <p className="studio-muted share-note">{t("share.note")}</p>
           </div>
         ) : null}
       </main>

@@ -37,7 +37,9 @@ export async function fetchProfile(userId: string) {
   if (!isSupabaseConfigured) return { error: null, profile: null };
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, full_name, avatar_url, is_creator, creator_slug")
+    .select(
+      "id, full_name, avatar_url, is_creator, creator_slug, stripe_account_id, stripe_charges_enabled, stripe_details_submitted, stripe_account_id_live, stripe_charges_enabled_live, stripe_details_submitted_live",
+    )
     .eq("id", userId)
     .maybeSingle();
   if (error) return { error: error.message, profile: null };
@@ -155,6 +157,8 @@ export async function updateProgram(
     level: string;
     tags: string[];
     is_premium: boolean;
+    price_cents: number | null;
+    currency: string;
     status: "draft" | "published";
   }>,
 ) {
