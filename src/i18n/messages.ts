@@ -50,6 +50,13 @@ const en = {
     googlePlay: "Google Play",
     getApp: "Get the app",
   },
+  getApp: {
+    kicker: "ATHLETE APP",
+    title: "Train in the RASHMAT app",
+    body: "The athlete platform lives in the native app. Download RASHMAT, or open it if it’s already installed. Creators publish on the web Studio.",
+    openInstalled: "Open installed app",
+    note: "App Store listing goes public after review. Internal TestFlight builds work for invited testers. Creator Studio stays at rashmat.com/studio.",
+  },
   errors: {
     supabaseMissing: "Supabase not configured",
     supabaseKeys: "Supabase keys missing — add web/.env first.",
@@ -631,6 +638,13 @@ export const messages: Record<Locale, WebMessages> = {
       getItOn: "Disponível no",
       googlePlay: "Google Play",
       getApp: "Obter a app",
+    },
+    getApp: {
+      kicker: "APP DO ATLETA",
+      title: "Treina na app RASHMAT",
+      body: "A plataforma do atleta vive na app nativa. Descarrega o RASHMAT, ou abre-o se já estiver instalado. Os creators publicam no Studio web.",
+      openInstalled: "Abrir app instalada",
+      note: "A listagem na App Store fica pública após review. Builds TestFlight internos funcionam para testers convidados. O Creator Studio continua em rashmat.com/studio.",
     },
     errors: {
       supabaseMissing: "Supabase não está configurado",
