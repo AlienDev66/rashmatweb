@@ -4,10 +4,13 @@ Canonical public domain: **`rashmat.com`** (Squarespace registrar).
 
 | Host | Role |
 |------|------|
-| `rashmat.com` / `www.rashmat.com` | Marketing site + Creator Studio (`/studio`) |
-| `app.rashmat.com` | Athlete platform / Expo web (when deployed) |
-| `rashmat://…` | Native app deep links (unchanged) |
-| `com.rashmat.app` | iOS/Android package ID (unchanged — store identity) |
+| `rashmat.com` / `www.rashmat.com` | Marketing site + Creator Studio (`/studio`) + athlete handoff (`/get-app`) |
+| `app.rashmat.com` | Reserved for Expo web athlete shell (not required for soft launch) |
+| `rashmat.com/get-app` | Soft-launch “Enter the platform” — store links + `rashmat://` deep link |
+| `rashmat://…` | Native app deep links |
+| `com.rashmat.app` | iOS/Android package ID |
+
+**Soft launch CTA:** marketing `platformUrl` → `/get-app` (see `web/src/brand.ts`). When Expo web is deployed on `app.rashmat.com`, point `platformUrl` there and 301 `/get-app` if you still want a download page.
 
 Emails in product copy: `hello@rashmat.com`, `support@rashmat.com` (create mailboxes / forwarding when DNS is live).
 
