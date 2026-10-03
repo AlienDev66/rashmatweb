@@ -233,7 +233,26 @@ const en = {
       "Publish programs, sessions, and drills at rashmat.com/studio. Include your creator handle and a short screen recording when you can.",
     supportPrivacyTitle: "Privacy & data",
     supportPrivacyBody:
-      "For access, deletion, or privacy requests, email us and mention “privacy” in the subject. See also our Privacy Policy.",
+      "For access, deletion, or privacy requests, email us and mention “privacy” in the subject. See also our Privacy Policy and Delete account page.",
+    deleteAccountKicker: "ACCOUNT",
+    deleteAccountTitle: "Delete your RASHMAT account",
+    deleteAccountSummary:
+      "This page explains how to delete your RASHMAT account and associated personal data from the athlete apps, Creator Studio, and rashmat.com.",
+    deleteAccountInAppTitle: "1. Delete in the RASHMAT app (fastest)",
+    deleteAccountInAppBody:
+      "Open the RASHMAT app → More / Settings → Delete account. Confirm twice. This permanently removes your account.",
+    deleteAccountEmailTitle: "2. Request deletion by email",
+    deleteAccountEmailBody:
+      "If you no longer have the app, email support@rashmat.com with subject “Delete account” and the email address of the account. We process requests within a few business days (usually within 30 days).",
+    deleteAccountWhatTitle: "What we delete",
+    deleteAccountWhatBody:
+      "We delete or anonymize account data tied to you, including profile details, training progress, enrollments, follows, creator content you own (programs/sessions/drills you published), and notification tokens.",
+    deleteAccountRetainTitle: "What we may retain",
+    deleteAccountRetainBody:
+      "We may keep limited records required by law or for fraud prevention, billing disputes, and security (for example transaction references or logs) for a limited period. Public content already shared by others is not controlled by your deletion request.",
+    deleteAccountPartialTitle: "Delete some data without closing the account",
+    deleteAccountPartialBody:
+      "Email support@rashmat.com describing what you want removed (for example an avatar or a specific program). We will confirm what can be deleted while keeping your account active.",
   },
   studio: {
     navDashboard: "Dashboard",
@@ -846,7 +865,26 @@ export const messages: Record<Locale, WebMessages> = {
         "Publica programas, sessões e drills em rashmat.com/studio. Inclui o teu handle de creator e um short screen recording quando puderes.",
       supportPrivacyTitle: "Privacidade e dados",
       supportPrivacyBody:
-        "Para pedidos de acesso, eliminação ou privacidade, envia email com “privacy” no assunto. Vê também a Política de Privacidade.",
+        "Para pedidos de acesso, eliminação ou privacidade, envia email com “privacy” no assunto. Vê também a Política de Privacidade e a página Eliminar conta.",
+      deleteAccountKicker: "CONTA",
+      deleteAccountTitle: "Eliminar a tua conta RASHMAT",
+      deleteAccountSummary:
+        "Esta página explica como eliminar a tua conta RASHMAT e os dados pessoais associados nas apps de atleta, no Creator Studio e em rashmat.com.",
+      deleteAccountInAppTitle: "1. Eliminar na app RASHMAT (mais rápido)",
+      deleteAccountInAppBody:
+        "Abre a app RASHMAT → Mais / Definições → Eliminar conta. Confirma duas vezes. Isto remove a conta de forma permanente.",
+      deleteAccountEmailTitle: "2. Pedir eliminação por email",
+      deleteAccountEmailBody:
+        "Se já não tens a app, envia email para support@rashmat.com com o assunto “Eliminar conta” e o email da conta. Tratamos pedidos em poucos dias úteis (normalmente até 30 dias).",
+      deleteAccountWhatTitle: "O que eliminamos",
+      deleteAccountWhatBody:
+        "Eliminamos ou anonimizamos dados de conta ligados a ti, incluindo perfil, progresso de treino, enrollments, follows, conteúdo de creator que possuis (programas/sessões/drills que publicaste) e tokens de notificação.",
+      deleteAccountRetainTitle: "O que podemos reter",
+      deleteAccountRetainBody:
+        "Podemos manter registos limitados exigidos por lei ou para prevenção de fraude, litígios de faturação e segurança (por exemplo referências de transação ou logs) por um período limitado. Conteúdo público já partilhado por outros não é controlado pelo teu pedido de eliminação.",
+      deleteAccountPartialTitle: "Eliminar alguns dados sem fechar a conta",
+      deleteAccountPartialBody:
+        "Envia email para support@rashmat.com a descrever o que queres remover (por exemplo avatar ou um programa específico). Confirmamos o que pode ser eliminado mantendo a conta ativa.",
     },
     studio: {
       navDashboard: "Dashboard",

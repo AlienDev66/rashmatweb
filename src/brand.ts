@@ -31,6 +31,7 @@ export const brand = {
     privacyUrl: "/privacy",
     termsUrl: "/terms",
     supportUrl: "/support",
+    deleteAccountUrl: "/delete-account",
     effectiveDate: "September 30, 2026",
     governingLaw: "Portugal",
   },

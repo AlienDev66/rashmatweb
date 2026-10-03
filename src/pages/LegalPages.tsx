@@ -162,11 +162,80 @@ export function SupportPage() {
         </div>
 
         <p className="legal__contact">
+          <Link to={brand.legal.deleteAccountUrl}>{t("legal.deleteAccountTitle")}</Link>
+          {" · "}
           <Link to={brand.legal.privacyUrl}>{t("legal.navPrivacy")}</Link>
           {" · "}
           <Link to={brand.legal.termsUrl}>{t("legal.navTerms")}</Link>
           {" · "}
           <a href={`mailto:${brand.email}`}>{brand.email}</a>
+        </p>
+      </main>
+    </LegalChrome>
+  );
+}
+
+export function DeleteAccountPage() {
+  const t = useT();
+
+  useEffect(() => {
+    document.title = `${t("legal.deleteAccountTitle")} — ${brand.name}`;
+    return () => {
+      document.title = "RASHMAT — Train with creators on the mat";
+    };
+  }, [t]);
+
+  const sections = [
+    {
+      title: t("legal.deleteAccountInAppTitle"),
+      body: t("legal.deleteAccountInAppBody"),
+    },
+    {
+      title: t("legal.deleteAccountEmailTitle"),
+      body: t("legal.deleteAccountEmailBody"),
+    },
+    {
+      title: t("legal.deleteAccountWhatTitle"),
+      body: t("legal.deleteAccountWhatBody"),
+    },
+    {
+      title: t("legal.deleteAccountRetainTitle"),
+      body: t("legal.deleteAccountRetainBody"),
+    },
+    {
+      title: t("legal.deleteAccountPartialTitle"),
+      body: t("legal.deleteAccountPartialBody"),
+    },
+  ] as const;
+
+  return (
+    <LegalChrome>
+      <main className="shell legal">
+        <p className="kicker">{t("legal.deleteAccountKicker")}</p>
+        <h1 className="legal__title">{t("legal.deleteAccountTitle")}</h1>
+        <p className="body legal__summary">{t("legal.deleteAccountSummary")}</p>
+
+        <a className="support-email" href={`mailto:${brand.supportEmail}?subject=Delete%20account`}>
+          <span className="support-email__label">{t("legal.supportEmailLabel")}</span>
+          <span className="support-email__addr">{brand.supportEmail}</span>
+          <span className="support-email__hint">{t("legal.deleteAccountEmailTitle")}</span>
+        </a>
+
+        <div className="legal__body">
+          {sections.map((section) => (
+            <section key={section.title} className="legal__section">
+              <h2>{section.title}</h2>
+              <p>{section.body}</p>
+            </section>
+          ))}
+        </div>
+
+        <p className="legal__contact">
+          <Link to={brand.legal.privacyUrl}>{t("legal.navPrivacy")}</Link>
+          {" · "}
+          <Link to={brand.legal.supportUrl}>{t("legal.navSupport")}</Link>
+          {" · "}
+          <a href={`mailto:${brand.supportEmail}`}>{brand.supportEmail}</a>
         </p>
       </main>
     </LegalChrome>
