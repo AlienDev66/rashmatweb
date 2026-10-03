@@ -40,12 +40,16 @@ export const brand = {
 /** Full-bleed hero — local brand still (gi + black belt). */
 export const heroImage = "/hero-landing.jpg";
 
-export const athletesImage = "/section-plan.jpg";
+export const athletesImage = "/section-plan.jpg?v=20261003e";
 
-export const creatorsImage = "/section-creators.jpg";
+/** Cropped — previous asset had a baked black letterbox on the right. */
+export const creatorsImage = "/section-creators.jpg?v=20261003e";
 
-/** Atmosphere behind the CSS phone fan. */
-export const mocksStage = "/mocks-stage.png";
+/**
+ * Atmosphere behind the CSS phone fan.
+ * Prefer a clean still — avoid composites with baked UI/copy or letterbox bars.
+ */
+export const mocksStage = "/section-plan.jpg?v=20261003e";
 
 /** Individual app screenshots for device frames. Bump `v` when assets change. */
 const screenV = "20261003d";

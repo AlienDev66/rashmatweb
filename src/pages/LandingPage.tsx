@@ -56,10 +56,17 @@ type BrowserProps = {
   src: string;
   alt: string;
   label: string;
+  url?: string;
   className?: string;
 };
 
-function BrowserMock({ src, alt, label, className = "" }: BrowserProps) {
+function BrowserMock({
+  src,
+  alt,
+  label,
+  url = "rashmat.com/studio",
+  className = "",
+}: BrowserProps) {
   return (
     <figure className={`browser ${className}`}>
       <div className="browser__chrome" aria-hidden="true">
@@ -68,7 +75,7 @@ function BrowserMock({ src, alt, label, className = "" }: BrowserProps) {
           <i />
           <i />
         </span>
-        <span className="browser__url">rashmat.com/studio</span>
+        <span className="browser__url">{url}</span>
       </div>
       <div className="browser__screen">
         <img src={src} alt={alt} className="browser__shot" loading="lazy" />
@@ -183,38 +190,6 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="band" data-reveal>
-          <div className="shell band__inner">
-            <div className="band__head">
-              <p className="band__kicker">{t("landing.bandKicker")}</p>
-              <h2 className="band__title">{t("landing.bandTitle")}</h2>
-            </div>
-            <ul className="band__list">
-              <li>
-                <span className="band__n">01</span>
-                <div>
-                  <strong>{t("landing.band1Title")}</strong>
-                  <p>{t("landing.band1Body")}</p>
-                </div>
-              </li>
-              <li>
-                <span className="band__n">02</span>
-                <div>
-                  <strong>{t("landing.band2Title")}</strong>
-                  <p>{t("landing.band2Body")}</p>
-                </div>
-              </li>
-              <li>
-                <span className="band__n">03</span>
-                <div>
-                  <strong>{t("landing.band3Title")}</strong>
-                  <p>{t("landing.band3Body")}</p>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </section>
-
         <section className="paths" data-reveal>
           <div className="shell paths__inner">
             <div className="paths__head">
@@ -265,6 +240,53 @@ export function LandingPage() {
           </div>
         </section>
 
+        <section className="mocks mocks--tight" data-reveal>
+          <div
+            className="mocks__stage"
+            style={{ ["--stage" as string]: `url('${mocksStage}')` }}
+            aria-hidden="true"
+          />
+          <div className="mocks__veil" aria-hidden="true" />
+          <div className="shell mocks__inner">
+            <div className="mocks__head">
+              <p className="kicker">{t("landing.mocksKicker")}</p>
+              <h2 className="display">
+                {t("landing.mocksTitle1")}
+                <br />
+                <span className="accent">{t("landing.mocksTitle2")}</span>
+              </h2>
+              <p className="body">{t("landing.mocksBody")}</p>
+            </div>
+
+            <div className="phone-fan phone-fan--4" role="list">
+              <PhoneMock
+                className="phone--fan phone--f1"
+                src={appScreens.creators}
+                alt={t("landing.mockCreators")}
+                label={t("landing.mockCreators")}
+              />
+              <PhoneMock
+                className="phone--fan phone--f2 phone--featured"
+                src={appScreens.hub}
+                alt={t("landing.mockHub")}
+                label={t("landing.mockHub")}
+              />
+              <PhoneMock
+                className="phone--fan phone--f3"
+                src={appScreens.sessionPreview}
+                alt={t("landing.mockSession")}
+                label={t("landing.mockSession")}
+              />
+              <PhoneMock
+                className="phone--fan phone--f4"
+                src={appScreens.complete}
+                alt={t("landing.mockXp")}
+                label={t("landing.mockXp")}
+              />
+            </div>
+          </div>
+        </section>
+
         <section className="feature feature--flip" data-reveal>
           <div
             className="feature__media"
@@ -286,20 +308,9 @@ export function LandingPage() {
                 <li>{t("landing.creatorsP2")}</li>
                 <li>{t("landing.creatorsP3")}</li>
               </ul>
-              <div className="feature__cta-row">
-                <Link className="btn btn--accent btn--inline" to={brand.studioUrl}>
-                  {t("landing.creatorsCta")}
-                </Link>
-                <a
-                  className="btn btn--ghost btn--inline"
-                  href={brand.social.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <IgIcon />
-                  {brand.social.handle}
-                </a>
-              </div>
+              <Link className="btn btn--accent btn--inline" to={brand.studioUrl}>
+                {t("landing.creatorsCta")}
+              </Link>
             </div>
           </div>
         </section>
@@ -334,22 +345,32 @@ export function LandingPage() {
               src={studioWebScreens.dashboard}
               alt={t("landing.mockStudioDash")}
               label={t("landing.mockStudioDash")}
+              url="rashmat.com/studio"
             />
-            <div className="creator-proof__browsers" role="list">
+            <div className="creator-proof__browsers creator-proof__browsers--2" role="list">
               <BrowserMock
                 src={studioWebScreens.programs}
                 alt={t("landing.mockStudioPrograms")}
                 label={t("landing.mockStudioPrograms")}
+                url="rashmat.com/studio/programs"
               />
               <BrowserMock
-                src={studioWebScreens.wizard}
-                alt={t("landing.mockStudioWizard")}
-                label={t("landing.mockStudioWizard")}
+                src={studioWebScreens.cms}
+                alt={t("landing.mockStudioCms")}
+                label={t("landing.mockStudioCms")}
+                url="rashmat.com/studio/cms"
               />
               <BrowserMock
                 src={studioWebScreens.students}
                 alt={t("landing.mockStudioStudents")}
                 label={t("landing.mockStudioStudents")}
+                url="rashmat.com/studio/students"
+              />
+              <BrowserMock
+                src={studioWebScreens.wizard}
+                alt={t("landing.mockStudioWizard")}
+                label={t("landing.mockStudioWizard")}
+                url="rashmat.com/studio/programs/new"
               />
             </div>
             <div className="creator-proof__cta">
@@ -360,76 +381,18 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section className="mocks" data-reveal>
-          <div
-            className="mocks__stage"
-            style={{ ["--stage" as string]: `url('${mocksStage}')` }}
-            aria-hidden="true"
-          />
-          <div className="mocks__veil" aria-hidden="true" />
-          <div className="shell mocks__inner">
-            <div className="mocks__head">
-              <p className="kicker">{t("landing.mocksKicker")}</p>
-              <h2 className="display">
-                {t("landing.mocksTitle1")}
-                <br />
-                <span className="accent">{t("landing.mocksTitle2")}</span>
-              </h2>
-              <p className="body">{t("landing.mocksBody")}</p>
-            </div>
-
-            <div className="phone-fan" role="list">
-              <PhoneMock
-                className="phone--fan phone--f1"
-                src={appScreens.creators}
-                alt={t("landing.mockCreators")}
-                label={t("landing.mockCreators")}
-              />
-              <PhoneMock
-                className="phone--fan phone--f2 phone--featured"
-                src={appScreens.creatorProfile}
-                alt={t("landing.mockCreatorProfile")}
-                label={t("landing.mockCreatorProfile")}
-              />
-              <PhoneMock
-                className="phone--fan phone--f3"
-                src={appScreens.hub}
-                alt={t("landing.mockHub")}
-                label={t("landing.mockHub")}
-              />
-              <PhoneMock
-                className="phone--fan phone--f4"
-                src={appScreens.sessionPreview}
-                alt={t("landing.mockSession")}
-                label={t("landing.mockSession")}
-              />
-              <PhoneMock
-                className="phone--fan phone--f5"
-                src={appScreens.programOverview}
-                alt={t("landing.mockProgram")}
-                label={t("landing.mockProgram")}
-              />
-              <PhoneMock
-                className="phone--fan phone--f6"
-                src={appScreens.complete}
-                alt={t("landing.mockXp")}
-                label={t("landing.mockXp")}
-              />
-            </div>
-
-            <div className="phone-rail" role="list">
-              <PhoneMock
-                className="phone--rail"
-                src={appScreens.studio}
-                alt={t("landing.mockStudio")}
-                label={t("landing.mockStudio")}
-              />
-              <PhoneMock
-                className="phone--rail"
-                src={appScreens.welcomeHero}
-                alt={t("landing.mockWelcome")}
-                label={t("landing.mockWelcome")}
-              />
+        <section className="close" data-reveal>
+          <div className="shell close__inner">
+            <p className="kicker">{t("landing.closeKicker")}</p>
+            <h2 className="display">{t("landing.closeTitle")}</h2>
+            <p className="body">{t("landing.closeBody")}</p>
+            <div className="close__ctas">
+              <a className="btn btn--accent" href={brand.platformUrl}>
+                {t("landing.closeAthlete")}
+              </a>
+              <Link className="btn btn--ghost" to={brand.studioUrl}>
+                {t("landing.closeCreator")}
+              </Link>
             </div>
           </div>
         </section>

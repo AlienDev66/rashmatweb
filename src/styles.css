@@ -682,10 +682,16 @@ img {
   gap: 1rem;
 }
 
-@media (min-width: 860px) {
+@media (min-width: 720px) {
   .creator-proof__browsers {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.15rem;
+  }
+}
+
+@media (min-width: 860px) {
+  .creator-proof__browsers:not(.creator-proof__browsers--2) {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -784,6 +790,42 @@ img {
   justify-content: center;
 }
 
+/* —— Close CTA —— */
+.close {
+  position: relative;
+  padding: clamp(4rem, 9vw, 6rem) 0;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.close::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 55% 70% at 50% 100%, rgba(241, 188, 3, 0.1), transparent 60%);
+  pointer-events: none;
+}
+
+.close__inner {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+}
+
+.close__inner .body {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.close__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
 /* —— Full-bleed feature planes —— */
 .feature {
   position: relative;
@@ -801,6 +843,7 @@ img {
   background-image: var(--img);
   background-size: cover;
   background-position: center 40%;
+  background-repeat: no-repeat;
   transform: scale(1.08);
   transition: transform 1.6s var(--ease);
 }
@@ -810,7 +853,7 @@ img {
 }
 
 .feature--flip .feature__media {
-  background-position: 35% 45%;
+  background-position: 42% 45%;
 }
 
 .feature__veil {
@@ -836,10 +879,10 @@ img {
   background:
     linear-gradient(
       270deg,
-      rgba(20, 17, 17, 0.96) 0%,
-      rgba(20, 17, 17, 0.82) 38%,
-      rgba(20, 17, 17, 0.35) 68%,
-      rgba(20, 17, 17, 0.15) 100%
+      rgba(20, 17, 17, 0.92) 0%,
+      rgba(20, 17, 17, 0.72) 34%,
+      rgba(20, 17, 17, 0.32) 64%,
+      rgba(20, 17, 17, 0.1) 100%
     ),
     linear-gradient(180deg, rgba(20, 17, 17, 0.35) 0%, transparent 28%, rgba(20, 17, 17, 0.55) 100%);
 }
@@ -971,9 +1014,16 @@ img {
   position: absolute;
   inset: 0;
   z-index: 0;
+  /* Stage PNG is an old full mock (baked typography) — crop to atmosphere only */
   background:
-    linear-gradient(180deg, rgba(20, 17, 17, 0.55) 0%, rgba(20, 17, 17, 0.82) 100%),
-    var(--stage) center 40% / cover no-repeat;
+    linear-gradient(
+      180deg,
+      var(--bg) 0%,
+      rgba(20, 17, 17, 0.94) 28%,
+      rgba(20, 17, 17, 0.55) 58%,
+      rgba(20, 17, 17, 0.88) 100%
+    ),
+    var(--stage) center 78% / cover no-repeat;
   transform: scale(1.06);
   transition: transform 1.6s var(--ease);
   pointer-events: none;
@@ -988,8 +1038,15 @@ img {
   inset: 0;
   z-index: 1;
   background:
-    radial-gradient(ellipse 70% 50% at 50% 20%, rgba(241, 188, 3, 0.07), transparent 55%),
-    linear-gradient(180deg, var(--bg) 0%, transparent 18%, transparent 72%, var(--bg) 100%);
+    radial-gradient(ellipse 70% 45% at 50% 75%, rgba(241, 188, 3, 0.06), transparent 55%),
+    linear-gradient(
+      180deg,
+      var(--bg) 0%,
+      var(--bg) 26%,
+      transparent 48%,
+      transparent 68%,
+      var(--bg) 100%
+    );
   pointer-events: none;
 }
 
@@ -1080,6 +1137,38 @@ img {
   perspective: 1400px;
 }
 
+/* 4-up: span the shell evenly */
+.phone-fan--4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  justify-items: center;
+  align-items: end;
+  gap: clamp(0.55rem, 1.6vw, 1.25rem);
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding: 1.5rem 0 0.5rem;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.phone-fan--4 .phone--fan {
+  width: 100%;
+  max-width: 13rem;
+  min-width: 0;
+  overflow: visible;
+}
+
+.phone-fan--4 .phone--fan .phone__device {
+  width: 100%;
+  max-width: none;
+}
+
+.mocks--tight .mocks__inner {
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  overflow: visible;
+}
+
 .phone--fan {
   opacity: 0;
   transform: translateY(36px) scale(0.94);
@@ -1112,10 +1201,19 @@ img {
 .phone--f5 .phone__device { transform: rotate(9deg) translateY(0.95rem); }
 .phone--f6 .phone__device { transform: rotate(13deg) translateY(1.4rem); }
 
+.phone-fan--4 .phone--f1 .phone__device { transform: rotate(-4deg) translateY(0.55rem); }
+.phone-fan--4 .phone--f2 .phone__device { transform: rotate(-1deg) translateY(0.1rem); }
+.phone-fan--4 .phone--f3 .phone__device { transform: rotate(1.5deg) translateY(0.2rem); }
+.phone-fan--4 .phone--f4 .phone__device { transform: rotate(4deg) translateY(0.55rem); }
+
 .phone--featured .phone__device {
   transform: rotate(0deg) translateY(-0.45rem) scale(1.1) !important;
   filter: drop-shadow(0 32px 48px rgba(0, 0, 0, 0.75));
   z-index: 2;
+}
+
+.phone-fan--4 .phone--featured .phone__device {
+  transform: rotate(0deg) translateY(-0.35rem) scale(1.04) !important;
 }
 
 .phone--featured .phone__cap {
@@ -1154,7 +1252,8 @@ img {
 .mocks.is-in .phone-rail .phone--rail:nth-child(2) { transition-delay: 360ms; }
 
 @media (max-width: 980px) {
-  .phone-fan {
+  /* Legacy 6-up fans can still scroll; 4-up uses a 2×2 grid (below). */
+  .phone-fan:not(.phone-fan--4) {
     display: flex;
     gap: 0.85rem;
     overflow-x: auto;
@@ -1167,32 +1266,63 @@ img {
     scrollbar-width: none;
   }
 
-  .phone-fan::-webkit-scrollbar {
+  .phone-fan:not(.phone-fan--4)::-webkit-scrollbar {
     display: none;
   }
 
-  .phone--fan {
+  .phone-fan:not(.phone-fan--4) .phone--fan {
     flex: 0 0 min(42vw, 11.5rem);
     scroll-snap-align: center;
   }
 
-  .phone--fan .phone__device {
+  .phone-fan:not(.phone-fan--4) .phone--fan .phone__device {
     max-width: none;
   }
 
-  .phone--f1 .phone__device,
-  .phone--f2 .phone__device,
-  .phone--f3 .phone__device,
-  .phone--f4 .phone__device,
-  .phone--f5 .phone__device,
-  .phone--f6 .phone__device,
-  .phone--featured .phone__device {
+  .phone-fan:not(.phone-fan--4) .phone--f1 .phone__device,
+  .phone-fan:not(.phone-fan--4) .phone--f2 .phone__device,
+  .phone-fan:not(.phone-fan--4) .phone--f3 .phone__device,
+  .phone-fan:not(.phone-fan--4) .phone--f4 .phone__device,
+  .phone-fan:not(.phone-fan--4) .phone--f5 .phone__device,
+  .phone-fan:not(.phone-fan--4) .phone--f6 .phone__device,
+  .phone-fan:not(.phone-fan--4) .phone--featured .phone__device {
     transform: none !important;
     filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.55));
   }
 
-  .phone--featured {
+  .phone-fan:not(.phone-fan--4) .phone--featured {
     flex-basis: min(48vw, 13rem);
+  }
+
+  /* 4-up: 2×2 — no empty scroll gutter on the right */
+  .phone-fan--4 {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 11rem));
+    justify-content: center;
+    justify-items: center;
+    align-items: start;
+    gap: 1.15rem 1.35rem;
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+    padding: 1.25rem 0 0.5rem;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .phone-fan--4 .phone--fan {
+    flex: unset;
+    width: 100%;
+    max-width: 11rem;
+  }
+
+  .phone-fan--4 .phone--f1 .phone__device,
+  .phone-fan--4 .phone--f2 .phone__device,
+  .phone-fan--4 .phone--f3 .phone__device,
+  .phone-fan--4 .phone--f4 .phone__device,
+  .phone-fan--4 .phone--featured .phone__device {
+    transform: none !important;
+    filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.55));
   }
 
   .phone-rail {
@@ -1203,12 +1333,21 @@ img {
 }
 
 @media (max-width: 560px) {
-  .phone--fan {
+  .phone-fan:not(.phone-fan--4) .phone--fan {
     flex-basis: min(58vw, 12.5rem);
   }
 
-  .phone--featured {
+  .phone-fan:not(.phone-fan--4) .phone--featured {
     flex-basis: min(64vw, 14rem);
+  }
+
+  .phone-fan--4 {
+    grid-template-columns: repeat(2, minmax(0, 9.75rem));
+    gap: 1rem 0.85rem;
+  }
+
+  .phone-fan--4 .phone--fan {
+    max-width: 9.75rem;
   }
 }
 
