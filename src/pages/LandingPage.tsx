@@ -8,6 +8,7 @@ import {
   heroImage,
   igImage,
   mocksStage,
+  studioWebScreens,
 } from "../brand";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { SiteFooter } from "../components/SiteFooter";
@@ -47,6 +48,32 @@ function PhoneMock({ src, alt, label, className = "" }: PhoneProps) {
         </div>
       </div>
       <figcaption className="phone__cap">{label}</figcaption>
+    </figure>
+  );
+}
+
+type BrowserProps = {
+  src: string;
+  alt: string;
+  label: string;
+  className?: string;
+};
+
+function BrowserMock({ src, alt, label, className = "" }: BrowserProps) {
+  return (
+    <figure className={`browser ${className}`}>
+      <div className="browser__chrome" aria-hidden="true">
+        <span className="browser__dots">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="browser__url">rashmat.com/studio</span>
+      </div>
+      <div className="browser__screen">
+        <img src={src} alt={alt} className="browser__shot" loading="lazy" />
+      </div>
+      <figcaption className="browser__cap">{label}</figcaption>
     </figure>
   );
 }
@@ -140,15 +167,9 @@ export function LandingPage() {
                 <a className="btn btn--accent" href={brand.platformUrl}>
                   {t("landing.ctaPlatform")}
                 </a>
-                <a
-                  className="btn btn--ghost"
-                  href={brand.social.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <IgIcon />
-                  {brand.social.handle}
-                </a>
+                <Link className="btn btn--ghost" to={brand.studioUrl}>
+                  {t("landing.ctaCreator")}
+                </Link>
               </div>
             </div>
           </div>
@@ -191,6 +212,28 @@ export function LandingPage() {
                 </div>
               </li>
             </ul>
+          </div>
+        </section>
+
+        <section className="paths" data-reveal>
+          <div className="shell paths__inner">
+            <div className="paths__head">
+              <p className="kicker">{t("landing.pathsKicker")}</p>
+              <h2 className="display">{t("landing.pathsTitle")}</h2>
+              <p className="body">{t("landing.pathsBody")}</p>
+            </div>
+            <div className="paths__grid">
+              <a className="paths__door" href={brand.platformUrl}>
+                <span className="paths__role">{t("landing.pathsAthleteTitle")}</span>
+                <p>{t("landing.pathsAthleteBody")}</p>
+                <span className="paths__cta">{t("landing.pathsAthleteCta")}</span>
+              </a>
+              <Link className="paths__door paths__door--creator" to={brand.studioUrl}>
+                <span className="paths__role">{t("landing.pathsCreatorTitle")}</span>
+                <p>{t("landing.pathsCreatorBody")}</p>
+                <span className="paths__cta">{t("landing.pathsCreatorCta")}</span>
+              </Link>
+            </div>
           </div>
         </section>
 
@@ -243,8 +286,75 @@ export function LandingPage() {
                 <li>{t("landing.creatorsP2")}</li>
                 <li>{t("landing.creatorsP3")}</li>
               </ul>
-              <Link className="btn btn--accent btn--inline" to={brand.studioUrl}>
-                {t("landing.creatorsCta")}
+              <div className="feature__cta-row">
+                <Link className="btn btn--accent btn--inline" to={brand.studioUrl}>
+                  {t("landing.creatorsCta")}
+                </Link>
+                <a
+                  className="btn btn--ghost btn--inline"
+                  href={brand.social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <IgIcon />
+                  {brand.social.handle}
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="creator-proof" data-reveal>
+          <div className="shell creator-proof__inner">
+            <div className="creator-proof__head">
+              <p className="kicker">{t("landing.studioWebKicker")}</p>
+              <h2 className="display">
+                {t("landing.studioWebTitle1")}
+                <br />
+                <span className="accent">{t("landing.studioWebTitle2")}</span>
+              </h2>
+              <p className="body">{t("landing.studioWebBody")}</p>
+            </div>
+            <ol className="creator-proof__steps">
+              <li>
+                <strong>{t("landing.creatorsStep1")}</strong>
+                <p>{t("landing.creatorsStep1Body")}</p>
+              </li>
+              <li>
+                <strong>{t("landing.creatorsStep2")}</strong>
+                <p>{t("landing.creatorsStep2Body")}</p>
+              </li>
+              <li>
+                <strong>{t("landing.creatorsStep3")}</strong>
+                <p>{t("landing.creatorsStep3Body")}</p>
+              </li>
+            </ol>
+            <BrowserMock
+              className="browser--hero"
+              src={studioWebScreens.dashboard}
+              alt={t("landing.mockStudioDash")}
+              label={t("landing.mockStudioDash")}
+            />
+            <div className="creator-proof__browsers" role="list">
+              <BrowserMock
+                src={studioWebScreens.programs}
+                alt={t("landing.mockStudioPrograms")}
+                label={t("landing.mockStudioPrograms")}
+              />
+              <BrowserMock
+                src={studioWebScreens.wizard}
+                alt={t("landing.mockStudioWizard")}
+                label={t("landing.mockStudioWizard")}
+              />
+              <BrowserMock
+                src={studioWebScreens.students}
+                alt={t("landing.mockStudioStudents")}
+                label={t("landing.mockStudioStudents")}
+              />
+            </div>
+            <div className="creator-proof__cta">
+              <Link className="btn btn--accent" to={brand.studioUrl}>
+                {t("landing.creatorsProofCta")}
               </Link>
             </div>
           </div>
@@ -271,33 +381,33 @@ export function LandingPage() {
             <div className="phone-fan" role="list">
               <PhoneMock
                 className="phone--fan phone--f1"
-                src={appScreens.welcomeHero}
-                alt={t("landing.mockWelcome")}
-                label={t("landing.mockWelcome")}
+                src={appScreens.creators}
+                alt={t("landing.mockCreators")}
+                label={t("landing.mockCreators")}
               />
               <PhoneMock
                 className="phone--fan phone--f2 phone--featured"
+                src={appScreens.creatorProfile}
+                alt={t("landing.mockCreatorProfile")}
+                label={t("landing.mockCreatorProfile")}
+              />
+              <PhoneMock
+                className="phone--fan phone--f3"
                 src={appScreens.hub}
                 alt={t("landing.mockHub")}
                 label={t("landing.mockHub")}
               />
               <PhoneMock
-                className="phone--fan phone--f3"
+                className="phone--fan phone--f4"
                 src={appScreens.sessionPreview}
                 alt={t("landing.mockSession")}
                 label={t("landing.mockSession")}
               />
               <PhoneMock
-                className="phone--fan phone--f4"
+                className="phone--fan phone--f5"
                 src={appScreens.programOverview}
                 alt={t("landing.mockProgram")}
                 label={t("landing.mockProgram")}
-              />
-              <PhoneMock
-                className="phone--fan phone--f5"
-                src={appScreens.creators}
-                alt={t("landing.mockCreators")}
-                label={t("landing.mockCreators")}
               />
               <PhoneMock
                 className="phone--fan phone--f6"
@@ -310,15 +420,15 @@ export function LandingPage() {
             <div className="phone-rail" role="list">
               <PhoneMock
                 className="phone--rail"
-                src={appScreens.creatorProfile}
-                alt={t("landing.mockCreatorProfile")}
-                label={t("landing.mockCreatorProfile")}
-              />
-              <PhoneMock
-                className="phone--rail"
                 src={appScreens.studio}
                 alt={t("landing.mockStudio")}
                 label={t("landing.mockStudio")}
+              />
+              <PhoneMock
+                className="phone--rail"
+                src={appScreens.welcomeHero}
+                alt={t("landing.mockWelcome")}
+                label={t("landing.mockWelcome")}
               />
             </div>
           </div>

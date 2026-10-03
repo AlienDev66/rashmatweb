@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RASHMAT — Soft Launch GTM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0909;
+      --panel: #141111;
+      --line: rgba(255, 255, 255, 0.1);
+      --text: #f5f5f5;
+      --muted: rgba(245, 245, 245, 0.62);
+      --accent: #f5c410;
+      --accent-ink: #0a0909;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "DM Sans", system-ui, sans-serif;
+    }
+    .deck {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    .slide {
+      display: none;
+      height: 100%;
+      padding: clamp(1.5rem, 4vw, 3.5rem);
+      padding-top: clamp(4.25rem, 8vw, 5rem);
+      padding-bottom: 5.5rem;
+      overflow: auto;
+      background:
+        radial-gradient(ellipse 80% 50% at 100% 0%, rgba(245, 196, 16, 0.07), transparent 55%),
+        var(--bg);
+    }
+    .slide.is-on { display: block; animation: in 280ms ease; }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* Jump menu */
+    .nav-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 30;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      appearance: none;
+      border: 1px solid var(--line);
+      background: rgba(20, 17, 17, 0.92);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.55rem 0.95rem;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: border-color 180ms ease, color 180ms ease, transform 180ms ease;
+    }
+    .nav-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .nav-toggle__icon {
+      width: 1.05rem;
+      height: 0.85rem;
+      display: grid;
+      gap: 0.18rem;
+      align-content: center;
+    }
+    .nav-toggle__icon i {
+      display: block;
+      height: 2px;
+      background: currentColor;
+      border-radius: 2px;
+      transition: transform 220ms ease, opacity 180ms ease, width 220ms ease;
+      transform-origin: center;
+    }
+    .nav-toggle__icon i:nth-child(2) { width: 70%; }
+    body.nav-open .nav-toggle__icon i:nth-child(1) {
+      transform: translateY(5px) rotate(45deg);
+    }
+    body.nav-open .nav-toggle__icon i:nth-child(2) {
+      opacity: 0;
+      width: 0;
+    }
+    body.nav-open .nav-toggle__icon i:nth-child(3) {
+      transform: translateY(-5px) rotate(-45deg);
+    }
+
+    .nav-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 240ms ease;
+    }
+    body.nav-open .nav-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .nav-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 25;
+      width: min(22rem, 88vw);
+      height: 100%;
+      background: var(--panel);
+      border-left: 1px solid var(--line);
+      padding: 4.5rem 1rem 1.5rem;
+      overflow: auto;
+      transform: translateX(104%);
+      transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    body.nav-open .nav-drawer {
+      transform: translateX(0);
+    }
+    .nav-drawer__label {
+      margin: 0 0.5rem 0.75rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.25rem;
+    }
+    .nav-list button {
+      width: 100%;
+      appearance: none;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      border-radius: 0.75rem;
+      padding: 0.7rem 0.8rem;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      gap: 0.75rem;
+      align-items: baseline;
+      transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+    .nav-list button:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      transform: translateX(2px);
+    }
+    .nav-list button.is-active {
+      background: rgba(245, 196, 16, 0.1);
+      border-color: rgba(245, 196, 16, 0.35);
+      color: var(--accent);
+    }
+    .nav-list__num {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      min-width: 1.6rem;
+      color: inherit;
+      opacity: 0.75;
+    }
+    .kicker {
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin: 0 0 0.6rem;
+    }
+    h1, h2 {
+      font-family: "Bebas Neue", sans-serif;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      line-height: 0.95;
+      margin: 0 0 1rem;
+    }
+    h1 { font-size: clamp(2.8rem, 7vw, 5rem); max-width: 14ch; }
+    h2 { font-size: clamp(2rem, 5vw, 3.4rem); }
+    .lead {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted);
+      max-width: 42rem;
+      line-height: 1.45;
+      margin: 0 0 1.5rem;
+    }
+    .accent { color: var(--accent); }
+    .grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1.1rem 1.2rem;
+    }
+    .card h3 {
+      margin: 0 0 0.45rem;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .card p, .card li {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+    .card ul { margin: 0.4rem 0 0; padding-left: 1.1rem; }
+    .card li { margin-bottom: 0.25rem; }
+    .pill {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      margin-bottom: 0.55rem;
+    }
+    .pill.soft {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid rgba(245, 196, 16, 0.45);
+    }
+    .pill.muted {
+      background: rgba(255,255,255,0.08);
+      color: var(--muted);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.7rem 0.65rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    td a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    td a:hover { text-decoration: underline; }
+    .msg {
+      background: #0f0e0e;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      border-radius: 0.75rem;
+      padding: 1rem 1.1rem;
+      white-space: pre-wrap;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: rgba(245,245,245,0.88);
+      margin: 0.75rem 0 0;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      align-items: baseline;
+      margin-bottom: 0.5rem;
+    }
+    .meta { color: var(--muted); font-size: 0.88rem; }
+    .bar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: rgba(10, 9, 9, 0.92);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+      z-index: 5;
+    }
+    .bar button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .bar button:hover { border-color: var(--accent); color: var(--accent); }
+    .bar .progress {
+      flex: 1;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    .brand {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+    }
+    .two {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: 1.1fr 1fr;
+    }
+    @media (max-width: 860px) {
+      .two { grid-template-columns: 1fr; }
+      h1 { max-width: none; }
+    }
+    .checklist label {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .checklist input { margin-top: 0.2rem; accent-color: var(--accent); }
+    .big-num {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 2.5rem;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .footer-note {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navDrawer">
+    <span class="nav-toggle__icon" aria-hidden="true"><i></i><i></i><i></i></span>
+    Índice
+  </button>
+  <div class="nav-backdrop" id="navBackdrop" hidden></div>
+  <aside class="nav-drawer" id="navDrawer" aria-label="Índice de slides">
+    <p class="nav-drawer__label">Saltar para</p>
+    <ul class="nav-list" id="navList"></ul>
+  </aside>
+
+  <div class="deck" id="deck">
+
+    <!-- 0 -->
+    <section class="slide is-on" data-title="Capa">
+      <p class="kicker">Soft launch · GTM</p>
+      <h1>RASHMAT<br /><span class="accent">Vender estrutura.</span></h1>
+      <p class="lead">
+        Plano de aquisição de creators + Instagram + ação semanal.
+        Enquanto as stores revisam — construímos supply, prova e outbound.
+      </p>
+      <div class="grid">
+        <div class="card"><h3>One-liner</h3><p>Programas de mat com progresso real. Creators publicam. Atletas treinam.</p></div>
+        <div class="card"><h3>Wedge</h3><p>Não vendemos “fitness app”. Vendemos o <strong style="color:#fff">sistema do coach</strong> numa app — com semanas, vídeo e XP.</p></div>
+        <div class="card"><h3>Meta soft launch</h3><p><span class="big-num">5</span><br />creators com programa live &gt; 50 “seguidores” vazios.</p></div>
+      </div>
+      <p class="footer-note">← → ou botões em baixo · Abrir ficheiro no browser · Partilhar com o mestre</p>
+    </section>
+
+    <!-- 1 -->
+    <section class="slide" data-title="Posicionamento">
+      <p class="kicker">01 · Posicionamento</p>
+      <h2>Mensagem única</h2>
+      <p class="lead"><strong style="color:#fff">RASHMAT — train with structure.</strong><br />
+        Creators publicam programas. Atletas treinam com progresso real.</p>
+      <div class="two">
+        <div class="card">
+          <span class="pill">Nós</span>
+          <h3>Corre o programa</h3>
+          <ul>
+            <li>Camps com semanas e sessões</li>
+            <li>Vídeo + rest + next</li>
+            <li>XP, streak, % de progresso</li>
+            <li>Creator recebe via Stripe Connect</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="pill soft">Não somos</span>
+          <h3>Journal / playlist</h3>
+          <ul>
+            <li>myBJJ = regista o que aprendeste</li>
+            <li>YouTube = vídeo solto</li>
+            <li>Hotmart solto = sem hábito na app</li>
+          </ul>
+          <p style="margin-top:0.75rem">Linha de contraste:<br /><em style="color:#fff">“Journal vs Program — RASHMAT corre o camp.”</em></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide" data-title="Quem">
+      <p class="kicker">02 · ICP</p>
+      <h2>Quem abordar</h2>
+      <div class="grid">
+        <div class="card">
+          <span class="pill">P0</span>
+          <h3>Fechar agora</h3>
+          <p>Coaches que já vendem método/curso · 10k–250k IG · ou academia forte com warm intro. Preferir quem já cobra.</p>
+        </div>
+        <div class="card">
+          <span class="pill soft">P1</span>
+          <h3>Depois de 2 lives</h3>
+          <p>Nomes grandes (Jura, Mário). Só com intro. Prestige, ciclo longo.</p>
+        </div>
+        <div class="card">
+          <span class="pill muted">Ignorar</span>
+          <h3>Por agora</h3>
+          <p>Influencer genérico · ginásio sem dono de conteúdo · quem só posta rolagem gratis.</p>
+        </div>
+      </div>
+      <p class="lead" style="margin-top:1.25rem">Regra: <strong style="color:#fff">1 creator mid-tier live</strong> vale mais que 10 DMs a 500k sem resposta.</p>
+    </section>
+
+    <!-- 3 -->
+    <section class="slide" data-title="Oferta">
+      <p class="kicker">03 · Oferta creator</p>
+      <h2>O deal soft launch</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Pitch 15s</h3>
+          <p>“Publicas o teu camp na RASHMAT. Alunos treinam com a tua estrutura. Tu recebes via Stripe. Nós somos a app.”</p>
+        </div>
+        <div class="card">
+          <h3>O que damos</h3>
+          <ul>
+            <li>Onboarding 1:1 (30–45 min)</li>
+            <li>Ajuda a meter o 1º programa live</li>
+            <li>Highlight IG @rashmatapp + in-app</li>
+            <li>Fee 0% platform nos primeiros 30–60 dias <em>(opcional, escolhe um incentivo)</em></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>O que pedimos</h3>
+          <ul>
+            <li>1 camp publicado</li>
+            <li>Stripe Connect ligado</li>
+            <li>Eles trazem ~10 alunos do próprio IG</li>
+          </ul>
+        </div>
+      </div>
+      <p class="meta" style="margin-top:1rem">CTA único: <a href="https://rashmat.com/studio" style="color:var(--accent)">rashmat.com/studio</a> · “marca 30 min comigo”</p>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide" data-title="Plano 14 dias">
+      <p class="kicker">04 · Plano de ação · 14 dias</p>
+      <h2>Calendário de execução</h2>
+      <table>
+        <thead>
+          <tr><th>Dia</th><th>Creators</th><th>Produto / prova</th><th>Instagram</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Seg</strong></td><td>5 BR (Rollo, Wilgner, Leo, Lipe, Galdino) + 3 PT</td><td>Camp teu live + links no bio</td><td>Post Product (Hub)</td></tr>
+          <tr><td><strong>Ter</strong></td><td>1 call onboarding se houver reply</td><td>Fluxo completo: sessão + XP</td><td>Stories bastidores Studio</td></tr>
+          <tr><td><strong>Qua</strong></td><td>Follow-up nos DMs sem resposta</td><td>Checklist Stripe Connect (teu)</td><td>Post Mat / drill</td></tr>
+          <tr><td><strong>Qui</strong></td><td>10 DMs novos + pedir intro ao mestre</td><td>—</td><td>Post Creator (tu)</td></tr>
+          <tr><td><strong>Sex</strong></td><td>Review métricas (tabela final)</td><td>Bug list dos testers internos</td><td>Stories prova / XP</td></tr>
+          <tr><td><strong>Sáb</strong></td><td>—</td><td>Treinar na app (UGC)</td><td>Reel rolling + overlay</td></tr>
+          <tr><td><strong>Dom</strong></td><td>Lista semana 2</td><td>—</td><td>Planear 5 posts</td></tr>
+          <tr><td><strong>Sem. 2</strong></td><td>Jura/Mário só com intro · fechar 2º creator</td><td>Stores: convites assim que sair</td><td>Pins + contrast journal vs program</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide" data-title="Checklist">
+      <p class="kicker">05 · Checklist esta semana</p>
+      <h2>Fazer / não fazer</h2>
+      <div class="two">
+        <div class="card checklist">
+          <span class="pill">Fazer</span>
+          <label><input type="checkbox" /> Publicar-me como creator #1 (camps live)</label>
+          <label><input type="checkbox" /> Enviar DM a Rollo + Wilgner</label>
+          <label><input type="checkbox" /> Pedir 1 intro (mestre → Jura ou Mário)</label>
+          <label><input type="checkbox" /> Fixar 3 pins no @rashmatapp</label>
+          <label><input type="checkbox" /> Lista de 15–20 testers com email</label>
+          <label><input type="checkbox" /> 4–5 posts IG esta semana</label>
+        </div>
+        <div class="card">
+          <span class="pill muted">Não fazer</span>
+          <ul>
+            <li>Features novas grandes</li>
+            <li>Rebuild na store a cada detalhe</li>
+            <li>Ads de creator</li>
+            <li>Cold DM a 500k sem intro</li>
+            <li>Esperar stores para começar outbound</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 overview creators -->
+    <section class="slide" data-title="Creators overview">
+      <p class="kicker">06 · Creators a abordar</p>
+      <h2>Mapa PT + BR</h2>
+      <p class="lead">Regra: mid-tier que <strong style="color:#fff">já vende curso / tem método</strong> &gt; famoso que não responde. Verifica handle antes do DM.</p>
+      <table>
+        <thead>
+          <tr><th>Prio</th><th>Nome</th><th>IG</th><th>Mercado</th><th>Porquê</th><th>Move</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill">P0</span></td>
+            <td>Domingos (tu)</td>
+            <td><a href="https://www.instagram.com/rashmatapp/" target="_blank" rel="noopener">@rashmatapp</a></td>
+            <td>PT</td>
+            <td>Supply #1</td>
+            <td>Camp live já</td>
+          </tr>
+          <tr>
+            <td><span class="pill">P0</span></td>
+            <td>Gabriel Rollo</td>
+            <td><a href="https://www.instagram.com/gabrielrollo/" target="_blank" rel="noopener">@gabrielrollo</a></td>
+            <td>BR</td>
+            <td>Técnico acessível</td>
+            <td>Cold DM</td>
+          </tr>
+          <tr>
+            <td><span class="pill">P0</span></td>
+            <td>Wilgner Silva</td>
+            <td><a href="https://www.instagram.com/wilgnersilva96/" target="_blank" rel="noopener">@wilgnersilva96</a></td>
+            <td>BR</td>
+            <td>~220k · vende instrucional</td>
+            <td>Cold DM</td>
+          </tr>
+          <tr>
+            <td><span class="pill">P0</span></td>
+            <td>Leo Zada (Brocca)</td>
+            <td><a href="https://www.instagram.com/leozadabjj/" target="_blank" rel="noopener">@leozadabjj</a></td>
+            <td>BR</td>
+            <td>~38k · Iniciante Turbo · 300+ alunos digital</td>
+            <td>Cold DM</td>
+          </tr>
+          <tr>
+            <td><span class="pill">P0</span></td>
+            <td>Lipe Machado</td>
+            <td><a href="https://www.instagram.com/lipemachadojj/" target="_blank" rel="noopener">@lipemachadojj</a></td>
+            <td>BR</td>
+            <td>~34k · highlight “Meus cursos”</td>
+            <td>Cold DM</td>
+          </tr>
+          <tr>
+            <td><span class="pill">P0</span></td>
+            <td>Marcelo Galdino</td>
+            <td><a href="https://www.instagram.com/marcelogaldinoct/" target="_blank" rel="noopener">@marcelogaldinoct</a></td>
+            <td>BR→PT</td>
+            <td>17k alunos online · filiais PT</td>
+            <td>Cold DM</td>
+          </tr>
+          <tr>
+            <td><span class="pill">P0</span></td>
+            <td>Paulo Sampayo</td>
+            <td><a href="https://www.instagram.com/artsuavepincel/" target="_blank" rel="noopener">@artsuavepincel</a> / Jitsu Foz</td>
+            <td>PT · Porto</td>
+            <td>Warm local · método claro</td>
+            <td>DM / café</td>
+          </tr>
+          <tr>
+            <td><span class="pill soft">P1</span></td>
+            <td>Nelson “Pincel”</td>
+            <td><a href="https://www.instagram.com/artsuave.pincel/" target="_blank" rel="noopener">@artsuave.pincel</a></td>
+            <td>PT · Gaia</td>
+            <td>Rede ArtSuave</td>
+            <td>DM PT</td>
+          </tr>
+          <tr>
+            <td><span class="pill soft">P1</span></td>
+            <td>Carlos Cobrinha (Ozório)</td>
+            <td><a href="https://carloscobrinhabjj.pt/" target="_blank" rel="noopener">carloscobrinhabjj.pt</a></td>
+            <td>PT · Gaia</td>
+            <td>Site próprio · ArtSuave</td>
+            <td>Email / DM</td>
+          </tr>
+          <tr>
+            <td><span class="pill soft">P1</span></td>
+            <td>Eduardo Nunes</td>
+            <td><a href="https://studioabsoluto.pt/jiu-jitsu/" target="_blank" rel="noopener">studioabsoluto.pt</a></td>
+            <td>PT · Porto</td>
+            <td>Direção técnica Absoluto</td>
+            <td>DM academia</td>
+          </tr>
+          <tr>
+            <td><span class="pill soft">P1</span></td>
+            <td>Mathias Ribeiro</td>
+            <td><a href="https://www.instagram.com/mathiasribeirobjj/" target="_blank" rel="noopener">@mathiasribeirobjj</a></td>
+            <td>BR / EU</td>
+            <td>Team site · Europa IBJJF</td>
+            <td>Cold DM</td>
+          </tr>
+          <tr>
+            <td><span class="pill soft">P1</span></td>
+            <td>Jura BJJ</td>
+            <td><a href="https://www.instagram.com/jura_bjj/" target="_blank" rel="noopener">@jura_bjj</a></td>
+            <td>BR</td>
+            <td>~500k · funil forte</td>
+            <td>Só intro</td>
+          </tr>
+          <tr>
+            <td><span class="pill soft">P1</span></td>
+            <td>Mário Reis</td>
+            <td><a href="https://www.instagram.com/marioreisjiujitsu/" target="_blank" rel="noopener">@marioreisjiujitsu</a></td>
+            <td>BR</td>
+            <td>~190k Alliance</td>
+            <td>Só intro</td>
+          </tr>
+          <tr>
+            <td><span class="pill muted">P2</span></td>
+            <td>João Miyao / Mica Galvão</td>
+            <td><a href="https://www.instagram.com/joaomiyao/" target="_blank" rel="noopener">@joaomiyao</a> · <a href="https://www.instagram.com/micagalvaojj/" target="_blank" rel="noopener">@micagalvaojj</a></td>
+            <td>BR</td>
+            <td>Prestige · ciclo longo</td>
+            <td>Não agora</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide" data-title="Kit de prova">
+      <p class="kicker">06b · Material para convencer</p>
+      <h2>Kit que envias no DM / call</h2>
+      <p class="lead">Não vendas “app genérica”. Mostra o produto a funcionar + o dinheiro a chegar à conta deles.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>1 · Links vivos</h3>
+          <ul>
+            <li><a href="https://rashmat.com/" target="_blank" rel="noopener">rashmat.com</a> — landing (atletas + creators)</li>
+            <li><a href="https://rashmat.com/studio" target="_blank" rel="noopener">rashmat.com/studio</a> — eles criam conta e veem o CMS</li>
+            <li><a href="https://rashmat.com/get-app" target="_blank" rel="noopener">rashmat.com/get-app</a> — atletas descarregam</li>
+            <li><a href="https://www.instagram.com/rashmatapp/" target="_blank" rel="noopener">@rashmatapp</a> — prova social / Reels</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>2 · O que mostrar em 3 min</h3>
+          <ol style="margin:0.5rem 0 0;padding-left:1.2rem;color:var(--muted);line-height:1.55">
+            <li><strong style="color:#fff">Studio</strong> — programa → semana → drill + vídeo</li>
+            <li><strong style="color:#fff">App</strong> — Creators tab → perfil → unlock → Hub Day 1</li>
+            <li><strong style="color:#fff">Stripe Connect</strong> — “o dinheiro vai para a tua conta”</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>3 · Argumentos que fecham</h3>
+          <ul>
+            <li>Hotmart/playlist = dump. RASHMAT = <strong style="color:#fff">hábito semanal</strong></li>
+            <li>Tu vês <strong style="color:#fff">% progresso + alunos</strong>, não só likes</li>
+            <li>Soft launch: <strong style="color:#fff">onboarding feito por nós</strong> (1 call 30 min)</li>
+            <li>Primeiros 5 creators = positioning na home / IG</li>
+            <li>PT+BR: produto e suporte em PT</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>4 · Anexo opcional no DM</h3>
+          <ul>
+            <li>1 Loom 60–90s: Studio → publish → athlete Hub</li>
+            <li>Screenshot Creators tab + teu camp live</li>
+            <li>Frase: “não pedimos exclusividade — 1 camp de 4 semanas”</li>
+          </ul>
+        </div>
+      </div>
+      <p class="meta" style="margin-top:1rem">Pitch de 1 linha: <strong style="color:#fff">“O teu sistema no telemóvel deles, com semanas, vídeo e pagamento Stripe — nós publicamos contigo.”</strong></p>
+    </section>
+
+    <section class="slide" data-title="Brasil P0">
+      <p class="kicker">06c · Brasil · mid-tier que já vende</p>
+      <h2>Fila BR esta semana</h2>
+      <table>
+        <thead><tr><th>Quem</th><th>Prova que já monetiza</th><th>Camp proposto</th><th>Ângulo DM</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a href="https://www.instagram.com/leozadabjj/" target="_blank" rel="noopener">@leozadabjj</a><br /><span class="meta">Leo Zada · ~38k</span></td>
+            <td><a href="https://leozadabjj.com.br/" target="_blank" rel="noopener">leozadabjj.com.br</a> · Iniciante Turbo · +90 aulas</td>
+            <td>“Iniciante Turbo · 4 semanas na app”</td>
+            <td>Complementar o funil — não matar Hotmart/área de membros</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.instagram.com/lipemachadojj/" target="_blank" rel="noopener">@lipemachadojj</a><br /><span class="meta">Lipe · ~34k</span></td>
+            <td>Highlight IG “Meus cursos”</td>
+            <td>1 sistema de guarda / passagem (4 sem.)</td>
+            <td>“Os teus cursos merecem progresso diário no telemóvel”</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.instagram.com/marcelogaldinoct/" target="_blank" rel="noopener">@marcelogaldinoct</a><br /><span class="meta">Galdino · 17k alunos</span></td>
+            <td><a href="https://guardablindada.marcelogaldino.com.br/" target="_blank" rel="noopener">Guarda Blindada</a> · filiais PT</td>
+            <td>Guarda Blindada como camp RASHMAT</td>
+            <td>Ponte BR↔PT — filiais em Portugal = ângulo único</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.instagram.com/wilgnersilva96/" target="_blank" rel="noopener">@wilgnersilva96</a></td>
+            <td>Já vende Wrestling for BJJ</td>
+            <td>Wrestling → BJJ · 4 semanas</td>
+            <td>Nicho claríssimo = camp óbvio</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.instagram.com/gabrielrollo/" target="_blank" rel="noopener">@gabrielrollo</a></td>
+            <td>Conteúdo técnico Checkmat</td>
+            <td>Passagem / guarda · 4 semanas</td>
+            <td>Case study soft launch · acessível</td>
+          </tr>
+          <tr>
+            <td><a href="https://www.instagram.com/mathiasribeirobjj/" target="_blank" rel="noopener">@mathiasribeirobjj</a></td>
+            <td><a href="https://www.mathiasribeiroteam.com" target="_blank" rel="noopener">mathiasribeiroteam.com</a></td>
+            <td>Team fundamentals camp</td>
+            <td>Já tem brand de team — app = extensão</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide" data-title="Portugal P0">
+      <p class="kicker">06d · Portugal · academias &amp; coaches</p>
+      <h2>Fila PT (warm &gt; cold)</h2>
+      <p class="lead">Em PT o close é café / WhatsApp. Menos followers, mais relação. Oferece: <strong style="color:#fff">publicamos o camp da academia esta semana</strong>.</p>
+      <table>
+        <thead><tr><th>Quem</th><th>Onde</th><th>Contacto</th><th>Ângulo</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Paulo Sampayo · Jitsu Foz</td>
+            <td>Porto · Foz</td>
+            <td><a href="https://www.jitsufoz.com/" target="_blank" rel="noopener">jitsufoz.com</a> · <a href="https://www.instagram.com/artsuavepincel/" target="_blank" rel="noopener">IG ArtSuave</a> · geral@jitsufoz.com</td>
+            <td>“Cada aluno, o seu ritmo” → camp na app para kids/adultos entre aulas</td>
+          </tr>
+          <tr>
+            <td>Nelson Teixeira “Pincel”</td>
+            <td>V.N. Gaia</td>
+            <td><a href="https://www.instagram.com/artsuave.pincel/" target="_blank" rel="noopener">@artsuave.pincel</a></td>
+            <td>Rede ArtSuave · 1 camp fundamentals ArtSuave PT</td>
+          </tr>
+          <tr>
+            <td>Carlos Eduardo Ozório “Cobrinha”</td>
+            <td>Canidelo · Gaia</td>
+            <td><a href="https://carloscobrinhabjj.pt/" target="_blank" rel="noopener">carloscobrinhabjj.pt</a> · carloscobrinhabjj@gmail.com · +351 911 586 215</td>
+            <td>Já tem site — RASHMAT = camada mobile + progresso</td>
+          </tr>
+          <tr>
+            <td>Eduardo Nunes · Absoluto</td>
+            <td>Porto</td>
+            <td><a href="https://studioabsoluto.pt/jiu-jitsu/" target="_blank" rel="noopener">studioabsoluto.pt</a> · info@studioabsoluto.pt</td>
+            <td>Direção técnica + IPDJ — camp defesa / gi estruturado</td>
+          </tr>
+          <tr>
+            <td>Gladiadores PT (rede Galdino)</td>
+            <td>Filiais PT</td>
+            <td>Via <a href="https://www.instagram.com/marcelogaldinoct/" target="_blank" rel="noopener">@marcelogaldinoct</a> ou academia local</td>
+            <td>Mesmo método BR → alunos PT na app</td>
+          </tr>
+          <tr>
+            <td>Coach academia / mestre (teu)</td>
+            <td>A tua rede</td>
+            <td>WhatsApp</td>
+            <td>Close mais rápido do deck — slide Warm</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="meta" style="margin-top:1rem">Nota: handles de academia mudam — confirma no Google/IG antes de enviar. Preferir DM pessoal do professor à página da gym.</p>
+    </section>
+
+    <!-- Creator detail slides -->
+    <section class="slide" data-title="Rollo">
+      <p class="kicker">07 · Creator · P0 · BR</p>
+      <div class="row">
+        <h2 style="margin:0">Gabriel Rollo</h2>
+        <span class="pill">Enviar hoje</span>
+      </div>
+      <p class="meta"><a href="https://www.instagram.com/gabrielrollo/" target="_blank" rel="noopener">@gabrielrollo</a> · “Palito” · Checkmat · técnico · mid-tier</p>
+      <div class="two" style="margin-top:1rem">
+        <div class="card">
+          <h3>Porquê + prova a mostrar</h3>
+          <ul>
+            <li>Acessível vs 500k · camp natural (passagem/guarda)</li>
+            <li>Abrir na call: <a href="https://rashmat.com/studio" target="_blank" rel="noopener">Studio</a> + teu camp live</li>
+            <li>Landing creators: <a href="https://rashmat.com/" target="_blank" rel="noopener">rashmat.com</a> (secção Publish)</li>
+          </ul>
+          <h3 style="margin-top:1rem">Ângulo</h3>
+          <p>1 camp de 4 semanas — não “toda a carreira”. Stripe Connect para ele.</p>
+        </div>
+        <div>
+          <h3 style="margin:0 0 0.35rem;font-size:0.95rem">Mensagem (copiar)</h3>
+          <div class="msg">E aí Palito, tudo bem?
+
+Sou o Domingos, founder da RASHMAT (Portugal) — app onde o teu sistema vira camp: semanas, vídeo, progresso real. Os alunos treinam no telemóvel; tu vês quem terminou.
+
+Não é feed solto nem Hotmart dump. Proposta concreta: 1 camp teu (passagem/guarda) · eu publico contigo em 30 min · recebes via Stripe.
+
+Vê o Studio: https://rashmat.com/studio
+Landing: https://rashmat.com
+App: https://rashmat.com/get-app
+
+20 min esta semana para eu partilhar ecrã?</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Wilgner">
+      <p class="kicker">08 · Creator · P0 · BR</p>
+      <div class="row">
+        <h2 style="margin:0">Wilgner Silva</h2>
+        <span class="pill">Enviar hoje</span>
+      </div>
+      <p class="meta"><a href="https://www.instagram.com/wilgnersilva96/" target="_blank" rel="noopener">@wilgnersilva96</a> · ~220k · Wrestling for BJJ · já monetiza</p>
+      <div class="two" style="margin-top:1rem">
+        <div class="card">
+          <h3>Porquê + prova</h3>
+          <ul>
+            <li>Já vende instrucional → entende distribuição</li>
+            <li>Nicho = camp óbvio (quedas / wrestling)</li>
+            <li>Pitch: complementar o que já vende, não substituir</li>
+          </ul>
+          <h3 style="margin-top:1rem">Demo</h3>
+          <p>Screen: Studio → drill timer → Hub Day X → XP. Link Stripe “payout to you”.</p>
+        </div>
+        <div>
+          <h3 style="margin:0 0 0.35rem;font-size:0.95rem">Mensagem (copiar)</h3>
+          <div class="msg">Wilgner, fala!
+
+Sou o Domingos da RASHMAT. App de programas de mat com semanas + vídeo + % de progresso — feita para sistemas como o teu Wrestling for BJJ.
+
+Hoje o aluno compra e some na playlist. Na RASHMAT ele tem Day 1… Day 28 e tu vês quem treinou. Pagamento Stripe na tua conta.
+
+Não pedimos exclusividade — 1 camp de 4 semanas. Eu ajudo a publicar.
+
+Studio: https://rashmat.com/studio
+Site: https://rashmat.com
+
+Top 20 min esta semana?</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Leo Zada">
+      <p class="kicker">09 · Creator · P0 · BR</p>
+      <div class="row">
+        <h2 style="margin:0">Leo Zada (Leonardo Brocca)</h2>
+        <span class="pill">Enviar hoje</span>
+      </div>
+      <p class="meta"><a href="https://www.instagram.com/leozadabjj/" target="_blank" rel="noopener">@leozadabjj</a> · ~38k · <a href="https://leozadabjj.com.br/" target="_blank" rel="noopener">Iniciante Turbo</a> · +300 alunos digital · +90 aulas</p>
+      <div class="two" style="margin-top:1rem">
+        <div class="card">
+          <h3>Porquê (fit perfeito)</h3>
+          <ul>
+            <li>Já tem metodologia + área de membros</li>
+            <li>Dor: alunos compram e não abrem</li>
+            <li>RASHMAT = hábito diário no telemóvel</li>
+          </ul>
+          <h3 style="margin-top:1rem">Camp</h3>
+          <p>“Iniciante Turbo · 4 semanas” espelhando módulos principais — link para o funil dele no bio se quiser.</p>
+        </div>
+        <div>
+          <h3 style="margin:0 0 0.35rem;font-size:0.95rem">Mensagem (copiar)</h3>
+          <div class="msg">Leo, e aí!
+
+Vi o Iniciante Turbo (leozadabjj.com.br) e os +300 alunos no digital. Sou o Domingos, founder da RASHMAT — app PT/BR onde o camp corre por semanas com vídeo e progresso %.
+
+A ideia: não substituir a tua área de membros. Dar aos alunos uma camada mobile com Day 1–28, timers e tu a veres quem mostrou. Stripe para ti. Eu monto o primeiro camp contigo.
+
+Studio: https://rashmat.com/studio
+https://rashmat.com
+
+Faz sentido 20 min?</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Lipe">
+      <p class="kicker">10 · Creator · P0 · BR</p>
+      <div class="row">
+        <h2 style="margin:0">Lipe Machado</h2>
+        <span class="pill">Enviar hoje</span>
+      </div>
+      <p class="meta"><a href="https://www.instagram.com/lipemachadojj/" target="_blank" rel="noopener">@lipemachadojj</a> · ~34k · highlight “Meus cursos” · competidor top</p>
+      <div class="two" style="margin-top:1rem">
+        <div class="card">
+          <h3>Porquê</h3>
+          <ul>
+            <li>Já sinaliza cursos no IG → conversa aberta</li>
+            <li>Atleta reconhecível sem ser inacessível</li>
+            <li>1 sistema (guarda/passagem) = camp clean</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin:0 0 0.35rem;font-size:0.95rem">Mensagem (copiar)</h3>
+          <div class="msg">Lipe, fala!
+
+Sou Domingos da RASHMAT. Vi o highlight “Meus cursos” — estamos a construir a app onde esses sistemas viram camps com semanas, vídeo e progresso real (não playlist morta).
+
+Proposta: 1 camp teu na app, eu ajudo a publicar em 30 min, tu recebes via Stripe. Soft launch: pioneers com destaque no IG @rashmatapp.
+
+https://rashmat.com/studio
+https://rashmat.com/get-app
+
+20 min esta semana?</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Galdino">
+      <p class="kicker">11 · Creator · P0 · BR→PT</p>
+      <div class="row">
+        <h2 style="margin:0">Marcelo Galdino</h2>
+        <span class="pill">Enviar hoje</span>
+      </div>
+      <p class="meta"><a href="https://www.instagram.com/marcelogaldinoct/" target="_blank" rel="noopener">@marcelogaldinoct</a> · 17k+ alunos online · Gladiadores · filiais BR/AR/<strong style="color:#fff">PT</strong> · <a href="https://guardablindada.marcelogaldino.com.br/" target="_blank" rel="noopener">Guarda Blindada</a></p>
+      <div class="two" style="margin-top:1rem">
+        <div class="card">
+          <h3>Porquê (estratégico)</h3>
+          <ul>
+            <li>Já tem escola online enorme</li>
+            <li>Filiais em Portugal = bridge RASHMAT</li>
+            <li>Ângulo: alunos das filiais PT treinam o método na app</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin:0 0 0.35rem;font-size:0.95rem">Mensagem (copiar)</h3>
+          <div class="msg">Professor Marcelo, tudo bem?
+
+Sou o Domingos, founder da RASHMAT — app de programas de mat sediada em Portugal. Vi a Guarda Blindada e que as Gladiadores já têm filiais em PT.
+
+Proposta: levar 1 seminário/camp (ex. Guarda Blindada) para a app — semanas, vídeo, % progresso — com Stripe para si. Útil para alunos das filiais PT e digitais.
+
+Não substituímos a mg.marcelogaldino.com.br — somos a camada de hábito no telemóvel.
+
+Studio: https://rashmat.com/studio
+Site: https://rashmat.com
+
+Aceita 20 min para eu mostrar?</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="PT academias">
+      <p class="kicker">12 · Creators · P0/P1 · Portugal</p>
+      <h2>Scripts locais</h2>
+      <div class="two">
+        <div>
+          <h3 style="margin:0 0 0.35rem;font-size:0.95rem">Paulo Sampayo / Jitsu Foz</h3>
+          <div class="msg">Paulo, tudo bem?
+
+Sou o Domingos — estou a lançar a RASHMAT (rashmat.com), app PT de camps de mat com progresso. Vi a Jitsu Foz (“cada aluno, o seu ritmo”) e faz sentido ter o vosso método no telemóvel dos alunos entre aulas.
+
+Oferta: publicamos 1 camp da academia esta semana no Studio (eu ajudo). Stripe para receberem. Grátis para começar.
+
+https://rashmat.com/studio
+Café ou 20 min call?</div>
+          <h3 style="margin:1rem 0 0.35rem;font-size:0.95rem">Cobrinha PT</h3>
+          <div class="msg">Professor Carlos, tudo bem?
+
+Vi o carloscobrinhabjj.pt. Sou Domingos da RASHMAT — app onde coaches em PT publicam programas com semanas + vídeo + progresso.
+
+O site explica a academia; a app faz o aluno treinar em casa com estrutura. 1 camp ArtSuave, eu monto contigo, Stripe para si.
+
+https://rashmat.com/studio</div>
+        </div>
+        <div>
+          <h3 style="margin:0 0 0.35rem;font-size:0.95rem">Pincel / ArtSuave Gaia</h3>
+          <div class="msg">Pincel, fala!
+
+RASHMAT — app de programas de mat (PT). Queria o método ArtSuave como um dos primeiros camps em Portugal. Eu publico no Studio contigo em 30 min; alunos seguem e treinam com %.
+
+https://rashmat.com
+https://rashmat.com/studio
+
+Quando dá?</div>
+          <h3 style="margin:1rem 0 0.35rem;font-size:0.95rem">Absoluto · Eduardo Nunes</h3>
+          <div class="msg">Eduardo, tudo bem? (Studio Absoluto)
+
+Sou Domingos da RASHMAT. App para academias publicarem camps com progresso real — útil para alunos entre aulas de gi/defesa.
+
+Proposta soft launch PT: 1 programa Absoluto live esta semana. Eu ajudo no Studio.
+
+https://rashmat.com/studio · info também em rashmat.com</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Jura">
+      <p class="kicker">13 · Creator · P1 · BR</p>
+      <div class="row">
+        <h2 style="margin:0">Jura BJJ</h2>
+        <span class="pill soft">Só com intro</span>
+      </div>
+      <p class="meta"><a href="https://www.instagram.com/jura_bjj/" target="_blank" rel="noopener">@jura_bjj</a> · ~500k · “Básico que Funciona” · Templo</p>
+      <div class="two" style="margin-top:1rem">
+        <div class="card">
+          <h3>Porquê (e risco)</h3>
+          <ul>
+            <li>Audiência massiva + já vende curso</li>
+            <li>Cold DM quase morto → precisa intro</li>
+            <li>Levar: Loom + Studio + “não matamos o funil”</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin:0 0 0.35rem;font-size:0.95rem">Mensagem (após intro)</h3>
+          <div class="msg">Jura, tudo bem?
+
+[Nome] apresentou-nos.
+
+Sou o Domingos, founder da RASHMAT — app onde o Básico que Funciona vive no telemóvel com semanas + % progresso (não feed solto). Stripe para ti. Não substituímos o teu funil — reforçamos o hábito pós-compra.
+
+Studio: https://rashmat.com/studio
+Site: https://rashmat.com
+
+20 min para partilha de ecrã?</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Mario">
+      <p class="kicker">14 · Creator · P1 · BR</p>
+      <div class="row">
+        <h2 style="margin:0">Mário Reis</h2>
+        <span class="pill soft">Só com intro</span>
+      </div>
+      <p class="meta"><a href="https://www.instagram.com/marioreisjiujitsu/" target="_blank" rel="noopener">@marioreisjiujitsu</a> · ~190k · Alliance</p>
+      <div class="two" style="margin-top:1rem">
+        <div class="card">
+          <h3>Porquê (e risco)</h3>
+          <ul>
+            <li>Prestige · ciclo longo</li>
+            <li>Ângulo: jornada + disciplina em formato camp</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin:0 0 0.35rem;font-size:0.95rem">Mensagem (após intro)</h3>
+          <div class="msg">Professor Mário, tudo bem?
+
+[Nome] sugeriu que falássemos.
+
+Sou o Domingos da RASHMAT (rashmat.com). App onde coaches publicam programas com estrutura real — semanas, sessões, progresso — e recebem via Stripe.
+
+A tua forma de formar atletas encaixa. Queria mostrar 1 camp teu no Studio, sem complicar a Alliance.
+
+https://rashmat.com/studio — 20 min?</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Warm">
+      <p class="kicker">15 · Creator · P0 warm</p>
+      <h2>Academia / rede do mestre</h2>
+      <p class="lead">O close mais rápido. Não precisa de 100k followers.</p>
+      <div class="two">
+        <div class="card">
+          <h3>Quem + o que levar</h3>
+          <ul>
+            <li>1–2 pretas da tua academia / rede</li>
+            <li>Telemóvel com Studio logado + teu camp</li>
+            <li>Frase: “esta semana estás live”</li>
+            <li>Links: studio · get-app · @rashmatapp</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin:0 0 0.35rem;font-size:0.95rem">Mensagem (WhatsApp)</h3>
+          <div class="msg">Bro, estou a lançar a RASHMAT — app de programas de mat (vídeo + semanas + progresso).
+
+Quero que sejas dos primeiros creators em PT. Publicamos o teu camp juntos esta semana (eu faço o Studio contigo). Tu recebes via Stripe. Alunos descarregam em rashmat.com/get-app.
+
+Studio: https://rashmat.com/studio
+Site: https://rashmat.com
+
+Quando dá 30 min?</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IG -->
+    <section class="slide" data-title="Instagram">
+      <p class="kicker">16 · Instagram</p>
+      <h2>Sistema de conteúdo</h2>
+      <div class="grid">
+        <div class="card"><span class="pill">40%</span><h3>Product</h3><p>Screen record: Hub → Start → XP</p></div>
+        <div class="card"><span class="pill">40%</span><h3>Mat / proof</h3><p>Drill real + “Day X do camp”</p></div>
+        <div class="card"><span class="pill">20%</span><h3>Creator</h3><p>Face + nome + “treina o sistema do X”</p></div>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <h3>3 pins (estilo myBJJ, mensagem nossa)</h3>
+        <ol style="margin:0.5rem 0 0;padding-left:1.2rem;color:var(--muted);line-height:1.6">
+          <li><strong style="color:#fff">TRAIN WITH STRUCTURE</strong> — screenshot Hub</li>
+          <li><strong style="color:#fff">REAL PROGRESS</strong> — XP / % do camp</li>
+          <li><strong style="color:#fff">CREATORS PUBLISH</strong> — Studio / Follow</li>
+        </ol>
+      </div>
+      <p class="meta" style="margin-top:1rem">Cadência: 4–5 posts/semana · Stories quase diários · CTA: APP ou DM CREATOR</p>
+    </section>
+
+    <section class="slide" data-title="14 posts">
+      <p class="kicker">17 · Calendário 14 posts</p>
+      <h2>Próximas 2 semanas</h2>
+      <table>
+        <thead><tr><th>#</th><th>Tipo</th><th>Ideia</th><th>CTA</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Product</td><td>Hub Start Day 1</td><td>APP</td></tr>
+          <tr><td>2</td><td>Mat</td><td>1 drill + Day X</td><td>—</td></tr>
+          <tr><td>3</td><td>Pin</td><td>Carrossel Programas / Progresso / Creators</td><td>Studio</td></tr>
+          <tr><td>4</td><td>Product</td><td>Session complete + XP</td><td>—</td></tr>
+          <tr><td>5</td><td>Creator</td><td>Tu no Studio</td><td>Studio</td></tr>
+          <tr><td>6</td><td>Mat</td><td>Playlist vs Camp</td><td>—</td></tr>
+          <tr><td>7</td><td>Product</td><td>Program overview %</td><td>APP</td></tr>
+          <tr><td>8</td><td>Proof</td><td>Streak</td><td>—</td></tr>
+          <tr><td>9</td><td>Contrast</td><td>Journal vs Program (sem nomear rival)</td><td>—</td></tr>
+          <tr><td>10</td><td>Creator</td><td>Vagas para 5 coaches</td><td>DM CREATOR</td></tr>
+          <tr><td>11</td><td>Product</td><td>Creators tab</td><td>—</td></tr>
+          <tr><td>12</td><td>Mat</td><td>Rolling + overlay structured</td><td>—</td></tr>
+          <tr><td>13</td><td>Proof</td><td>Quote tester/mestre</td><td>APP</td></tr>
+          <tr><td>14</td><td>Offer</td><td>Athletes get-app · Coaches studio</td><td>Ambos</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- myBJJ -->
+    <section class="slide" data-title="myBJJ">
+      <p class="kicker">18 · Concorrente · learn</p>
+      <h2>myBJJ — o que aproveitar</h2>
+      <p class="lead">@mybjjapp · journal single-player · ~52k followers. Não copiar o produto — copiar a clareza.</p>
+      <div class="two">
+        <div class="card">
+          <span class="pill">Aproveitar já</span>
+          <ul>
+            <li>3 pins óbvios no perfil</li>
+            <li>Narrativa athlete-first enquanto há poucos creators</li>
+            <li>Prova de progresso (XP, %, streak) no IG</li>
+            <li><strong style="color:#fff">Tu = supply</strong> até haver 5 creators</li>
+          </ul>
+        </div>
+        <div class="card">
+          <span class="pill muted">Não agora</span>
+          <ul>
+            <li>Rebuild journal / pie charts</li>
+            <li>Competir em “notebook de técnicas”</li>
+            <li>Ficar só BJJ no branding (RASHMAT é mat mais largo)</li>
+          </ul>
+          <p style="margin-top:0.75rem"><strong style="color:#fff">Linha:</strong> myBJJ regista. RASHMAT corre o programa.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Metrics -->
+    <section class="slide" data-title="Métricas">
+      <p class="kicker">19 · Métricas</p>
+      <h2>Só estes números</h2>
+      <div class="grid">
+        <div class="card"><h3>Creators</h3><p>Contactados → Reply → Call → Programa live</p></div>
+        <div class="card"><h3>Testers</h3><p>iOS + Android quando os links saírem</p></div>
+        <div class="card"><h3>Retention proxy</h3><p>Sessions completadas / semana</p></div>
+        <div class="card"><h3>Money</h3><p>Unlocks / GMV (mesmo pequeno)</p></div>
+      </div>
+      <p class="lead" style="margin-top:1.25rem">Se reply rate cold DM &lt; 5% → muda o ângulo, não aumentes volume às cegas.</p>
+    </section>
+
+    <!-- Close -->
+    <section class="slide" data-title="Hoje">
+      <p class="kicker">20 · Começa hoje</p>
+      <h2>4 ações</h2>
+      <div class="grid">
+        <div class="card">
+          <span class="big-num">1</span>
+          <h3>5 DMs BR</h3>
+          <p><a href="https://www.instagram.com/gabrielrollo/" target="_blank" rel="noopener">Rollo</a> · <a href="https://www.instagram.com/wilgnersilva96/" target="_blank" rel="noopener">Wilgner</a> · <a href="https://www.instagram.com/leozadabjj/" target="_blank" rel="noopener">Leo Zada</a> · <a href="https://www.instagram.com/lipemachadojj/" target="_blank" rel="noopener">Lipe</a> · <a href="https://www.instagram.com/marcelogaldinoct/" target="_blank" rel="noopener">Galdino</a> — slides 07–11 + kit 06b.</p>
+        </div>
+        <div class="card">
+          <span class="big-num">2</span>
+          <h3>3 contactos PT</h3>
+          <p>Jitsu Foz / Pincel / Cobrinha ou Absoluto — scripts no slide 12. Preferir WhatsApp/café.</p>
+        </div>
+        <div class="card">
+          <span class="big-num">3</span>
+          <h3>1 intro prestige</h3>
+          <p>Mestre → Jura ou Mário. Sem intro, não envies cold aos 500k.</p>
+        </div>
+        <div class="card">
+          <span class="big-num">4</span>
+          <h3>Prova no ar</h3>
+          <p>Camp teu live no Studio · pins Structure/Progress/Creators · Reel Hub→XP · links rashmat.com no bio.</p>
+        </div>
+      </div>
+      <p class="footer-note">Ficheiro: <span class="brand">web/docs/gtm-soft-launch.html</span> · Abrir no Chrome · Setas para navegar</p>
+    </section>
+
+  </div>
+
+  <div class="bar">
+    <button type="button" id="prev">← Anterior</button>
+    <div class="progress" id="progress">1 / 1</div>
+    <button type="button" id="next">Seguinte →</button>
+  </div>
+
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const progress = document.getElementById("progress");
+    const navList = document.getElementById("navList");
+    const navToggle = document.getElementById("navToggle");
+    const navBackdrop = document.getElementById("navBackdrop");
+    let i = 0;
+
+    slides.forEach((s, idx) => {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.innerHTML =
+        `<span class="nav-list__num">${String(idx + 1).padStart(2, "0")}</span>` +
+        `<span>${s.dataset.title || "Slide " + (idx + 1)}</span>`;
+      btn.addEventListener("click", () => {
+        show(idx);
+        setNavOpen(false);
+      });
+      li.appendChild(btn);
+      navList.appendChild(li);
+    });
+
+    function setNavOpen(open) {
+      document.body.classList.toggle("nav-open", open);
+      navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      navBackdrop.hidden = !open;
+    }
+
+    function show(n) {
+      i = Math.max(0, Math.min(slides.length - 1, n));
+      slides.forEach((s, idx) => s.classList.toggle("is-on", idx === i));
+      [...navList.querySelectorAll("button")].forEach((b, idx) => {
+        b.classList.toggle("is-active", idx === i);
+      });
+      const title = slides[i].dataset.title || "";
+      progress.textContent = `${i + 1} / ${slides.length} · ${title}`;
+      slides[i].scrollTop = 0;
+    }
+
+    navToggle.addEventListener("click", () => {
+      setNavOpen(!document.body.classList.contains("nav-open"));
+    });
+    navBackdrop.addEventListener("click", () => setNavOpen(false));
+
+    document.getElementById("prev").onclick = () => show(i - 1);
+    document.getElementById("next").onclick = () => show(i + 1);
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setNavOpen(false);
+      if (document.body.classList.contains("nav-open")) return;
+      if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); show(i + 1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); show(i - 1); }
+    });
+    show(0);
+  </script>
+</body>
+</html>

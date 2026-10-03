@@ -48,7 +48,7 @@ export const creatorsImage = "/section-creators.jpg";
 export const mocksStage = "/mocks-stage.png";
 
 /** Individual app screenshots for device frames. Bump `v` when assets change. */
-const screenV = "20261003c";
+const screenV = "20261003d";
 export const appScreens = {
   welcomeHero: `/screens/welcome-hero.jpg?v=${screenV}`,
   signIn: `/screens/sign-in.png?v=${screenV}`,
@@ -64,6 +64,21 @@ export const appScreens = {
   complete: `/screens/complete.jpg?v=${screenV}`,
   studio: `/screens/studio.png?v=${screenV}`,
   library: `/screens/library.png?v=${screenV}`,
+} as const;
+
+/** Creator Studio (web CMS) desktop captures — browser frames on the landing. */
+const studioWebV = "20261003a";
+export const studioWebScreens = {
+  dashboard: `/screens/studio-web-dashboard.png?v=${studioWebV}`,
+  programs: `/screens/studio-web-programs.png?v=${studioWebV}`,
+  program: `/screens/studio-web-program.png?v=${studioWebV}`,
+  students: `/screens/studio-web-students.png?v=${studioWebV}`,
+  wizard: `/screens/studio-web-new.png?v=${studioWebV}`,
+  cms: `/screens/studio-web-cms.png?v=${studioWebV}`,
+  followers: `/screens/studio-web-followers.png?v=${studioWebV}`,
+  library: `/screens/studio-web-library.png?v=${studioWebV}`,
+  settings: `/screens/studio-web-settings.png?v=${studioWebV}`,
+  login: `/screens/studio-web-login.png?v=${studioWebV}`,
 } as const;
 
 export const igImage = "/ig-section.jpg";
