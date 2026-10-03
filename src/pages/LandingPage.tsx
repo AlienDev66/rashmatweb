@@ -35,41 +35,15 @@ type PhoneProps = {
   alt: string;
   label: string;
   className?: string;
-  welcome?: boolean;
-  welcomeCopy?: {
-    kicker: string;
-    kickerAccent: string;
-    titleOutline: string;
-    titleSolid: string;
-    sub: string;
-    cta: string;
-  };
 };
 
-function PhoneMock({ src, alt, label, className = "", welcome, welcomeCopy }: PhoneProps) {
+function PhoneMock({ src, alt, label, className = "" }: PhoneProps) {
   return (
     <figure className={`phone ${className}`}>
-      <div className="phone__device" aria-hidden={!welcome}>
+      <div className="phone__device" aria-hidden="true">
         <div className="phone__bezel">
           <span className="phone__island" />
-          {welcome && welcomeCopy ? (
-            <div className="phone__screen phone__screen--welcome">
-              <img src={src} alt="" className="phone__shot" />
-              <div className="phone__welcome">
-                <p className="phone__welcome-kicker">
-                  {welcomeCopy.kicker} <span>{welcomeCopy.kickerAccent}</span>
-                </p>
-                <p className="phone__welcome-title">
-                  <span className="phone__welcome-outline">{welcomeCopy.titleOutline}</span>
-                  <span className="phone__welcome-solid">{welcomeCopy.titleSolid}</span>
-                </p>
-                <p className="phone__welcome-sub">{welcomeCopy.sub}</p>
-                <span className="phone__welcome-cta">{welcomeCopy.cta}</span>
-              </div>
-            </div>
-          ) : (
-            <img src={src} alt={alt} className="phone__shot" loading="lazy" />
-          )}
+          <img src={src} alt={alt} className="phone__shot" loading="lazy" />
         </div>
       </div>
       <figcaption className="phone__cap">{label}</figcaption>
@@ -126,15 +100,6 @@ export function LandingPage() {
       document.documentElement.classList.remove("is-ready");
     };
   }, []);
-
-  const welcomeCopy = {
-    kicker: t("landing.kicker"),
-    kickerAccent: t("landing.kickerAccent"),
-    titleOutline: t("landing.titleOutline"),
-    titleSolid: t("landing.titleSolid"),
-    sub: t("landing.sub"),
-    cta: t("landing.athletesCta").replace(" →", "").toUpperCase(),
-  };
 
   return (
     <>
@@ -309,8 +274,6 @@ export function LandingPage() {
                 src={appScreens.welcomeHero}
                 alt={t("landing.mockWelcome")}
                 label={t("landing.mockWelcome")}
-                welcome
-                welcomeCopy={welcomeCopy}
               />
               <PhoneMock
                 className="phone--fan phone--f2 phone--featured"

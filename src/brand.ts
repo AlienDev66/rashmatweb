@@ -47,22 +47,23 @@ export const creatorsImage = "/section-creators.jpg";
 /** Atmosphere behind the CSS phone fan. */
 export const mocksStage = "/mocks-stage.png";
 
-/** Individual app screenshots for device frames. */
+/** Individual app screenshots for device frames. Bump `v` when assets change. */
+const screenV = "20261003c";
 export const appScreens = {
-  welcomeHero: "/screens/welcome-hero.jpg",
-  signIn: "/screens/sign-in.png",
-  hub: "/screens/hub.jpg",
-  recover: "/screens/recover.png",
-  programs: "/screens/programs.jpg",
-  profile: "/screens/profile.png",
-  creators: "/screens/creators.png",
-  creatorProfile: "/screens/creator-profile.jpg",
-  programOverview: "/screens/program-overview.jpg",
-  programDays: "/screens/program-days.jpg",
-  sessionPreview: "/screens/session-preview.jpg",
-  complete: "/screens/complete.jpg",
-  studio: "/screens/studio.png",
-  library: "/screens/library.png",
+  welcomeHero: `/screens/welcome-hero.jpg?v=${screenV}`,
+  signIn: `/screens/sign-in.png?v=${screenV}`,
+  hub: `/screens/hub.jpg?v=${screenV}`,
+  recover: `/screens/recover.png?v=${screenV}`,
+  programs: `/screens/programs.jpg?v=${screenV}`,
+  profile: `/screens/profile.png?v=${screenV}`,
+  creators: `/screens/creators.png?v=${screenV}`,
+  creatorProfile: `/screens/creator-profile.jpg?v=${screenV}`,
+  programOverview: `/screens/program-overview.jpg?v=${screenV}`,
+  programDays: `/screens/program-days.jpg?v=${screenV}`,
+  sessionPreview: `/screens/session-preview.jpg?v=${screenV}`,
+  complete: `/screens/complete.jpg?v=${screenV}`,
+  studio: `/screens/studio.png?v=${screenV}`,
+  library: `/screens/library.png?v=${screenV}`,
 } as const;
 
 export const igImage = "/ig-section.jpg";
